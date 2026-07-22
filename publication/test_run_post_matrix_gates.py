@@ -14,6 +14,7 @@ if str(PUBLICATION_ROOT) not in sys.path:
 from aggregate_verification import REQUIRED_GATE_IDS  # noqa: E402
 from run_post_matrix_gates import (  # noqa: E402
     REQUIRED_GATES,
+    REQUIRED_PYTEST_FRAGMENTS,
     copy_tree_new_or_identical,
     reject_tree_symlinks,
     reject_symlink_components,
@@ -36,6 +37,21 @@ def artifact_record(path: Path) -> dict[str, object]:
 
 
 class PostMatrixCoordinatorTests(unittest.TestCase):
+    def test_release_unit_gate_requires_nonoptional_publication_modules(self) -> None:
+        required = set(REQUIRED_PYTEST_FRAGMENTS)
+        self.assertIn(
+            "test_build_stage_authors_projection_sorting_and_fractional_opacity",
+            required,
+        )
+        self.assertIn(
+            "test_redacts_paths_and_rebinds_transitive_hashes",
+            required,
+        )
+        self.assertIn(
+            "test_content_addressed_manifest_matches_canonical_bytes",
+            required,
+        )
+
     def test_gate_contract_exactly_matches_aggregate(self) -> None:
         self.assertEqual(REQUIRED_GATES, REQUIRED_GATE_IDS)
         self.assertEqual(len(REQUIRED_GATES), len(set(REQUIRED_GATES)))

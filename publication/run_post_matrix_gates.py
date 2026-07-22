@@ -41,6 +41,25 @@ REQUIRED_GATES = (
     "bounded-stability-soak",
 )
 FLASHGS_GATES = {"flashgs-b64-repair", "repair-compute-sanitizer"}
+REQUIRED_PYTEST_FRAGMENTS = (
+    "test_bundle_is_relocatable_and_archive_is_deterministic",
+    "test_primary_physical_schedule_is_exact",
+    "test_verify_existing_cli_does_not_rewrite_summary",
+    "test_node_occupancy_evidence_fails_closed",
+    "test_repaired_compositor_schedule_preserves_feature_sources",
+    "test_publication_code_freeze_rejects_load_bearing_changes",
+    "test_two_fresh_equal_processes_are_content_addressed",
+    "test_replay_inert_bound_runner_token_fails_with_refreshed_command",
+    "test_b64_missing_transitive_evidence_key_fails_with_refreshed_graph",
+    "test_b64_privacy_redacted_artifact_tamper_fails",
+    "test_b64_redaction_inventory_binds_every_public_file",
+    "test_redacts_paths_and_rebinds_transitive_hashes",
+    "test_content_addressed_manifest_matches_canonical_bytes",
+    "test_build_stage_authors_projection_sorting_and_fractional_opacity",
+    "test_s3_put_is_signed_and_conditionally_create_only",
+    "test_rejects_non_public_repository_before_network_record",
+    "test_inconsistent_primary_run_environment_fails",
+)
 
 
 def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
@@ -722,24 +741,7 @@ def main(arguments: Iterable[str] | None = None) -> None:
         "--scene-sha256",
         SCENE_SHA256,
     ]
-    for fragment in (
-        "test_bundle_is_relocatable_and_archive_is_deterministic",
-        "test_primary_physical_schedule_is_exact",
-        "test_verify_existing_cli_does_not_rewrite_summary",
-        "test_node_occupancy_evidence_fails_closed",
-        "test_repaired_compositor_schedule_preserves_feature_sources",
-        "test_publication_code_freeze_rejects_load_bearing_changes",
-        "test_two_fresh_equal_processes_are_content_addressed",
-        "test_replay_inert_bound_runner_token_fails_with_refreshed_command",
-        "test_b64_missing_transitive_evidence_key_fails_with_refreshed_graph",
-        "test_b64_privacy_redacted_artifact_tamper_fails",
-        "test_b64_redaction_inventory_binds_every_public_file",
-        "test_redacts_paths_and_rebinds_transitive_hashes",
-        "test_content_addressed_manifest_matches_canonical_bytes",
-        "test_s3_put_is_signed_and_conditionally_create_only",
-        "test_rejects_non_public_repository_before_network_record",
-        "test_inconsistent_primary_run_environment_fails",
-    ):
+    for fragment in REQUIRED_PYTEST_FRAGMENTS:
         unit_command.extend(["--required-test-fragment", fragment])
     unit_command.extend(
         [
