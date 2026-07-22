@@ -29,7 +29,7 @@ python3 publication/redact_b64_diagnosis.py \
   --output-manifest /staging/public-b64/evidence/diagnostics/privacy-redaction-manifest.json
 ```
 
-Pass those three public derivative paths to `run_post_matrix_gates.py` through
+Pass those four public derivative paths to `run_post_matrix_gates.py` through
 `--historical-b64-root`, `--diagnosis-index`, `--diagnosis-lock`, and
 `--diagnosis-redaction-manifest`. Pass the clean public FlashGS checkout at
 commit `cdfc4e4002318423eda356eed02df8e01fa32cb6` through
