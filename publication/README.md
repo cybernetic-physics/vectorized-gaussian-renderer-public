@@ -59,6 +59,11 @@ archive again from a relocated directory before upload. The canonical
 object, treating binary Nsight/SQLite string tables as potential captured
 environment data and rejecting secret assignments or host-user paths.
 
+Pass the immutable Home Scan retrieval manifest URL
+`https://raw.githubusercontent.com/cybernetic-physics/vectorized-gaussian-renderer-public/b4a4fd0ec6962d905e9bc33672607e5161d6ee05/publication/manifests/b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json` to `write_bundle_inputs.py`. The URL is pinned to the commit that
+introduced the content-addressed file, and anonymous retrieval must reproduce
+SHA-256 `b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9`.
+
 After R2 upload and anonymous verification, merge the publication PR with a
 merge commit, create the release tag and GitHub release, verify anonymous raw
 article/README and tag URLs, and build the separate external envelope with

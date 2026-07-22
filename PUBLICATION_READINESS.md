@@ -112,9 +112,13 @@ submission schedule at B128; it does not isolate a kernel mechanism, explain
 the cross-renderer result, or establish a batch-scaling law. Report all trials
 whether they favor P1, favor P128, or disagree.
 
-Current gate: the corrected-support run was stopped after sparse edge-tile
-omissions in our pre-repair FlashGS-derived matched-contract port. Frozen
-pre-repair traces now establish their exact cause:
+Current execution: the corrected matrix is running from the frozen
+`benchmark-gcp-l4-matched-v8` source on one identified L4. An earlier launch
+completed capacity calibration but was rejected before any timed row because
+its postflight occupancy check observed an overlapping verification shell from
+the same investigation. That failed root remains diagnostic only; the clean
+replacement uses a fresh output root and automatic shutdown. Frozen pre-repair
+traces establish the original sparse edge-tile omission's exact cause:
 the final cooperative load in short tile tails used an unassigned feature
 offset and therefore read the first Gaussian's features. An older complete
 Freiza run is also invalid because its candidates used 3.0-sigma support while
@@ -224,9 +228,9 @@ Every production render must verify CUDA residency, finite RGB/alpha, finite
 foreground depth, alpha range, foreground coverage, valid semantic IDs, and
 zero capacity overflow. Always close `SimulationApp` in `finally`.
 
-Current blocker: existing L4 tests prove an earlier source revision. The two
-matched-benchmark hardening commits and release corrections need an exact-current
-test record.
+Current blocker: the clean matrix and the exact-current CUDA, Isaac/Fabric,
+sanitizer, profiler, and stability records have not completed. Local
+publication-tool tests do not substitute for those L4 gates.
 
 Before every unprofiled matrix row, preserve a fail-closed occupancy record:
 `nvidia-smi`, active CUDA compute processes, relevant Python/Isaac/profiler
@@ -285,9 +289,10 @@ an identical existing object, and fail rather than overwrite an unequal object.
 Prefer a custom R2 domain; otherwise explicitly accept and document the
 `r2.dev` URL as the publication endpoint.
 
-Current blocker: the frozen diagnosis is historical, while the repaired gate
-and final evidence root must be regenerated on the identified L4 before any
-new performance result is publishable.
+Current blocker: the privacy-safe derivative tooling is ready, but the
+derivative, repaired gate, and final evidence root must be regenerated and
+verified with the exact committed publication tool on the identified L4 before
+any new performance result is publishable.
 
 ### 6. Package media rather than linking loose files
 
@@ -362,4 +367,6 @@ retained conclusion.
 - The article separates production raster, experimental OptiX, Warp hybrid, and
   OVRTX claims and removes broken media links and mixed-contract tables.
 
-These fixes are not complete until their branch is tested, reviewed, and merged.
+These fixes do not become release evidence until the GPU gates pass, the final
+bundle is anonymously verified, and the publication branch is reviewed and
+merged.

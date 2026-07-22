@@ -232,7 +232,7 @@ the scene in two resident ParticleField prims containing 16,777,215 and
 | Custom EWA video | [MP4](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/custom.mp4) |
 | OVRTX perspective video | [MP4](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/ovrtx-perspective.mp4) |
 | Poster and 12-frame visual audit | [poster](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/poster.png), [storyboard](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/storyboard.png) |
-| Canonical Home Scan LOD0 | [1.20 GB PLY](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply), [dataset manifest](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/manifests/b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json) |
+| Canonical Home Scan LOD0 | [1.20 GB PLY](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply), [dataset manifest](https://raw.githubusercontent.com/cybernetic-physics/vectorized-gaussian-renderer-public/b4a4fd0ec6962d905e9bc33672607e5161d6ee05/publication/manifests/b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json) |
 
 The packaged video was decoded again after H.264 encoding and visually checked
 at the beginning, midpoint, end, and twelve evenly spaced frames. The path is
@@ -245,9 +245,10 @@ Home Scan is by
 under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The canonical
 PLY SHA-256 is
 `29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267`.
-The release dependency manifest is published create-only with
-`publication/publish_immutable_r2.py`; its full-hash key and anonymous
-verification receipt are part of the release evidence. The older
+The release dependency manifest is stored at a content-addressed path in the
+immutable public commit linked above. The numerical evidence archive is
+published create-only with `publication/publish_immutable_r2.py`; its full-hash
+key and anonymous verification receipt are part of the release evidence. The older
 `cloudflare/r2-assets.json` remains the historical flyby-upload inventory and
 is not the dependency manifest for this benchmark release.
 
