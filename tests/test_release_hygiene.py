@@ -16,7 +16,7 @@ def test_distribution_metadata_and_license_payload_are_explicit() -> None:
     assert metadata["authors"] == [{"name": "Cybernetic Physics"}]
     assert metadata["readme"]["file"] == "README.md"
     assert metadata["urls"]["Repository"] == (
-        "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
+        "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public"
     )
 
     required_license_files = {

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -71,6 +72,21 @@ from isaacsim_gaussian_renderer.flashgs_native_loader import (  # noqa: E402
 )
 
 
+_SENSITIVE_ENV_NAME_RE = re.compile(
+    r"(?i)(?:^|_)(?:api_key|access_key(?:_id)?|auth(?:orization)?|"
+    r"credentials?|password|passwd|private_key|secret(?:_access_key|_key)?|"
+    r"token)(?:_|$)"
+)
+_HOST_USER_PATH_RE = re.compile(
+    r"(?<![A-Za-z0-9])(?:"
+    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+/|"
+    r"/(?:Users|home)/[^/\s:]+/|"
+    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s:]+[\\/]"
+    r")"
+)
+RUNTIME_PREFLIGHT_SCHEMA = "flashgs-publication-runtime-preflight-v1"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scene-path", type=Path, required=True)
@@ -123,6 +139,46 @@ def publication_child_environment(
     environment["PROJECT_ROOT"] = str(PROJECT_ROOT)
     environment["VGR_PROJECT_ROOT"] = str(PROJECT_ROOT)
     return environment
+
+
+def require_publication_safe_environment(environment: dict[str, str]) -> None:
+    """Reject credentials and host-user paths before any child or profiler."""
+
+    unsafe_names = sorted(
+        name
+        for name, value in environment.items()
+        if value and _SENSITIVE_ENV_NAME_RE.search(name)
+    )
+    if unsafe_names:
+        raise ValueError(
+            "Publication environment contains credential-shaped variables: "
+            + ", ".join(unsafe_names)
+        )
+    unsafe_paths = sorted(
+        name
+        for name, value in environment.items()
+        if isinstance(value, str) and _HOST_USER_PATH_RE.search(value)
+    )
+    if unsafe_paths:
+        raise ValueError(
+            "Publication environment contains host-user paths in: "
+            + ", ".join(unsafe_paths)
+        )
+
+
+def require_publication_safe_paths(paths: dict[str, str | Path]) -> None:
+    """Reject nonportable launch paths before writing matrix provenance."""
+
+    unsafe = sorted(
+        label
+        for label, value in paths.items()
+        if _HOST_USER_PATH_RE.search(os.fspath(value))
+    )
+    if unsafe:
+        raise ValueError(
+            "Publication launch paths contain host-user identities in: "
+            + ", ".join(unsafe)
+        )
 
 
 def capacity_calibration_schedule(
@@ -281,6 +337,69 @@ def runtime_identity(
     ).strip()
     payload["gpu_uuid"] = gpu_uuid
     return payload
+
+
+def require_runtime_preflight_identity(
+    preflight: dict[str, Any],
+    *,
+    expected_gpu_uuid: str,
+    expected_source_identity: dict[str, Any],
+    source_manifest: Path,
+) -> None:
+    """Validate the fail-fast CUDA/LPIPS runtime proof for this checkout."""
+
+    operations = preflight.get("operations") or {}
+    if (
+        preflight.get("schema_version") != RUNTIME_PREFLIGHT_SCHEMA
+        or preflight.get("pass") is not True
+        or preflight.get("gpu_uuid") != expected_gpu_uuid
+        or preflight.get("source_identity") != expected_source_identity
+        or not same_artifact(
+            preflight.get("source_manifest"),
+            artifact_record(source_manifest),
+        )
+        or operations
+        != {
+            "cuda_convolution_finite": True,
+            "cuda_matmul_finite": True,
+            "lpips_backend": "lpips-alex",
+            "lpips_finite": True,
+        }
+    ):
+        raise RuntimeError("Publication runtime preflight identity differs.")
+    modules = preflight.get("modules") or {}
+    if set(modules) != {"lpips", "torch", "torchvision"}:
+        raise RuntimeError("Publication runtime module origins are incomplete.")
+    for name, record in modules.items():
+        origin = Path(str((record or {}).get("origin", "")))
+        if (
+            (record or {}).get("name") != name
+            or not origin.is_file()
+            or _HOST_USER_PATH_RE.search(str(origin))
+        ):
+            raise RuntimeError(f"Publication runtime module {name} is invalid.")
+    weights = preflight.get("lpips_weights") or {}
+    if set(weights) != {"alexnet_imagenet", "lpips_alex_v0_1"}:
+        raise RuntimeError("Publication runtime LPIPS weights are incomplete.")
+    for label, record in weights.items():
+        path = Path(str((record or {}).get("path", "")))
+        if (
+            not path.is_file()
+            or _HOST_USER_PATH_RE.search(str(path))
+            or not same_artifact(record, artifact_record(path))
+        ):
+            raise RuntimeError(f"Publication runtime weight {label} is invalid.")
+    libraries = preflight.get("loaded_cuda_libraries")
+    if (
+        not isinstance(libraries, list)
+        or not libraries
+        or any(
+            not isinstance(path, str) or _HOST_USER_PATH_RE.search(path)
+            for path in libraries
+        )
+        or not any("libcublas" in Path(path).name.lower() for path in libraries)
+    ):
+        raise RuntimeError("Publication runtime did not prove a portable cuBLAS load.")
 
 
 def require_pass(path: Path, schema: str) -> dict[str, Any]:
@@ -1258,6 +1377,19 @@ def main() -> None:
         raise ValueError(f"Batches must be a subset of {PRIMARY_BATCHES}.")
     if len(set(batches)) != len(batches):
         raise ValueError("Batches may not contain duplicates.")
+    require_publication_safe_paths(
+        {
+            "cwd": Path.cwd().absolute(),
+            "flashgs_source": args.flashgs_source.absolute(),
+            "gsplat_source": args.gsplat_source.absolute(),
+            "matrix_python": Path(args.python).absolute(),
+            "output_root": args.output_root.absolute(),
+            "project_root": PROJECT_ROOT.absolute(),
+            "scene_path": args.scene_path.absolute(),
+            "source_manifest": args.source_manifest.absolute(),
+            "sys_executable": Path(sys.executable).absolute(),
+        }
+    )
     require_publication_source_manifest_location(args.output_root, args.source_manifest)
     calibration_schedule = capacity_calibration_schedule(batches)
     resume = result_root_has_compatible_invocation_or_is_pristine(
@@ -1267,6 +1399,7 @@ def main() -> None:
     executor_lock = ensure_cooperative_executor_lock()
     args.output_root.mkdir(parents=True, exist_ok=True)
     environment = publication_child_environment()
+    require_publication_safe_environment(environment)
     matrix_invocation_path = args.output_root / "provenance/matrix-invocation.json"
     write_or_validate_matrix_invocation(
         matrix_invocation_path,
@@ -1363,6 +1496,37 @@ def main() -> None:
             f"TORCH_CUDA_ARCH_LIST conflicts with the contracted GPU: {configured_arch!r} != {expected_arch!r}."
         )
     environment["TORCH_CUDA_ARCH_LIST"] = expected_arch
+    runtime_preflight_path = (
+        args.output_root / "provenance/publication-runtime-preflight.json"
+    )
+    if not runtime_preflight_path.is_file():
+        run_logged(
+            [
+                args.python,
+                str(
+                    PROJECT_ROOT
+                    / "benchmarks/verify_flashgs_publication_runtime.py"
+                ),
+                "--expected-gpu-uuid",
+                args.expected_gpu_uuid,
+                "--source-manifest",
+                str(args.source_manifest),
+                "--output",
+                str(runtime_preflight_path),
+            ],
+            log_path=args.output_root / "logs/publication-runtime-preflight.log",
+            environment=environment,
+        )
+    runtime_preflight = require_pass(
+        runtime_preflight_path,
+        RUNTIME_PREFLIGHT_SCHEMA,
+    )
+    require_runtime_preflight_identity(
+        runtime_preflight,
+        expected_gpu_uuid=args.expected_gpu_uuid,
+        expected_source_identity=expected_source_identity,
+        source_manifest=args.source_manifest,
+    )
     adapter_attestation_path = args.output_root / "provenance/flashgs-adapter-attestation.json"
     if not adapter_attestation_path.is_file():
         run_logged(
@@ -1449,7 +1613,9 @@ def main() -> None:
     # Finish every capacity-only process before launching a timed process. The
     # largest Custom rows go first so a memory-infeasible matrix fails early,
     # before spending hours on publishable-looking partial timing results.
-    run_records: dict[str, Any] = {}
+    run_records: dict[str, Any] = {
+        "publication-runtime-preflight": str(runtime_preflight_path)
+    }
     calibration_artifacts_by_pair: dict[tuple[int, str], dict[str, Any]] = {}
     for batch, renderer in calibration_schedule:
         contract = batch_contracts[batch]

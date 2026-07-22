@@ -72,10 +72,10 @@ SHA-256, for example:
 python3 publication/publish_immutable_r2.py \
   --bucket vectorized-gaussian-renderer-assets \
   --public-base-url https://pub-243008be935848b6accaf262f04a7b82.r2.dev \
-  --file /path/to/gcp-l4-matched-v1.tar \
-  --key evidence/gcp-l4-matched-v1/<full-archive-sha256>.tar \
-  --download-name gcp-l4-matched-v1.tar \
-  --receipt /path/to/gcp-l4-matched-v1.r2-receipt.json
+  --file /path/to/gcp-l4-matched-v2.tar \
+  --key evidence/gcp-l4-matched-v2/<full-archive-sha256>.tar \
+  --download-name gcp-l4-matched-v2.tar \
+  --receipt /path/to/gcp-l4-matched-v2.r2-receipt.json
 ```
 
 Before the first upload, the helper snapshots the local bytes and downloads
@@ -127,9 +127,9 @@ archive after the publisher succeeds:
 
 ```bash
 python3 publication/verify_public_release.py r2 \
-  --receipt /path/to/gcp-l4-matched-v1.r2-receipt.json \
-  --archive /path/to/gcp-l4-matched-v1.tar \
-  --output /path/to/gcp-l4-matched-v1.r2-public.json
+  --receipt /path/to/gcp-l4-matched-v2.r2-receipt.json \
+  --archive /path/to/gcp-l4-matched-v2.tar \
+  --output /path/to/gcp-l4-matched-v2.r2-public.json
 ```
 
 This second pass uses no R2 credential. It re-downloads every public object,
@@ -143,14 +143,14 @@ visibility exist, generate the GitHub record:
 
 ```bash
 python3 publication/verify_public_release.py github \
-  --repository-url https://github.com/cybernetic-physics/vectorized-gaussian-renderer \
-  --benchmark-tag benchmark-gcp-l4-matched-v1 \
-  --benchmark-commit 7fb29813a52ee652a09f76803cbdf126957443cf \
-  --release-tag vgr-gcp-l4-matched-v1 \
+  --repository-url https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public \
+  --benchmark-tag benchmark-gcp-l4-matched-v2 \
+  --benchmark-commit <benchmark-commit> \
+  --release-tag vgr-gcp-l4-matched-v2 \
   --final-merge-commit <full-merge-commit> \
   --article post.md \
   --readme README.md \
-  --output /path/to/gcp-l4-matched-v1.github-public.json
+  --output /path/to/gcp-l4-matched-v2.github-public.json
 ```
 
 The GitHub pass also uses no credential or `gh` session. It verifies the

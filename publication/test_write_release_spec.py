@@ -30,12 +30,12 @@ class WriteReleaseSpecTests(unittest.TestCase):
         self.arguments = {
             "artifact_paths": self.artifacts,
             "owner": "cybernetic-physics",
-            "name": "vectorized-gaussian-renderer",
+            "name": "vectorized-gaussian-renderer-public",
             "benchmark_commit": "1" * 40,
-            "benchmark_tag": "benchmark-gcp-l4-matched-v1",
+            "benchmark_tag": "benchmark-gcp-l4-matched-v2",
             "publication_content_commit": "2" * 40,
             "final_merge_commit": "3" * 40,
-            "release_tag": "vgr-gcp-l4-matched-v1",
+            "release_tag": "vgr-gcp-l4-matched-v2",
         }
 
     def tearDown(self) -> None:
@@ -56,12 +56,12 @@ class WriteReleaseSpecTests(unittest.TestCase):
         self.assertEqual(_validate_repository_spec(spec["repository"]), spec["repository"])
         self.assertEqual(
             spec["repository"]["url"],
-            "https://github.com/cybernetic-physics/vectorized-gaussian-renderer",
+            "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public",
         )
         self.assertEqual(
             spec["repository"]["release_url"],
-            "https://github.com/cybernetic-physics/vectorized-gaussian-renderer/"
-            "releases/tag/vgr-gcp-l4-matched-v1",
+            "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public/"
+            "releases/tag/vgr-gcp-l4-matched-v2",
         )
         self.assertEqual(spec["repository"]["visibility"], "public")
         for role, path in self.artifacts.items():
@@ -222,17 +222,17 @@ class WriteReleaseSpecTests(unittest.TestCase):
                 "--owner",
                 "cybernetic-physics",
                 "--name",
-                "vectorized-gaussian-renderer",
+                "vectorized-gaussian-renderer-public",
                 "--benchmark-commit",
                 "1" * 40,
                 "--benchmark-tag",
-                "benchmark-gcp-l4-matched-v1",
+                "benchmark-gcp-l4-matched-v2",
                 "--publication-content-commit",
                 "2" * 40,
                 "--final-merge-commit",
                 "3" * 40,
                 "--release-tag",
-                "vgr-gcp-l4-matched-v1",
+                "vgr-gcp-l4-matched-v2",
                 "--output",
                 str(self.output),
             )

@@ -4,7 +4,7 @@ category = "Simulation"
 title = "Isaac Sim Gaussian Renderer"
 description = "Lifecycle extension for the Isaac Sim-native Gaussian renderer service."
 authors = ["Cybernetic Physics"]
-repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
+repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public"
 keywords = ["isaacsim", "gaussian", "renderer"]
 
 [dependencies]

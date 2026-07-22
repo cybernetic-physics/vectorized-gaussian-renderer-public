@@ -29,10 +29,14 @@ from benchmarks.run_flashgs_matched import (
 from benchmarks.run_flashgs_matched_matrix import (
     FLASHGS_UPSTREAM_COMMIT,
     PROJECT_ROOT as MATRIX_PROJECT_ROOT,
+    RUNTIME_PREFLIGHT_SCHEMA,
     SRC_ROOT as MATRIX_SRC_ROOT,
     capacity_calibration_schedule,
     custom_physical_view_args,
     publication_child_environment,
+    require_publication_safe_environment,
+    require_publication_safe_paths,
+    require_runtime_preflight_identity,
     require_adapter_attestation_identity,
     require_b128_repeat_identity,
     require_capacity_calibration_identity,
@@ -447,6 +451,86 @@ def test_matrix_child_environment_force_prefixes_current_checkout() -> None:
     assert environment["VGR_PROJECT_ROOT"] == str(MATRIX_PROJECT_ROOT)
 
 
+def test_publication_environment_rejects_secrets_and_host_user_paths() -> None:
+    require_publication_safe_environment(
+        {
+            "PATH": "/usr/local/cuda/bin:/usr/bin:/bin",
+            "HOME": "/workspace/publication-home",
+        }
+    )
+    with pytest.raises(ValueError, match="credential-shaped.*JUPYTER_TOKEN"):
+        require_publication_safe_environment(
+            {"JUPYTER_TOKEN": "A" * 64, "PATH": "/usr/bin"}
+        )
+    with pytest.raises(ValueError, match="host-user paths.*PATH"):
+        require_publication_safe_environment(
+            {"PATH": "/home/alice/private/bin:/usr/bin"}
+        )
+
+
+def test_publication_launch_paths_reject_host_user_identity() -> None:
+    require_publication_safe_paths(
+        {"source": "/workspace/source", "output": "/workspace/output"}
+    )
+    with pytest.raises(ValueError, match="host-user identities.*python"):
+        require_publication_safe_paths(
+            {"python": "/Users/alice/private/venv/bin/python"}
+        )
+
+
+def test_publication_runtime_preflight_is_content_bound(tmp_path: Path) -> None:
+    source_manifest = tmp_path / "source-manifest.json"
+    source_manifest.write_text("{}\n", encoding="utf-8")
+    source = {
+        "manifest_sha256": "a" * 64,
+        "source_tree_sha256": "b" * 64,
+        "head": "c" * 40,
+        "dirty": False,
+        "diff_sha256": None,
+    }
+    modules = {}
+    for name in ("torch", "torchvision", "lpips"):
+        path = tmp_path / f"{name}.py"
+        path.write_text(f"# {name}\n", encoding="utf-8")
+        modules[name] = {"name": name, "origin": str(path), "version": "1"}
+    weights = {}
+    for name in ("alexnet_imagenet", "lpips_alex_v0_1"):
+        path = tmp_path / f"{name}.pth"
+        path.write_bytes(name.encode("ascii"))
+        weights[name] = artifact_record(path)
+    preflight = {
+        "schema_version": RUNTIME_PREFLIGHT_SCHEMA,
+        "pass": True,
+        "gpu_uuid": "GPU-test",
+        "source_identity": source,
+        "source_manifest": artifact_record(source_manifest),
+        "modules": modules,
+        "operations": {
+            "cuda_convolution_finite": True,
+            "cuda_matmul_finite": True,
+            "lpips_backend": "lpips-alex",
+            "lpips_finite": True,
+        },
+        "lpips_weights": weights,
+        "loaded_cuda_libraries": ["/usr/lib/libcublas.so.12"],
+    }
+
+    require_runtime_preflight_identity(
+        preflight,
+        expected_gpu_uuid="GPU-test",
+        expected_source_identity=source,
+        source_manifest=source_manifest,
+    )
+    Path(weights["lpips_alex_v0_1"]["path"]).write_bytes(b"changed")
+    with pytest.raises(RuntimeError, match="weight lpips_alex_v0_1"):
+        require_runtime_preflight_identity(
+            preflight,
+            expected_gpu_uuid="GPU-test",
+            expected_source_identity=source,
+            source_manifest=source_manifest,
+        )
+
+
 def test_profile_wrapper_rebinds_project_root_before_remote_environment() -> None:
     script = Path(__file__).resolve().parents[1] / ("scripts/profile_flashgs_matched_nsys.sh")
     text = script.read_text(encoding="utf-8")
@@ -462,6 +546,26 @@ def test_profile_wrapper_rebinds_project_root_before_remote_environment() -> Non
     assert 'runner_args+=(--flashgs-demand-survey "$capacity_artifact")' in text
     assert 'runner_args+=(--capacity-calibration "$capacity_artifact")' in text
     assert "flashgs-matched-flashgs-demand-survey-v1" in text
+    assert "PUBLICATION_PROFILE_ENVIRONMENT_SAFE" in text
+    assert 'if [[ "${MATCHED_PUBLICATION_RUNTIME:-0}" == "1" ]]' in text
+
+
+def test_publication_launcher_uses_empty_explicit_environment() -> None:
+    script = Path(__file__).resolve().parents[1] / (
+        "scripts/launch_flashgs_publication_matrix.sh"
+    )
+    text = script.read_text(encoding="utf-8")
+    assert 'exec env -i "${safe_environment[@]}"' in text
+    assert '"HOME=$safe_home"' in text
+    assert '"USER=vgr-publication"' in text
+    assert '"PYTHONNOUSERSITE=1"' in text
+    assert '"TMPDIR=$safe_tmp"' in text
+    assert '"XDG_RUNTIME_DIR=$safe_xdg"' in text
+    assert '"MATCHED_PUBLICATION_RUNTIME=1"' in text
+    assert 'safe_pythonpath="$PROJECT_ROOT/src:$gsplat_source"' in text
+    assert "ISAACSIM_ML_PREBUNDLE" not in text
+    assert "OVRTX_ROOT" not in text
+    assert "PUBLICATION_MATRIX_ENVIRONMENT_SAFE" in text
 
 
 def test_primary_fidelity_selection_covers_steps_and_chunk_boundaries() -> None:

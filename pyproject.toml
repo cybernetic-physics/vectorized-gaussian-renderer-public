@@ -40,9 +40,9 @@ dependencies = [
 compare-fidelity = "isaacsim_gaussian_renderer.fidelity.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
-Repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
-Issues = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer/issues"
+Homepage = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public"
+Repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public"
+Issues = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

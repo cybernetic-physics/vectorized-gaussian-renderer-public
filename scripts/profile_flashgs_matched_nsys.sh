@@ -4,13 +4,44 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PROJECT_ROOT
 export VGR_PROJECT_ROOT="$PROJECT_ROOT"
-matched_cuda_home="${MATCHED_CUDA_HOME:-}"
-source "$(dirname "$0")/remote_env.sh"
-if [[ -n "$matched_cuda_home" ]]; then
+matched_cuda_home="${MATCHED_CUDA_HOME:-${CUDA_HOME:-}}"
+if [[ "${MATCHED_PUBLICATION_RUNTIME:-0}" == "1" ]]; then
+  if [[ -z "$matched_cuda_home" || -z "${MATCHED_BENCHMARK_PYTHON:-}" ]]; then
+    echo "Publication profiling requires MATCHED_CUDA_HOME and MATCHED_BENCHMARK_PYTHON." >&2
+    exit 2
+  fi
   export CUDA_HOME="$matched_cuda_home"
+else
+  source "$(dirname "$0")/remote_env.sh"
+  if [[ -n "$matched_cuda_home" ]]; then
+    export CUDA_HOME="$matched_cuda_home"
+  fi
 fi
 
-benchmark_python="${MATCHED_BENCHMARK_PYTHON:-$ISAACSIM_PATH/python.sh}"
+# Nsight reports retain printable target-process environment strings. Reject
+# credentials and user-specific home paths before a capture can be created.
+while IFS= read -r -d '' environment_entry; do
+  environment_name="${environment_entry%%=*}"
+  environment_value="${environment_entry#*=}"
+  environment_name_upper="${environment_name^^}"
+  case "_${environment_name_upper}_" in
+    *_API_KEY_*|*_ACCESS_KEY_*|*_AUTH_*|*_AUTHORIZATION_*|*_CREDENTIAL_*|*_CREDENTIALS_*|*_PASSWORD_*|*_PASSWD_*|*_PRIVATE_KEY_*|*_SECRET_*|*_TOKEN_*)
+      if [[ -n "$environment_value" ]]; then
+        echo "Credential-shaped environment variable is forbidden during publication profiling: $environment_name" >&2
+        exit 2
+      fi
+      ;;
+  esac
+  case "$environment_value" in
+    *"/Users/"*|*"/home/"*)
+      echo "Host-user path is forbidden during publication profiling: $environment_name" >&2
+      exit 2
+      ;;
+  esac
+done < <(env -0)
+echo "PUBLICATION_PROFILE_ENVIRONMENT_SAFE"
+
+benchmark_python="${MATCHED_BENCHMARK_PYTHON:-${ISAACSIM_PATH:?ISAACSIM_PATH is required}/python.sh}"
 allow_nonheadline_gpu="${MATCHED_ALLOW_NONHEADLINE_GPU:-0}"
 nsys_importer="${MATCHED_NSYS_IMPORTER:-}"
 renderer="${1:?renderer must be custom or flashgs}"
