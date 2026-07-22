@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,6 +9,18 @@ from publication.write_bundle_inputs import build_roles, validate_manifest_url
 
 
 class BundleInputTests(unittest.TestCase):
+    def test_content_addressed_manifest_matches_canonical_bytes(self) -> None:
+        publication_root = Path(__file__).resolve().parent
+        canonical = publication_root / "home-scan-lod0-public-manifest.json"
+        addressed = (
+            publication_root
+            / "manifests"
+            / "b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json"
+        )
+        payload = canonical.read_bytes()
+        self.assertEqual(addressed.read_bytes(), payload)
+        self.assertEqual(hashlib.sha256(payload).hexdigest(), addressed.stem)
+
     def test_roles_are_exact_and_extras_are_supporting(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

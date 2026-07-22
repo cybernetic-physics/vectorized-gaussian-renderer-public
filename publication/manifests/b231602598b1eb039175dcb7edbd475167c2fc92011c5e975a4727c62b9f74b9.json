@@ -1,0 +1,30 @@
+{
+  "artifact": {
+    "bytes": 1203883212,
+    "format": "binary_little_endian PLY",
+    "record_count": 21497908,
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "spherical_harmonic_bands": 0,
+    "url": "https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply"
+  },
+  "benchmark_use": {
+    "semantic_ids": "The source has no semantic IDs. The benchmark generates one deterministic spatial-octant sidecar and shares it across renderers.",
+    "usage": "The canonical LOD0 PLY is an external dependency and is not embedded in the evidence archive."
+  },
+  "dataset_id": "home-scan-lod0",
+  "modifications": {
+    "description": "Selected the source asset's full-resolution LOD0 chunks, preserved record order, merged them, and converted the PlayCanvas SOG representation to a canonical binary little-endian degree-zero PLY.",
+    "tool": "splat-transform",
+    "tool_build": "b42b60c",
+    "tool_version": "2.7.1"
+  },
+  "schema_version": "home-scan-public-manifest-v1",
+  "source": {
+    "asset_title": "Home Scan (Creation process in description)",
+    "asset_url": "https://superspl.at/scene/3f89bbd3",
+    "author": "Isaiah Sweeney",
+    "author_profile": "https://superspl.at/user?id=luxury_scans",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+  }
+}
