@@ -186,6 +186,13 @@ process samples and deferred ancestry checks until after that child had exited.
 The v6 source verifies ancestry while each process is live and retains only the
 direct child and descendants it actually verified on the expected GPU.
 
+The source-only v6 tag also produced no benchmark result. Its matrix invocation
+revealed that a sanitized tmux process can still inherit an exact user home as
+its working directory, and the original host-path matcher only rejected paths
+below that directory. The v7 launcher enters the frozen checkout explicitly,
+the matrix requires that exact working directory, and the publication scanner
+rejects both exact home roots and their descendants.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

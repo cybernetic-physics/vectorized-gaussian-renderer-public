@@ -34,9 +34,10 @@ from isaacsim_gaussian_renderer.fidelity.metrics import _lpips_per_view  # noqa:
 RUNTIME_PREFLIGHT_SCHEMA = "flashgs-publication-runtime-preflight-v1"
 _HOST_USER_PATH_RE = re.compile(
     r"(?<![A-Za-z0-9])(?:"
-    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+/|"
-    r"/(?:Users|home)/[^/\s:]+/|"
-    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s:]+[\\/]"
+    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]"
+    r"[^\\/\s:]+?(?=[\\/]|$|[\"'\s,}\]])"
     r")"
 )
 _CUDA_LIBRARY_NAMES = (

@@ -36,6 +36,7 @@ from benchmarks.run_flashgs_matched_matrix import (
     publication_child_environment,
     require_publication_safe_environment,
     require_publication_safe_paths,
+    require_publication_working_directory,
     require_runtime_preflight_identity,
     require_adapter_attestation_identity,
     require_b128_repeat_identity,
@@ -466,6 +467,8 @@ def test_publication_environment_rejects_secrets_and_host_user_paths() -> None:
         require_publication_safe_environment(
             {"PATH": "/home/alice/private/bin:/usr/bin"}
         )
+    with pytest.raises(ValueError, match="host-user paths.*HOME"):
+        require_publication_safe_environment({"HOME": "/home/alice"})
 
 
 def test_publication_launch_paths_reject_host_user_identity() -> None:
@@ -476,6 +479,14 @@ def test_publication_launch_paths_reject_host_user_identity() -> None:
         require_publication_safe_paths(
             {"python": "/Users/alice/private/venv/bin/python"}
         )
+    with pytest.raises(ValueError, match="host-user identities.*cwd"):
+        require_publication_safe_paths({"cwd": "/Users/alice"})
+
+
+def test_publication_working_directory_must_be_frozen_checkout() -> None:
+    require_publication_working_directory(MATRIX_PROJECT_ROOT)
+    with pytest.raises(ValueError, match="working directory differs"):
+        require_publication_working_directory(MATRIX_PROJECT_ROOT.parent)
 
 
 def test_publication_runtime_preflight_is_content_bound(tmp_path: Path) -> None:
@@ -563,6 +574,10 @@ def test_publication_launcher_uses_empty_explicit_environment() -> None:
     assert '"XDG_RUNTIME_DIR=$safe_xdg"' in text
     assert '"MATCHED_PUBLICATION_RUNTIME=1"' in text
     assert 'safe_pythonpath="$PROJECT_ROOT/src:$gsplat_source"' in text
+    assert 'cd "$PROJECT_ROOT"' in text
+    assert text.index('cd "$PROJECT_ROOT"') < text.index(
+        'exec env -i "${safe_environment[@]}"'
+    )
     assert "LD_LIBRARY_PATH=" not in text
     assert "ISAACSIM_ML_PREBUNDLE" not in text
     assert "OVRTX_ROOT" not in text

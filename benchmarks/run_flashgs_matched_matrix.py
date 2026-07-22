@@ -79,9 +79,10 @@ _SENSITIVE_ENV_NAME_RE = re.compile(
 )
 _HOST_USER_PATH_RE = re.compile(
     r"(?<![A-Za-z0-9])(?:"
-    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+/|"
-    r"/(?:Users|home)/[^/\s:]+/|"
-    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s:]+[\\/]"
+    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]"
+    r"[^\\/\s:]+?(?=[\\/]|$|[\"'\s,}\]])"
     r")"
 )
 RUNTIME_PREFLIGHT_SCHEMA = "flashgs-publication-runtime-preflight-v1"
@@ -178,6 +179,17 @@ def require_publication_safe_paths(paths: dict[str, str | Path]) -> None:
         raise ValueError(
             "Publication launch paths contain host-user identities in: "
             + ", ".join(unsafe)
+        )
+
+
+def require_publication_working_directory(cwd: str | Path) -> None:
+    """Require the decisive process to start in its frozen source checkout."""
+
+    resolved = Path(cwd).resolve()
+    if resolved != PROJECT_ROOT:
+        raise ValueError(
+            "Publication matrix working directory differs from the frozen "
+            f"project root: {resolved} != {PROJECT_ROOT}."
         )
 
 
@@ -1377,6 +1389,7 @@ def main() -> None:
         raise ValueError(f"Batches must be a subset of {PRIMARY_BATCHES}.")
     if len(set(batches)) != len(batches):
         raise ValueError("Batches may not contain duplicates.")
+    require_publication_working_directory(Path.cwd())
     require_publication_safe_paths(
         {
             "cwd": Path.cwd().absolute(),

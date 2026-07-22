@@ -81,11 +81,26 @@ class PublicArtifactPrivacyTest(unittest.TestCase):
             ):
                 scan_public_artifact(path)
 
+    def test_rejects_exact_host_user_home_in_binary_containers(self) -> None:
+        with self.temporary_root() as directory:
+            path = Path(directory) / "capture.nsys-rep"
+            path.write_bytes(b"binary-prefix\x00/home/alice\x00binary-suffix")
+            with self.assertRaisesRegex(
+                PublicArtifactPrivacyError, "Host-user path"
+            ):
+                scan_public_artifact(path)
+
     def test_rejects_host_user_paths(self) -> None:
         with self.temporary_root() as directory:
             path = self.write_json(
                 Path(directory), {"provenance": "/Users/alice/private/results.json"}
             )
+            with self.assertRaisesRegex(PublicArtifactPrivacyError, "Host-user path"):
+                scan_public_artifact(path)
+
+    def test_rejects_exact_host_user_home(self) -> None:
+        with self.temporary_root() as directory:
+            path = self.write_json(Path(directory), {"cwd": "/home/alice"})
             with self.assertRaisesRegex(PublicArtifactPrivacyError, "Host-user path"):
                 scan_public_artifact(path)
 

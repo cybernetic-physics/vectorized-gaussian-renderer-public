@@ -39,6 +39,12 @@ if [[ ! -f "$scene_path" || ! -d "$gsplat_source" || ! -d "$flashgs_source" ]]; 
   exit 2
 fi
 
+cd "$PROJECT_ROOT"
+if [[ "$(pwd -P)" != "$PROJECT_ROOT" ]]; then
+  echo "Publication launcher did not enter its frozen source root." >&2
+  exit 2
+fi
+
 cuda_home="${MATCHED_CUDA_HOME:-/usr/local/cuda}"
 nsight_compute_home="/opt/nvidia/nsight-compute/2025.1.1"
 nsight_systems_home="/opt/nvidia/nsight-systems/2024.6.2/target-linux-x64"

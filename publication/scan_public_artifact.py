@@ -37,16 +37,19 @@ from evidence_bundle import _is_textual, _scan_secret_bytes  # noqa: E402
 
 _HOST_USER_PATH_RE = re.compile(
     r"(?<![A-Za-z0-9])(?:"
-    r"file://(?:localhost)?/(?:Users|home)/[^/\s]+/|"
-    r"/(?:Users|home)/[^/\s]+/|"
-    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+[\\/]"
+    r"file://(?:localhost)?/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"/(?:Users|home)/[^/\s:]+?(?=/|$|[\"'\s,}\]])|"
+    r"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]"
+    r"[^\\/\s:]+?(?=[\\/]|$|[\"'\s,}\]])"
     r")"
 )
 _HOST_USER_PATH_BYTES_RE = re.compile(
     rb"(?<![A-Za-z0-9])(?:"
-    rb"file://(?:localhost)?/(?:Users|home)/[^/\s\x00]+/|"
-    rb"/(?:Users|home)/[^/\s\x00]+/|"
-    rb"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s\x00]+[\\/]"
+    rb"file://(?:localhost)?/(?:Users|home)/[^/\s\x00:]+?"
+    rb"(?=/|$|[\"'\s,}\]\x00])|"
+    rb"/(?:Users|home)/[^/\s\x00:]+?(?=/|$|[\"'\s,}\]\x00])|"
+    rb"[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]"
+    rb"[^\\/\s\x00:]+?(?=[\\/]|$|[\"'\s,}\]\x00])"
     rb")"
 )
 _CAPTURED_ENV_SECRET_RE = re.compile(
