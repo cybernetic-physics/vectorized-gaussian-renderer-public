@@ -174,6 +174,12 @@ a legacy Git commit that the history-free public repository intentionally omits.
 The v4 source carries that exact pre-fix file as a noncompiled, hash-pinned
 reference and proves the audit works without any hidden Git history.
 
+The source-only v4 tag likewise produced no benchmark result. Its first bounded
+preflight exposed that this host's normal empty-tmux state is reported as
+`error connecting ... (No such file or directory)`, which the fail-closed
+occupancy probe did not yet recognize. The v5 source recognizes that specific
+empty-server result while continuing to reject unknown telemetry failures.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

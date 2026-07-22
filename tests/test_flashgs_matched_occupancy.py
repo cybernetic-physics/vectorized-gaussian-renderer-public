@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from benchmarks.flashgs_matched_occupancy import (
+    _probe,
     compute_sample_failures,
     occupancy_failures,
 )
@@ -113,6 +114,33 @@ def test_unknown_telemetry_fails_closed() -> None:
     )
 
     assert "occupancy telemetry probe failed: compute_apps" in failures
+
+
+def test_tmux_missing_socket_is_a_known_empty_state(monkeypatch) -> None:
+    def missing_tmux_socket(*args, **kwargs):
+        return subprocess.CompletedProcess(
+            args=args[0],
+            returncode=1,
+            stdout="",
+            stderr=(
+                "error connecting to /tmp/tmux-1001/default "
+                "(No such file or directory)\n"
+            ),
+        )
+
+    monkeypatch.setattr(subprocess, "run", missing_tmux_socket)
+    output, status = _probe(
+        ["tmux", "list-sessions", "-F", "#{session_name}"],
+        accepted_nonzero_stderr=(
+            "no server running",
+            "failed to connect",
+            "no such file or directory",
+        ),
+    )
+
+    assert output == ""
+    assert status["returncode"] == 1
+    assert status["success"] is True
 
 
 def test_periodic_sample_allows_only_current_job_on_expected_gpu() -> None:

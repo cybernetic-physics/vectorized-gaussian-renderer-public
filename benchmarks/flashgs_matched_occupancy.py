@@ -66,9 +66,13 @@ def _probe(
             "error": str(error),
         }
     stderr = result.stderr.strip()
+    normalized_stderr = stderr.casefold()
     accepted_nonzero = bool(
         result.returncode != 0
-        and any(marker in stderr for marker in accepted_nonzero_stderr)
+        and any(
+            marker.casefold() in normalized_stderr
+            for marker in accepted_nonzero_stderr
+        )
     )
     success = result.returncode == 0 or accepted_nonzero
     return (result.stdout.strip() if success else None), {
@@ -400,7 +404,11 @@ def capture_node_snapshot() -> dict[str, Any]:
                 continue
     tmux_raw, tmux_probe = _probe(
         ["tmux", "list-sessions", "-F", "#{session_name}"],
-        accepted_nonzero_stderr=("no server running", "failed to connect"),
+        accepted_nonzero_stderr=(
+            "no server running",
+            "failed to connect",
+            "no such file or directory",
+        ),
     )
     current_tmux = _command(["tmux", "display-message", "-p", "#{session_name}"])
     ancestry = process_ancestry()
