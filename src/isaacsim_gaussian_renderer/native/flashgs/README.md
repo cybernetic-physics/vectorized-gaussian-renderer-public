@@ -41,6 +41,15 @@ custom depth/foreground cutoff, alternate ordering method, or other custom
 rasterizer optimization. Fixed-capacity overflow is counted on the device and
 is a fail-closed benchmark condition.
 
+`repair_reference_render.cu` is not compiled. It is the exact pre-repair
+production `render.cu` from diagnosis commit
+`5eca4e640aabd234158d08b4ed61d061e530ee3f`, with SHA-256
+`141ddad0271055b41ef097540a95a9f217cc9e55b52bdec211c4da319486c97a`.
+The history-free public repository intentionally does not contain that legacy
+commit, so the repair audit reads this tracked, hash-pinned reference instead
+of depending on a hidden Git object. The reference and production source differ
+only in the two short-tail predicates described above.
+
 ## Debug-only pipeline trace
 
 `debug_adapter.cpp`, `debug_trace.cu`, and `debug_ops.h` build as a separate

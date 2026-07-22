@@ -79,7 +79,7 @@ Freeze the inventory:
 ```bash
 python3 scripts/write_matched_evidence_inventory.py \
   --input-root /path/to/final-staging \
-  --bundle-name gcp-l4-matched-v3 \
+  --bundle-name gcp-l4-matched-v4 \
   --roles /path/to/roles.json \
   --external-dependencies /path/to/external-dependencies.json \
   --output /path/to/publication-inventory.json
@@ -96,8 +96,8 @@ python3 scripts/build_matched_evidence_bundle.py \
   --inventory /path/to/publication-inventory.json \
   --semantic-root /path/to/original-matched-result \
   --project-root /path/to/exact-clean-benchmark-checkout \
-  --output-root /path/to/gcp-l4-matched-v3 \
-  --archive /path/to/gcp-l4-matched-v3.tar
+  --output-root /path/to/gcp-l4-matched-v4 \
+  --archive /path/to/gcp-l4-matched-v4.tar
 ```
 
 `--semantic-root` is the original matrix result while its recorded host-local
@@ -130,8 +130,8 @@ measurement-host paths are dead:
 
 ```bash
 python3 scripts/verify_matched_evidence_bundle.py \
-  --bundle-root /path/to/gcp-l4-matched-v3 \
-  --archive /path/to/gcp-l4-matched-v3.tar
+  --bundle-root /path/to/gcp-l4-matched-v4 \
+  --archive /path/to/gcp-l4-matched-v4.tar
 ```
 
 Verification recomputes every hash and byte count, the inventory ID, manifest

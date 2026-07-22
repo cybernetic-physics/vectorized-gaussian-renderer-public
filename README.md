@@ -168,6 +168,12 @@ runtime libraries authoritative and performs CUDA matrix, convolution, and
 LPIPS-Alex operations before any long render; it also records the loaded CUDA
 libraries and exact LPIPS weight hashes.
 
+The source-only v3 tag also produced no benchmark result. Its anonymous-clone
+test exposed that four repair-audit tests still read a pre-fix source file from
+a legacy Git commit that the history-free public repository intentionally omits.
+The v4 source carries that exact pre-fix file as a noncompiled, hash-pinned
+reference and proves the audit works without any hidden Git history.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

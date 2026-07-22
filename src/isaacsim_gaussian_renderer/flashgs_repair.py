@@ -6,7 +6,6 @@ import json
 import hashlib
 import math
 import difflib
-import subprocess
 from collections.abc import Iterable, Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
@@ -57,6 +56,12 @@ EXPECTED_MISMATCH_COUNT = 92
 EXPECTED_SELECTED_VIEW_MISMATCH_COUNTS = (0, 0, 2, 0, 87, 1, 1, 1)
 FLASHGS_B64_DIAGNOSIS_LOCK_SCHEMA = "flashgs-b64-diagnosis-lock-v1"
 FLASHGS_B64_PRE_FIX_COMMIT = "5eca4e640aabd234158d08b4ed61d061e530ee3f"
+FLASHGS_B64_PRE_FIX_RENDER_RELATIVE = (
+    "src/isaacsim_gaussian_renderer/native/flashgs/repair_reference_render.cu"
+)
+FLASHGS_B64_PRE_FIX_RENDER_SHA256 = (
+    "141ddad0271055b41ef097540a95a9f217cc9e55b52bdec211c4da319486c97a"
+)
 FLASHGS_PRODUCTION_SOURCE_NAMES = (
     "adapter.cpp",
     "preprocess.cu",
@@ -155,13 +160,17 @@ def audit_repaired_flashgs_production(
     if not isinstance(pre_fix_head, str) or len(pre_fix_head) != 40:
         raise ValueError("Pre-fix source identity has no full Git commit.")
     render_relative = "src/isaacsim_gaussian_renderer/native/flashgs/render.cu"
+    pre_fix_render_path = repository / FLASHGS_B64_PRE_FIX_RENDER_RELATIVE
     try:
-        pre_fix_render_bytes = subprocess.check_output(
-            ["git", "-C", str(repository), "show", f"{pre_fix_head}:{render_relative}"],
-            stderr=subprocess.PIPE,
-        )
-    except (OSError, subprocess.CalledProcessError) as error:
-        raise ValueError(f"Cannot load the frozen pre-fix render source at {pre_fix_head}.") from error
+        pre_fix_render_bytes = pre_fix_render_path.read_bytes()
+    except OSError as error:
+        raise ValueError(
+            "Cannot load the tracked pre-fix render reference at "
+            f"{FLASHGS_B64_PRE_FIX_RENDER_RELATIVE}."
+        ) from error
+    pre_fix_render_sha256 = hashlib.sha256(pre_fix_render_bytes).hexdigest()
+    if pre_fix_render_sha256 != FLASHGS_B64_PRE_FIX_RENDER_SHA256:
+        raise ValueError("Tracked pre-fix render reference hash differs.")
     try:
         pre_fix_render_source = pre_fix_render_bytes.decode("utf-8")
     except UnicodeDecodeError as error:
@@ -204,6 +213,9 @@ def audit_repaired_flashgs_production(
         "slot_1_load_guard_present": ("load_enable = load_enable && point_id + 1 < range.y" in render_source),
         "pre_fix_source_identity_clean": pre_fix_source_identity.get("dirty") is False,
         "pre_fix_commit_is_frozen_diagnosis_head": pre_fix_head == FLASHGS_B64_PRE_FIX_COMMIT,
+        "pre_fix_reference_matches_frozen_hash": (
+            pre_fix_render_sha256 == FLASHGS_B64_PRE_FIX_RENDER_SHA256
+        ),
         "pre_fix_has_exact_buggy_predicates": pre_fix_render_source.count(BUGGY_SLOT_0_OFFSET_PREDICATE) == 1
         and pre_fix_render_source.count(BUGGY_SLOT_1_OFFSET_PREDICATE) == 1,
         "production_render_diff_is_exact_two_line_repair": render_source == expected_repaired_source,
@@ -231,7 +243,8 @@ def audit_repaired_flashgs_production(
         "render_source": artifact_record(render_path),
         "exact_repair_diff": {
             "pre_fix_commit": pre_fix_head,
-            "pre_fix_render_sha256": hashlib.sha256(pre_fix_render_bytes).hexdigest(),
+            "pre_fix_render_sha256": pre_fix_render_sha256,
+            "pre_fix_render_reference": artifact_record(pre_fix_render_path),
             "current_render_sha256": hashlib.sha256(render_path.read_bytes()).hexdigest(),
             "unified_diff": unified_diff,
         },

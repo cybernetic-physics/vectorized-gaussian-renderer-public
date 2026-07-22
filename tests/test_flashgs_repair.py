@@ -26,6 +26,8 @@ from isaacsim_gaussian_renderer.flashgs_repair import (
     FLASHGS_B64_DIAGNOSIS_INDEX_SCHEMA,
     FLASHGS_B64_DIAGNOSIS_LOCK_SCHEMA,
     FLASHGS_B64_PRE_FIX_COMMIT,
+    FLASHGS_B64_PRE_FIX_RENDER_RELATIVE,
+    FLASHGS_B64_PRE_FIX_RENDER_SHA256,
     FLASHGS_B64_REPAIR_VERIFICATION_SCHEMA,
     PRE_FIX_PIPELINE_DEBUG_SCHEMA,
     PRE_FIX_RENDERER_RUN_SCHEMA,
@@ -951,6 +953,35 @@ def _build_contract(native_root: Path) -> dict[str, Any]:
 
 def _pre_fix_source_identity() -> dict[str, Any]:
     return {"head": FLASHGS_B64_PRE_FIX_COMMIT, "dirty": False}
+
+
+def test_production_audit_uses_tracked_reference_without_git_history(
+    tmp_path: Path,
+) -> None:
+    native_root = _copy_native_sources(tmp_path)
+    contract = _build_contract(native_root)
+    source_root = Path(__file__).resolve().parents[1]
+    reference = source_root / FLASHGS_B64_PRE_FIX_RENDER_RELATIVE
+    standalone_root = tmp_path / "standalone-source"
+    standalone_reference = standalone_root / FLASHGS_B64_PRE_FIX_RENDER_RELATIVE
+    standalone_reference.parent.mkdir(parents=True)
+    shutil.copy2(reference, standalone_reference)
+
+    assert artifact_record(reference)["sha256"] == FLASHGS_B64_PRE_FIX_RENDER_SHA256
+    assert not (standalone_root / ".git").exists()
+    audit = audit_repaired_flashgs_production(
+        native_root=native_root,
+        build_contract=contract,
+        repository_root=standalone_root,
+        pre_fix_source_identity=_pre_fix_source_identity(),
+        loaded_module_name=contract["module_name"],
+    )
+
+    assert audit["pass"] is True
+    assert audit["checks"]["pre_fix_reference_matches_frozen_hash"] is True
+    assert audit["exact_repair_diff"]["pre_fix_render_reference"]["sha256"] == (
+        FLASHGS_B64_PRE_FIX_RENDER_SHA256
+    )
 
 
 def test_production_audit_rejects_wrong_build_digest(tmp_path: Path) -> None:
