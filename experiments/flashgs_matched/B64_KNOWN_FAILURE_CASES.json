@@ -1,0 +1,87 @@
+{
+  "schema_version": "flashgs-b64-known-failure-cases-v1",
+  "diagnostic_only": true,
+  "source_commit": "3da2ffd",
+  "scene_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+  "trajectory_id": "e30050bf2d873825cf7cdebbe799c911ddaee5cc15d90e1c0dd8adc2c2e62cc0",
+  "batch": 64,
+  "step": 107,
+  "width": 128,
+  "height": 128,
+  "historical_artifacts": {
+    "trajectory_json": {
+      "sha256": "02db5aba4d523023712fb595ce1667b439df88518fa8edfd46925aaf1fd0c41d"
+    },
+    "trajectory_npz": {
+      "sha256": "bbf8e71c97f53b7e019e1aa61a22a26d2d5d6dd587ccb82b292eb0c85db818e1"
+    },
+    "custom_full_last_output": {
+      "sha256": "7e29321b045e384d8667270105582c8f8c9396f641dceb306b34f616370cdffe"
+    },
+    "flashgs_full_last_output": {
+      "sha256": "b1ab834f166c4d378e5b96f1674bc741d446b6e6438cd2e748cdc5309e8d3b30"
+    },
+    "pinned_gsplat_oracle": {
+      "sha256": "c7c5e4f23894e36af295cdc774c7dd930abb7d3f0cd5845e757e4e93db0d98f4"
+    }
+  },
+  "selection": "one highest-alpha mismatched pixel from each of the five sampled failing camera/tile regions",
+  "total_mismatched_pixels_across_regions": 92,
+  "cases": [
+    {
+      "case_id": "camera18-tile0-0",
+      "camera_index": 18,
+      "pixel_xy": [7, 3],
+      "tile_xy": [0, 0],
+      "region_mismatched_pixels": 2,
+      "oracle_alpha": 0.04832881689071655,
+      "oracle_semantic_id": 6,
+      "historical_flashgs_alpha": 0.0,
+      "historical_flashgs_semantic_id": -1
+    },
+    {
+      "case_id": "camera36-tile7-0",
+      "camera_index": 36,
+      "pixel_xy": [123, 15],
+      "tile_xy": [7, 0],
+      "region_mismatched_pixels": 87,
+      "oracle_alpha": 0.2515307664871216,
+      "oracle_semantic_id": 2,
+      "historical_flashgs_alpha": 0.0,
+      "historical_flashgs_semantic_id": -1
+    },
+    {
+      "case_id": "camera45-tile0-1",
+      "camera_index": 45,
+      "pixel_xy": [0, 31],
+      "tile_xy": [0, 1],
+      "region_mismatched_pixels": 1,
+      "oracle_alpha": 0.04784393310546875,
+      "oracle_semantic_id": 6,
+      "historical_flashgs_alpha": 0.0,
+      "historical_flashgs_semantic_id": -1
+    },
+    {
+      "case_id": "camera54-tile5-0",
+      "camera_index": 54,
+      "pixel_xy": [95, 15],
+      "tile_xy": [5, 0],
+      "region_mismatched_pixels": 1,
+      "oracle_alpha": 0.014007568359375,
+      "oracle_semantic_id": 7,
+      "historical_flashgs_alpha": 0.0,
+      "historical_flashgs_semantic_id": -1
+    },
+    {
+      "case_id": "camera63-tile6-1",
+      "camera_index": 63,
+      "pixel_xy": [111, 31],
+      "tile_xy": [6, 1],
+      "region_mismatched_pixels": 1,
+      "oracle_alpha": 0.014948844909667969,
+      "oracle_semantic_id": 2,
+      "historical_flashgs_alpha": 0.0,
+      "historical_flashgs_semantic_id": -1
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "bounds_max": [9.001820774078379, 0.06708456113934522, 1.454748272895813],
+  "bounds_min": [-16.316597747802735, -2.620230040550232, -14.12363052368164],
+  "coordinate_system": "world-xz-y-up",
+  "eye_height": -1.545304199874401,
+  "eye_height_fraction": 0.4,
+  "motion_classification": "representative-smooth-interior",
+  "name": "home-scan-representative-v1",
+  "planner": {"policy": "clearance-aware-resampled-smoothed", "source_route": "home-scan-walkthrough-v1", "source_route_sha256": "c408c29bd0914a53386e0379ebe01ec3fcbfc270f1a332d2659c82595f6cc43f"},
+  "position_smoothing_window": 21,
+  "route_sha256": "8b5b55fc6717ec8ff76df433f99bd511b9ff8d327c27ba508d250a1b66eb4ff8",
+  "schema_version": "home-scan-trajectory-route-v1",
+  "validation": {
+    "angular_acceleration_rad_s2": {"max_absolute": 44.78500747680664, "mean_absolute": 14.414321899414062, "p95_absolute": 31.839669132232657},
+    "duplicate_poses": 0,
+    "foreground_coverage": {"mean": 0.8167886098225912, "min": 0.6701812744140625},
+    "manual_storyboard_review": "pass",
+    "minimum_clearance_m": 0.2282496988773346,
+    "near_plane_pressure_fraction": 0.0,
+    "path_length_m": 8.986488342285156,
+    "rotation_per_frame_rad": {"max": 0.08935850858688354, "mean": 0.029960155487060547, "p95": 0.07396654337644576},
+    "status": "measured-pass",
+    "storyboard_sha256": "98b76be2b66da34e18f3d8f124c450d4a749f7640e4b7416f6920c1628238fdc",
+    "translation_per_frame_m": {"max": 0.07900559157133102, "mean": 0.0755167081952095, "p95": 0.07897347584366798},
+    "valid_depth_coverage": {"mean": 0.8167886098225912, "min": 0.6701812744140625}
+  },
+  "world_path_xz": [[-6.0205170433,-3.2874920986],[-5.3529267447,-2.6191252147],[-4.0786625666,-2.2748212271],[-2.7313222703,-2.1067936649],[-1.5183164419,-1.6147204307],[-0.6755755372,-1.8605837174],[-0.1958859546,-3.0790499224],[-0.3661452692,-4.4255809881],[-0.9870865334,-5.1132546519]]
+}

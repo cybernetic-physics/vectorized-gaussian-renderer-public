@@ -1,0 +1,48 @@
+[package]
+title = "VGR finite Isaac graphical test"
+description = "Small Isaac/RTX experience for bounded renderer integration tests"
+version = "1.0.0"
+
+[dependencies]
+"isaacsim.simulation_app" = {}
+"isaacsim.core.api" = {}
+"omni.hydra.rtx" = {}
+"omni.hydra.usdrt_delegate" = {}
+"omni.kit.loop-isaac" = {}
+"omni.kit.renderer.core" = {}
+
+[settings.app]
+fastShutdown = true
+file.ignoreUnsavedStage = true
+settings.persistent = false
+useFabricSceneDelegate = true
+vulkan = true
+
+# Acceptance must resolve only the runtime and repo extension trees supplied by
+# the gate. A missing dependency is a failure, not permission to fetch a moving
+# registry package during the run.
+[settings.app.extensions]
+mkdirExtFolders = false
+registryEnabled = false
+
+[settings.app.exts.folders]
+'++' = [
+    "${app}",
+    "${app}/../exts",
+    "${app}/../extscache",
+    "${app}/../extsUser",
+    "${app}/../extsDeprecated",
+]
+
+[settings.app.renderer]
+resolution.height = 720
+resolution.width = 1280
+skipWhileMinimized = false
+sleepMsOnFocus = 0
+sleepMsOutOfFocus = 0
+
+[settings]
+renderer.gpuEnumeration.glInterop.enabled = false
+omni.kit.plugin.syncUsdLoads = true
+rtx.hydra.materialSyncLoads = true
+rtx.materialDb.syncLoads = true

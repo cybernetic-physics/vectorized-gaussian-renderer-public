@@ -1,0 +1,4 @@
+interface:
+  display_name: "Provision RTX Workstation"
+  short_description: "Set up and coordinate an RTX development node"
+  default_prompt: "Use $provision-rtx-workstation to prepare and safely coordinate an RTX workstation for this renderer."

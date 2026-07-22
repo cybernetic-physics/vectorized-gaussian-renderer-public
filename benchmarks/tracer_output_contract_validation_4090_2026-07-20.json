@@ -1,0 +1,721 @@
+{
+  "environment": {
+    "cuda_toolkit": "12.8",
+    "driver": "590.48.01",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "hourly_cost_usd": 0.39,
+    "instance": 45429724,
+    "isaac_sim": "6.0.1",
+    "machine_id": 54495,
+    "optix": "9.1.0",
+    "provider": "Vast.ai",
+    "torch": "2.11.0+cu128",
+    "warp": "1.15.0"
+  },
+  "headline": {
+    "full_contract_parity_at_new_defaults": {
+      "alpha_mae": 0.0024,
+      "depth_rel_err": 0.0018,
+      "pass": true,
+      "rgb_psnr_db": 36.34,
+      "semantic_agreement": 0.994
+    },
+    "hybrid_baseline_img_s_32envs": 428.5,
+    "hybrid_with_reflections_img_s_32envs": 414.2,
+    "optimization_provenance": "merged-PR defaults 12.2/49.3 ms -> alpha_min 2/255 runtime+boxes 9.4/38.4 ms; K=24/32 measured worse than 16",
+    "per_link_ms_per_env_32envs": 0.399,
+    "per_link_refit_share_ms": 10.99,
+    "ray_matched_final_defaults": {
+      "exterior": {
+        "psnr_db": 35.7,
+        "raster_ms": 73.34,
+        "speedup": 7.81,
+        "tracer_ms": 9.39
+      },
+      "interior": {
+        "psnr_db": 40.1,
+        "raster_ms": 95.56,
+        "speedup": 2.49,
+        "tracer_ms": 38.39
+      }
+    },
+    "reflection_rays_per_frame_32envs": 68635,
+    "reflections_cost_ms_32envs": 2.22,
+    "zero_copy_bitwise_vs_cli": {
+      "in_process_launch_ms_8envs": 3.81,
+      "pass": true
+    }
+  },
+  "purpose": "Validation of the tracer follow-up PR: full output contract, zero-copy torch interop, reflection wiring, per-link articulation, extended optimization sweep",
+  "recorded": "2026-07-20",
+  "runs": {
+    "dense32_contract": {
+      "avg_traces_per_ray": 1.08,
+      "envs": 32,
+      "gas_build_ms": 38.7,
+      "gas_compacted_gb": 0.541,
+      "gaussians": 21493389,
+      "has_semantics": true,
+      "height": 256,
+      "hit_fraction": 0.0854,
+      "mean_launch_ms": 10.7574,
+      "mode": "dense",
+      "mrays_per_second": 194.95,
+      "outputs": [
+        "rgba",
+        "depth",
+        "semantic"
+      ],
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v2",
+      "width": 256
+    },
+    "g1_import": {
+      "articulation_root_count": 1,
+      "articulation_root_examples": [
+        "/g1_29dof/Geometry/pelvis"
+      ],
+      "collision_prim_count": 12,
+      "collision_prim_examples": [
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_1",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_2",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_3",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_1",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_2",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_3",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/left_shoulder_pitch_link/left_shoulder_roll_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/left_shoulder_pitch_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/right_shoulder_pitch_link/right_shoulder_roll_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/right_shoulder_pitch_link/cylinder"
+      ],
+      "imported_usd": "/workspace/assets/g1/g1_29dof/g1_29dof.usda",
+      "package_root": "/workspace/src/unitree_ros/robots/g1_description",
+      "result": "PASS",
+      "schema_version": "isaacsim-g1-urdf-import-smoke/v1",
+      "scope": "Validates robot collision/articulation authoring only. A Gaussian scene requires a separate PhysX collision proxy.",
+      "urdf": "/workspace/src/unitree_ros/robots/g1_description/g1_29dof.urdf"
+    },
+    "hybrid_base": {
+      "fit_frame_ms": {
+        "intercept_ms": 0.5660045882714861,
+        "ms_per_env": 2.312798499731461
+      },
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "mesh_source": "/workspace/outputs/g1_mesh.npz",
+      "ovrtx_unified_reference": {
+        "images_per_second_ceiling": 256,
+        "ms_per_env": 4.45
+      },
+      "points": [
+        {
+          "component_ms": {
+            "compositor": 0.7007620297372341,
+            "gaussian": 2.4214130050192275,
+            "mesh": 0.25221030227839947
+          },
+          "envs": 1,
+          "fps": 311.5243929219632,
+          "images_per_second": 311.5243929219632,
+          "mesh_hit_px_per_env": 1987.0,
+          "reflection_rays_per_frame": 0,
+          "wall_frame_ms": 3.2100215030368418
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7077450087914864,
+            "gaussian": 18.33661866839975,
+            "mesh": 0.29020434400687617
+          },
+          "envs": 8,
+          "fps": 53.64643164740639,
+          "images_per_second": 429.1714531792511,
+          "mesh_hit_px_per_env": 2156.125,
+          "reflection_rays_per_frame": 0,
+          "wall_frame_ms": 18.640568800037727
+        },
+        {
+          "component_ms": {
+            "compositor": 0.9883493185043335,
+            "gaussian": 73.54434265289456,
+            "mesh": 0.5574579893921813
+          },
+          "envs": 32,
+          "fps": 13.391871533863187,
+          "images_per_second": 428.539889083622,
+          "mesh_hit_px_per_env": 2144.84375,
+          "reflection_rays_per_frame": 0,
+          "wall_frame_ms": 74.67216195072979
+        }
+      ],
+      "reflections": false,
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "g1-hybrid-warp/v2",
+      "triangles": 382618
+    },
+    "hybrid_refl": {
+      "fit_frame_ms": {
+        "intercept_ms": 2.0662317273386464,
+        "ms_per_env": 2.3503194321195027
+      },
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "mesh_source": "/workspace/outputs/g1_mesh.npz",
+      "ovrtx_unified_reference": {
+        "images_per_second_ceiling": 256,
+        "ms_per_env": 4.45
+      },
+      "points": [
+        {
+          "component_ms": {
+            "compositor": 0.7029920040319363,
+            "gaussian": 2.412846350731949,
+            "mesh": 0.32018066849559546,
+            "reflection": 1.0797963477671146
+          },
+          "envs": 1,
+          "fps": 228.7432161641743,
+          "images_per_second": 228.7432161641743,
+          "mesh_hit_px_per_env": 1987.0,
+          "reflection_rays_per_frame": 1987,
+          "wall_frame_ms": 4.371714347507805
+        },
+        {
+          "component_ms": {
+            "compositor": 0.6993219722062349,
+            "gaussian": 18.349472666159272,
+            "mesh": 0.35327766090631485,
+            "reflection": 1.5126170280079048
+          },
+          "envs": 8,
+          "fps": 47.78583976989691,
+          "images_per_second": 382.2867181591753,
+          "mesh_hit_px_per_env": 2156.125,
+          "reflection_rays_per_frame": 17249,
+          "wall_frame_ms": 20.92670139973052
+        },
+        {
+          "component_ms": {
+            "compositor": 0.9809656379123529,
+            "gaussian": 73.55421897955239,
+            "mesh": 0.7516319941108426,
+            "reflection": 2.2228253462041416
+          },
+          "envs": 32,
+          "fps": 12.942742730228106,
+          "images_per_second": 414.1677673672994,
+          "mesh_hit_px_per_env": 2144.84375,
+          "reflection_rays_per_frame": 68635,
+          "wall_frame_ms": 77.26337615167722
+        }
+      ],
+      "reflections": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "g1-hybrid-warp/v2",
+      "triangles": 382618
+    },
+    "parity_a2": {
+      "alpha_mae": 0.0023900209926068783,
+      "camera": {
+        "fx": 230.4,
+        "fy": 230.4,
+        "origin": [
+          -5.5935413360595705,
+          -5.650021553039551,
+          -43.05939664840699
+        ],
+        "rotation": "identity"
+      },
+      "depth_rel_err": 0.0018119558226317167,
+      "depth_valid_px": 4953,
+      "envs": 32,
+      "gates": {
+        "max_alpha_mae": 0.03,
+        "max_depth_rel_err": 0.05,
+        "min_psnr_db": 25.0,
+        "min_semantic_agreement": 0.9
+      },
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "pass": true,
+      "rgb_psnr_db": 36.33788834617213,
+      "schema_version": "optix-tracer-raster-parity/v2",
+      "semantic_agreement": 0.9939821182943603,
+      "semantic_labeled_px": 5816,
+      "width": 256
+    },
+    "parity_full": {
+      "alpha_mae": 0.002343813655897975,
+      "camera": {
+        "fx": 230.4,
+        "fy": 230.4,
+        "origin": [
+          -5.5935413360595705,
+          -5.650021553039551,
+          -43.05939664840699
+        ],
+        "rotation": "identity"
+      },
+      "depth_rel_err": 0.001829208922572434,
+      "depth_valid_px": 4954,
+      "envs": 32,
+      "gates": {
+        "max_alpha_mae": 0.03,
+        "max_depth_rel_err": 0.05,
+        "min_psnr_db": 25.0,
+        "min_semantic_agreement": 0.9
+      },
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "pass": true,
+      "rgb_psnr_db": 36.27481529539003,
+      "schema_version": "optix-tracer-raster-parity/v2",
+      "semantic_agreement": 0.9929770469338814,
+      "semantic_labeled_px": 5838,
+      "width": 256
+    },
+    "rt_vs_raster_final": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.739514934854085,
+          "raster_mean_ms": 73.34322153086153,
+          "raster_ms": [
+            73.31760199740529,
+            73.39638464618474,
+            73.31567794899456
+          ],
+          "speedup_raster_over_tracer": 7.807509264581558,
+          "tracer": {
+            "avg_traces_per_ray": 1.07,
+            "hit_fraction": 0.0993,
+            "mrays_per_second": 225.09
+          },
+          "tracer_mean_ms": 9.393933333333335,
+          "tracer_ms": [
+            9.5088,
+            9.3562,
+            9.3168
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.131586542091576,
+          "raster_mean_ms": 95.56195306552884,
+          "raster_ms": [
+            95.55863139685243,
+            95.54790135007352,
+            95.57932644966058
+          ],
+          "speedup_raster_over_tracer": 2.489126220609684,
+          "tracer": {
+            "avg_traces_per_ray": 1.54,
+            "hit_fraction": 0.3998,
+            "mrays_per_second": 54.64
+          },
+          "tracer_mean_ms": 38.39176666666666,
+          "tracer_ms": [
+            38.4432,
+            38.3504,
+            38.3817
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sweep_a2boxes": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.73977476971478,
+          "raster_mean_ms": 73.32623041584156,
+          "raster_ms": [
+            73.331787600182,
+            73.32879810128361,
+            73.31810554605909
+          ],
+          "speedup_raster_over_tracer": 7.803070140345592,
+          "tracer": {
+            "avg_traces_per_ray": 1.07,
+            "hit_fraction": 0.0993,
+            "mrays_per_second": 222.94
+          },
+          "tracer_mean_ms": 9.3971,
+          "tracer_ms": [
+            9.3671,
+            9.4174,
+            9.4068
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.131901693814854,
+          "raster_mean_ms": 95.5492359023386,
+          "raster_ms": [
+            95.54658940178342,
+            95.54127940209582,
+            95.55983890313655
+          ],
+          "speedup_raster_over_tracer": 2.4861097444921,
+          "tracer": {
+            "avg_traces_per_ray": 1.54,
+            "hit_fraction": 0.3998,
+            "mrays_per_second": 54.53
+          },
+          "tracer_mean_ms": 38.433233333333334,
+          "tracer_ms": [
+            38.4346,
+            38.4072,
+            38.4579
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sweep_k16": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.77580502642322,
+          "raster_mean_ms": 73.3144075978392,
+          "raster_ms": [
+            73.31338310032152,
+            73.3237061474938,
+            73.30613354570232
+          ],
+          "speedup_raster_over_tracer": 5.760752412113212,
+          "tracer": {
+            "avg_traces_per_ray": 1.1,
+            "hit_fraction": 0.0995,
+            "mrays_per_second": 164.57
+          },
+          "tracer_mean_ms": 12.726533333333334,
+          "tracer_ms": [
+            12.6468,
+            12.7899,
+            12.7429
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.13574488250182,
+          "raster_mean_ms": 95.54950269909266,
+          "raster_ms": [
+            95.5608599469997,
+            95.54189534974284,
+            95.54575280053541
+          ],
+          "speedup_raster_over_tracer": 1.8698325465228236,
+          "tracer": {
+            "avg_traces_per_ray": 1.68,
+            "hit_fraction": 0.4001,
+            "mrays_per_second": 41.02
+          },
+          "tracer_mean_ms": 51.10056666666667,
+          "tracer_ms": [
+            51.0856,
+            51.0865,
+            51.1296
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sweep_k16_amin2": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.77572925045564,
+          "raster_mean_ms": 73.3591675661349,
+          "raster_ms": [
+            73.44053379492834,
+            73.31836345256306,
+            73.31860545091331
+          ],
+          "speedup_raster_over_tracer": 6.699406175846331,
+          "tracer": {
+            "avg_traces_per_ray": 1.07,
+            "hit_fraction": 0.0994,
+            "mrays_per_second": 192.19
+          },
+          "tracer_mean_ms": 10.950099999999999,
+          "tracer_ms": [
+            11.0245,
+            10.9142,
+            10.9116
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.13207328603528,
+          "raster_mean_ms": 95.56507653323933,
+          "raster_ms": [
+            95.56217989884317,
+            95.55457634851336,
+            95.57847335236147
+          ],
+          "speedup_raster_over_tracer": 2.1809896212965962,
+          "tracer": {
+            "avg_traces_per_ray": 1.54,
+            "hit_fraction": 0.3998,
+            "mrays_per_second": 47.74
+          },
+          "tracer_mean_ms": 43.817299999999996,
+          "tracer_ms": [
+            43.7219,
+            43.8036,
+            43.9264
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sweep_k24": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.778419464720756,
+          "raster_mean_ms": 73.33855706383474,
+          "raster_ms": [
+            73.32687004818581,
+            73.37838814710267,
+            73.31041299621575
+          ],
+          "speedup_raster_over_tracer": 5.644437833293249,
+          "tracer": {
+            "avg_traces_per_ray": 1.05,
+            "hit_fraction": 0.0995,
+            "mrays_per_second": 160.92
+          },
+          "tracer_mean_ms": 12.993066666666666,
+          "tracer_ms": [
+            12.9158,
+            13.0315,
+            13.0319
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.12986761695569,
+          "raster_mean_ms": 95.55903935106471,
+          "raster_ms": [
+            95.54829120170325,
+            95.56913819978945,
+            95.55968865170144
+          ],
+          "speedup_raster_over_tracer": 1.7406979866719663,
+          "tracer": {
+            "avg_traces_per_ray": 1.38,
+            "hit_fraction": 0.4001,
+            "mrays_per_second": 38.33
+          },
+          "tracer_mean_ms": 54.896966666666664,
+          "tracer_ms": [
+            54.9734,
+            55.0068,
+            54.7107
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sweep_k32": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.780849026731204,
+          "raster_mean_ms": 73.32874018078049,
+          "raster_ms": [
+            73.31847054883838,
+            73.31984594929963,
+            73.34790404420346
+          ],
+          "speedup_raster_over_tracer": 5.17649958567388,
+          "tracer": {
+            "avg_traces_per_ray": 1.02,
+            "hit_fraction": 0.0995,
+            "mrays_per_second": 147.3
+          },
+          "tracer_mean_ms": 14.165700000000001,
+          "tracer_ms": [
+            14.0779,
+            14.1817,
+            14.2375
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.137473148489285,
+          "raster_mean_ms": 95.55895716572802,
+          "raster_ms": [
+            95.54389999830164,
+            95.56198850041255,
+            95.57098299846984
+          ],
+          "speedup_raster_over_tracer": 1.5514799048860357,
+          "tracer": {
+            "avg_traces_per_ray": 1.25,
+            "hit_fraction": 0.4001,
+            "mrays_per_second": 34.08
+          },
+          "tracer_mean_ms": 61.59213333333333,
+          "tracer_ms": [
+            61.5208,
+            61.7239,
+            61.5317
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "torch_smoke": {
+      "depth_inf_mask_equal": false,
+      "depth_max_abs_diff": 2.2294235229492188,
+      "envs": 8,
+      "gas_build_ms": 38.780704498291016,
+      "has_semantics": true,
+      "height": 256,
+      "in_process_launch_ms": 5.5430002976208925,
+      "pass": false,
+      "rgba_max_abs_diff": 0.6924169063568115,
+      "schema_version": "gs-tracer-torch-smoke/v1",
+      "semantic_bitwise_equal": false,
+      "width": 256,
+      "zero_copy": "outputs are caller-owned torch CUDA tensors (data_ptr)"
+    },
+    "torch_smoke2": {
+      "depth_inf_mask_equal": true,
+      "depth_max_abs_diff": 0.0,
+      "envs": 8,
+      "gas_build_ms": 38.775169372558594,
+      "has_semantics": true,
+      "height": 256,
+      "in_process_launch_ms": 5.489101848797873,
+      "pass": true,
+      "rgba_max_abs_diff": 0.0,
+      "schema_version": "gs-tracer-torch-smoke/v1",
+      "semantic_bitwise_equal": true,
+      "width": 256,
+      "zero_copy": "outputs are caller-owned torch CUDA tensors (data_ptr)"
+    },
+    "torch_smoke_final": {
+      "depth_inf_mask_equal": true,
+      "depth_max_abs_diff": 0.0,
+      "envs": 8,
+      "gas_build_ms": 39.15769577026367,
+      "has_semantics": true,
+      "height": 256,
+      "in_process_launch_ms": 3.812728152843192,
+      "pass": true,
+      "rgba_max_abs_diff": 0.0,
+      "schema_version": "gs-tracer-torch-smoke/v1",
+      "semantic_bitwise_equal": true,
+      "width": 256,
+      "zero_copy": "outputs are caller-owned torch CUDA tensors (data_ptr)"
+    },
+    "warp_perlink": {
+      "bvh_build_ms_once": 176.66582798119634,
+      "fit": {
+        "intercept_ms": 0.9740978521175503,
+        "ms_per_env": 0.3698370473172802,
+        "r_squared": 0.9994923988189252
+      },
+      "gate_pass": true,
+      "gate_target_ms_per_env": 4.0,
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "links": 36,
+      "per_frame_geometry_rebuild": true,
+      "per_link_articulation": true,
+      "points": [
+        {
+          "articulate_refit_ms": 0.5387180989297727,
+          "envs": 1,
+          "hit_pixels_per_env": 3367.0,
+          "hit_pixels_total": 3367,
+          "images_per_second": 814.0352476092327,
+          "mean_frame_ms": 1.228448034574588,
+          "ms_per_env": 1.228448034574588
+        },
+        {
+          "articulate_refit_ms": 2.9753109944673874,
+          "envs": 8,
+          "hit_pixels_per_env": 3902.0,
+          "hit_pixels_total": 31216,
+          "images_per_second": 1959.8405330943733,
+          "mean_frame_ms": 4.081964764433603,
+          "ms_per_env": 0.5102455955542003
+        },
+        {
+          "articulate_refit_ms": 10.986463290949663,
+          "envs": 32,
+          "hit_pixels_per_env": 3939.96875,
+          "hit_pixels_total": 126079,
+          "images_per_second": 2504.853212324382,
+          "mean_frame_ms": 12.775199697352946,
+          "ms_per_env": 0.39922499054227956
+        }
+      ],
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "warp-mesh-tracer-gate/v2",
+      "triangles": 382618,
+      "vertices": 191434
+    }
+  },
+  "scene": {
+    "gaussians_raw": 21497908,
+    "name": "Home Scan LOD0",
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267"
+  },
+  "schema_version": "tracer-output-contract-validation/v1"
+}

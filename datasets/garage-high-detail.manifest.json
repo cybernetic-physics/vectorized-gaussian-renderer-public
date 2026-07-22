@@ -1,0 +1,51 @@
+{
+  "attribution": {
+    "author": "Ethan",
+    "author_url": "https://superspl.at/user?id=ethan3111",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "source_url": "https://superspl.at/scene/8f4d8e05",
+    "title": "Garage - High Detail Test"
+  },
+  "canonical_ply": {
+    "byte_count": 1282787492,
+    "format": "binary_little_endian",
+    "gaussian_count": 13943336,
+    "path": "garage-high-detail.ply",
+    "sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a"
+  },
+  "conversion": {
+    "command": [
+      "splat-transform",
+      "--mem",
+      "Garage - High Detail Test.sog",
+      "garage-high-detail.ply"
+    ],
+    "tool": "splat-transform",
+    "version": ""
+  },
+  "dataset_id": "garage-high-detail",
+  "schema_version": "vectorized-gaussian-renderer-external-scene/v1",
+  "source": {
+    "format": "PlayCanvas SOG",
+    "inputs": [
+      {
+        "bytes": 187142352,
+        "path": "Garage - High Detail Test.sog",
+        "sha256": "216b30b4dc07097aeaff6961fe4d151785055acc7c79af460d2dc44288f5632d"
+      }
+    ],
+    "inventory": {
+      "file_count": 1,
+      "files": [
+        {
+          "bytes": 187142352,
+          "path": "Garage - High Detail Test.sog",
+          "sha256": "216b30b4dc07097aeaff6961fe4d151785055acc7c79af460d2dc44288f5632d"
+        }
+      ],
+      "relative_file_manifest_sha256": "7dc3884756399be143d315084c2bf4d348353be3bf6d0256942814486f093ee4"
+    },
+    "lod": null
+  }
+}

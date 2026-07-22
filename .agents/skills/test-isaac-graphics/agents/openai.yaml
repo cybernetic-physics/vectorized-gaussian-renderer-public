@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Isaac Graphics"
+  short_description: "Write and run finite Isaac Sim graphics tests"
+  default_prompt: "Use $test-isaac-graphics to create or run a headless Isaac Sim graphical test with durable evidence."

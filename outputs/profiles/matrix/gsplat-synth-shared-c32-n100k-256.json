@@ -1,0 +1,125 @@
+{
+  "config_id": "gsplat-synth-shared-c32-n100k-256",
+  "contract": {
+    "note": "Semantic ID is represented as one extra rasterized scalar channel for profiling cost only.",
+    "outputs": [
+      "rgb",
+      "depth",
+      "alpha",
+      "semantic_id_scalar_proxy"
+    ],
+    "packed": true,
+    "radius_clip": 0.0,
+    "render_mode": "RGB+D"
+  },
+  "dataset_checksum": "2dbb4dba42b62d56c215fac0357fbe486c65715e027d99f8c73fa4802ea2d86c",
+  "environment": {
+    "cuda_runtime": "12.8",
+    "driver": "590.48.01",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "gsplat_commit": "77ab983ffe43420b2131669cb35776b883ca4c3c",
+    "host": "7ceadbdc663c",
+    "project_branch": "codex/profiling",
+    "project_commit": "ba3c95c811aec6a0f0ecaef3726050a004d5d2ef",
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128"
+  },
+  "implementation": "gsplat",
+  "matrix_point": {
+    "height": 256,
+    "iterations": 30,
+    "num_cameras": 32,
+    "num_gaussians": 100000,
+    "seed": 7,
+    "warmup": 10,
+    "width": 256
+  },
+  "memory": {
+    "after": {
+      "allocated_bytes": 243168256,
+      "max_allocated_bytes": 532493824,
+      "max_reserved_bytes": 612368384,
+      "reserved_bytes": 612368384
+    },
+    "before": {
+      "allocated_bytes": 6405120,
+      "reserved_bytes": 356515840
+    },
+    "peak_allocated_gib": 0.4959235191345215,
+    "peak_reserved_gib": 0.5703125
+  },
+  "output_shapes": {
+    "alpha": [
+      32,
+      256,
+      256,
+      1
+    ],
+    "rendered": [
+      32,
+      256,
+      256,
+      4
+    ],
+    "semantic": [
+      32,
+      256,
+      256,
+      1
+    ]
+  },
+  "scene": "synthetic-shared",
+  "schema_version": 1,
+  "timing": {
+    "ci95_ms": 0.07590014376445019,
+    "event_times_ms": [
+      2.7625598907470703,
+      3.891200065612793,
+      2.771967887878418,
+      2.717695951461792,
+      2.7555840015411377,
+      2.740351915359497,
+      2.865151882171631,
+      2.917311906814575,
+      2.7782719135284424,
+      2.709439992904663,
+      2.7115519046783447,
+      2.7494399547576904,
+      2.7311999797821045,
+      2.746367931365967,
+      2.7586240768432617,
+      2.7576000690460205,
+      2.7392001152038574,
+      2.7248640060424805,
+      2.7238399982452393,
+      2.7299840450286865,
+      2.78220796585083,
+      2.7412478923797607,
+      2.7299840450286865,
+      2.7504639625549316,
+      2.7535359859466553,
+      2.781183958053589,
+      2.8570239543914795,
+      2.8180480003356934,
+      2.7351040840148926,
+      2.7002880573272705
+    ],
+    "images_per_second": 11255.688037123875,
+    "mean_ms": 2.797709846496582,
+    "megapixels_per_second": 737.6527712009503,
+    "p50_ms": 2.749951958656311,
+    "p95_ms": 2.8938398957252502,
+    "stdev_ms": 0.21210316764119616,
+    "wall_mean_ms": 2.843007010718187
+  },
+  "torch_profiler_summary": [],
+  "torch_profiler_trace": null,
+  "work_counts": {
+    "tile_height": 16,
+    "tile_intersections": 3255861,
+    "tile_size": 16,
+    "tile_width": 16,
+    "tiles_per_gauss_sum": 3255861,
+    "visible_gaussian_camera_pairs": 1704596
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "cuda_compiler": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Fri_Feb_21_20:23:50_PST_2025\nCuda compilation tools, release 12.8, V12.8.93\nBuild cuda_12.8.r12.8/compiler.35583870_0",
+  "gpu": "NVIDIA GeForce RTX 4090, 590.48.01, 24564 MiB, 8.9",
+  "installed_packages": "cuda-nsight-12-8\t12.8.90-1\ncuda-nsight-compute-12-8\t12.8.2-1\ncuda-nsight-systems-12-8\t12.8.2-1\ncuda-toolkit-12-8\t12.8.2-1\nnsight-compute-2025.1.1\t2025.1.1.2-1\nnsight-graphics-for-linux-2026.2.0.0\t2026.2.0.0\nnsight-systems-2024.6.2\t2024.6.2.225-246235244400v0",
+  "nsight_compute": "NVIDIA (R) Nsight Compute Command Line Profiler\nCopyright (c) 2018-2025 NVIDIA Corporation\nVersion 2025.1.1.0 (build 35528883) (public-release)",
+  "nsight_graphics": "unavailable: Command '['/opt/nvidia/nsight-graphics-for-linux/nsight-graphics-for-linux-2026.2.0.0/host/linux-desktop-nomad-x64/ngfx', '--version']' returned non-zero exit status 1.",
+  "nsight_systems": "NVIDIA Nsight Systems version 2024.6.2.225-246235244400v0",
+  "nvidia_smi": "NVIDIA-SMI version  : 590.48.01\nNVML version        : 590.48\nDRIVER version      : 590.48.01\nCUDA Version        : 13.1"
+}

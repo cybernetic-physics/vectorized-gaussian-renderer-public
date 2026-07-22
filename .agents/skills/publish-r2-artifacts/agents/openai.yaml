@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish R2 Artifacts"
+  short_description: "Publish and verify immutable R2 evidence"
+  default_prompt: "Use $publish-r2-artifacts to publish this evaluation bundle to R2 and return a verified receipt."

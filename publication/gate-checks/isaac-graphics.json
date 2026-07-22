@@ -1,0 +1,14 @@
+{
+  "active_gpu_count": 1,
+  "all_outputs_valid": true,
+  "lanes": {
+    "extension": "ISAACSIM_GAUSSIAN_RENDERER_SMOKE_OK",
+    "fabric-camera": "FABRIC_CAMERA_SMOKE_OK",
+    "lifecycle-default": "ISAAC_HEADLESS_SMOKE_OK"
+  },
+  "residual_process_count": 0,
+  "runtime_unchanged": true,
+  "simulation_app_closed": true,
+  "source_unchanged": true,
+  "zero_overflow": true
+}

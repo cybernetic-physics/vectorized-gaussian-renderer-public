@@ -1,0 +1,289 @@
+{
+  "schema_version": "phase-scratch-alias-l4-results/v1",
+  "recorded_utc": "2026-07-17T17:43:09Z",
+  "issue": 30,
+  "customer_goal": "Increase the useful simultaneous-camera capacity of the vectorized custom Gaussian renderer without changing its rendering equation, output contracts, Isaac integration, or CUDA correctness.",
+  "verdict": {
+    "status": "pass-with-scope-limits",
+    "summary": "Reusing the CUB sort scratch allocation as compact depth-bucket storage saves exactly 150,994,944 bytes on Home B8, 67,108,864 bytes on Garage B8, and 754,974,720 bytes on Home B40. The exact 240-view Home B40 case still passes every output, motion, cache, and overflow check while driver-reported process memory falls from 22,485 MiB to 21,765 MiB. Strict 72-view custom-versus-gsplat fidelity, focused CUDA/Kit/Fabric tests, and Compute Sanitizer memcheck all pass.",
+    "performance_interpretation": "This is a capacity and headroom optimization, not a demonstrated rendering-speed improvement. Unprofiled throughput moved by roughly one percent in the favorable direction, while the fresh Nsight kernel-time diagnostic moved by 0.27 percent in the unfavorable direction. Both are treated as run-to-run noise because no kernel or launch order changed.",
+    "capacity_interpretation": "B40 is validated on this L4 protocol. B48 remains outside physical capacity: after observing 575,647,560 emitted intersections, bounded growth requested a 20,908,169,815-byte backend workspace and the allocator could not place its 6.50 GiB sort-scratch allocation alongside the scene, outputs, Isaac, and prior partial allocations.",
+    "customer_interpretation": "The change creates real memory headroom for vectorized Gaussian observations, but it does not yet prove safe co-residency with a substantial RTX workload, 24 Hz batch latency, an L40 result, or any replacement for RTX rendering."
+  },
+  "source": {
+    "branch": "codex/issue-30-phase-scratch-alias",
+    "base_commit": "c00459b9c9c73bdef322c1b901ca14e90264b810",
+    "renderer_commit": "2cd99053a1b67e9223f9a239c224e5731546c0cc",
+    "retained_change": "The compact depth_bucket_tau tensor is a typed contiguous view over the leading bytes of sort_temp. The shared allocation is sized to the larger logical requirement, and workspace accounting distinguishes unique physical storage from logical tensor views.",
+    "telemetry_change": "Capacity allocation and Isaac trajectory evidence report physical bytes, logical bytes by tensor, unaliased requested bytes, exact alias savings, and the installed storage-alias map.",
+    "native_math_change": false,
+    "native_launch_order_change": false
+  },
+  "lifetime_argument": {
+    "owner": "sort_temp",
+    "alias": "depth_bucket_tau",
+    "ordering": "On projection-cache misses, depth-bucket accumulation and cutoff construction finish before direct intersection emission and the emitted-prefix radix sort on the same current CUDA stream. The fast path also synchronizes that stream before invoking CUB. Projection-cache hits skip both depth accumulation and sorting.",
+    "simultaneous_use": false,
+    "allocation_rule": "physical shared bytes = max(CUB sort scratch bytes, depth-bucket tau bytes)",
+    "accounting_rule": "Unique untyped-storage pointers are counted once; depth_bucket_tau therefore contributes zero additional physical bytes while remaining visible in logical accounting."
+  },
+  "machine": {
+    "instance": "vgr-l4-audit-20260717-02",
+    "platform": "GCP g2-standard-16",
+    "gpu": "NVIDIA L4 23034 MiB",
+    "driver": "580.159.03",
+    "ecc": "enabled",
+    "cuda_runtime": "12.8",
+    "torch": "2.11.0+cu128",
+    "isaac_sim": "6.0.1.0",
+    "nsight_systems": "2024.6.2",
+    "compute_sanitizer": "2025.1.0.0"
+  },
+  "dependencies": {
+    "gsplat": "77ab983ffe43420b2131669cb35776b883ca4c3c",
+    "ovrtx_public_source": "29d11037fbcaed0f0f53e7f32d17bd0486fd453b",
+    "ovrtx_runtime": "0.3.0",
+    "kit_app_template": "76542106c2e97d1bbc76bf04259bec19887da554",
+    "lpips": "0.1.4"
+  },
+  "protocol": {
+    "trajectory_layout": "view-population-pack",
+    "coverage": "Every source view appears exactly once in each reported acceptance case.",
+    "custom_path": "Headless Isaac Sim MinimalRendering, USD/Fabric CUDA camera ingestion, compact projection cache, emitted-prefix global radix ordering, output-contract validation, and artifact bookkeeping.",
+    "fidelity_reference": "Pinned gsplat contract-exact replay of the persisted Garage B8 trajectory using the same deterministic screen-space EWA equation family.",
+    "warmup": "Shader, JIT, extension, adaptive-capacity, and renderer warmup occur outside acceptance timing.",
+    "workspace_cap_bytes": 21474836480,
+    "semantic_min_alpha": 0.01,
+    "output_requirements": [
+      "RGB finite",
+      "alpha finite and in range",
+      "foreground depth finite",
+      "background depth policy valid",
+      "foreground and background semantic policy valid",
+      "all production outputs CUDA-resident",
+      "camera motion reaches outputs",
+      "projection-cache expectations pass",
+      "zero visible or intersection capacity overflow"
+    ]
+  },
+  "scenes": {
+    "home-scan-lod0": {
+      "gaussian_count": 21497908,
+      "scene_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "resolution": [384, 384],
+      "source_views": 240,
+      "camera_contract_sha256": "a59ed5ade5b276cebc6535b1bbe4de2abe2bc50c9f4cd5e3f6906f90096df45f"
+    },
+    "garage-high-detail": {
+      "gaussian_count": 13943336,
+      "scene_sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a",
+      "resolution": [256, 256],
+      "source_views": 72,
+      "camera_contract_sha256": "2061260aecba934745dc235266cc3888c66af077c7bc4126ceb2561c8c9775b1"
+    }
+  },
+  "memory_optimization": {
+    "storage_aliases": {
+      "depth_bucket_tau": "sort_temp"
+    },
+    "cases": {
+      "home_b8": {
+        "baseline_workspace_bytes": 5819909015,
+        "candidate_workspace_bytes": 5668914071,
+        "logical_unaliased_workspace_bytes": 5819909015,
+        "exact_bytes_saved": 150994944,
+        "percent_saved": 2.594455404901,
+        "torch_peak_bytes_before": 7801896960,
+        "torch_peak_bytes_after": 7650902016
+      },
+      "garage_b8": {
+        "baseline_workspace_bytes": 2140158295,
+        "candidate_workspace_bytes": 2073049431,
+        "logical_unaliased_workspace_bytes": 2140158295,
+        "exact_bytes_saved": 67108864,
+        "percent_saved": 3.135696278018,
+        "torch_peak_bytes_before": 3409684480,
+        "torch_peak_bytes_after": 3342575616
+      },
+      "home_b40": {
+        "baseline_workspace_bytes": 20295721527,
+        "candidate_workspace_bytes": 19540746807,
+        "logical_unaliased_workspace_bytes": 20295721527,
+        "exact_bytes_saved": 754974720,
+        "percent_saved": 3.719871298961,
+        "torch_peak_bytes_before": 22624657408,
+        "torch_peak_bytes_after": 21869682688,
+        "driver_process_memory_mib_before": 22485,
+        "driver_process_memory_mib_after": 21765
+      }
+    },
+    "home_b40_physical_workspace_bytes_by_tensor": {
+      "sort_temp_and_depth_bucket_tau_shared_storage": 6529862655,
+      "depth_bucket_tau_additional_physical_bytes": 0,
+      "keys_in": 4305503200,
+      "keys_out": 4305503200,
+      "values_in": 2152751600,
+      "values_out": 2152751600,
+      "tile_starts": 23592960,
+      "tile_ends": 23592960,
+      "depth_cutoff": 23592960,
+      "depth_accumulated_tau": 23592960
+    },
+    "home_b40_depth_bucket_tau_logical_bytes": 754974720
+  },
+  "acceptance": {
+    "home_b8": {
+      "batch": 8,
+      "gpu_mean_ms_per_batch": 200.65047098795574,
+      "gpu_images_per_second": 39.87032754326407,
+      "integrated_wall_mean_ms_per_batch": 205.82358993330368,
+      "integrated_wall_images_per_second": 38.868236641836674,
+      "gpu_throughput_ratio_vs_base": 1.00989024754841,
+      "wall_throughput_ratio_vs_base": 1.010169127686313,
+      "workspace_bytes": 5668914071,
+      "maximum_observed_intersections": 130434818,
+      "zero_overflow": true,
+      "pass": true
+    },
+    "garage_b8": {
+      "batch": 8,
+      "gpu_mean_ms_per_batch": 105.62472618950738,
+      "gpu_images_per_second": 75.73984130994802,
+      "integrated_wall_mean_ms_per_batch": 110.67864833360848,
+      "integrated_wall_images_per_second": 72.28133086597096,
+      "gpu_throughput_ratio_vs_base": 1.006279021017954,
+      "wall_throughput_ratio_vs_base": 1.009261815514475,
+      "workspace_bytes": 2073049431,
+      "maximum_observed_intersections": 54077433,
+      "zero_overflow": true,
+      "pass": true
+    },
+    "home_b40": {
+      "batch": 40,
+      "covered_source_views": 240,
+      "gpu_mean_ms_per_batch": 1003.5971069335938,
+      "gpu_images_per_second": 39.85663143471649,
+      "integrated_wall_mean_ms_per_batch": 1015.4292506661781,
+      "integrated_wall_images_per_second": 39.39220775229567,
+      "gpu_throughput_ratio_vs_base": 1.014303873771116,
+      "wall_throughput_ratio_vs_base": 1.014141893842637,
+      "workspace_bytes": 19540746807,
+      "torch_peak_allocated_bytes": 21869682688,
+      "driver_process_memory_mib": 21765,
+      "final_intersection_capacity": 538187900,
+      "maximum_observed_intersections": 538187900,
+      "all_output_contracts_pass": true,
+      "camera_motion_pass": true,
+      "cache_expectations_pass": true,
+      "zero_overflow": true,
+      "pass": true
+    }
+  },
+  "stress_limit": {
+    "case": "Home B48 384x384, exact 240-view trajectory",
+    "result": "fail-at-physical-capacity",
+    "observed_visible_gaussians": 50447462,
+    "observed_tile_intersections": 575647560,
+    "initial_intersection_capacity": 73440000,
+    "intersection_overflow": 502207560,
+    "requested_candidate_workspace_bytes": 20908169815,
+    "workspace_cap_bytes": 21474836480,
+    "failed_allocation": "6.50 GiB",
+    "allocator_free_at_failure": "6.18 GiB",
+    "process_memory_at_failure": "15.82 GiB after partial replacement allocations",
+    "classification": "Expected capacity boundary. The request was below the configured backend-only workspace ceiling but did not leave enough physical memory for the scene, outputs, Isaac runtime, and allocation placement.",
+    "pass": false
+  },
+  "fidelity": {
+    "case": "garage-high-detail B8 256x256",
+    "views": 72,
+    "trajectory_id": "d7941d89b7cb349a51abd1f75a8e38c3c6592280468d68d3e13f1e8398931c5d",
+    "same_equation_family": true,
+    "lpips_required_and_available": true,
+    "failed_frames": 0,
+    "worst_rgb_psnr_db": 63.43092211920247,
+    "worst_rgb_ssim": 0.9999961940031311,
+    "worst_lpips": 0.000008073251592577435,
+    "worst_alpha_mae": 0.000005774778401246294,
+    "worst_depth_relative_error_mean": 0.00022327984333969653,
+    "worst_depth_relative_error_p95": 0.002936462697107345,
+    "worst_semantic_disagreement": 0.000152587890625,
+    "strict_semantic_agreement_all_pixels": 0.9999514685736762,
+    "pass": true
+  },
+  "profiling": {
+    "tool": "Nsight Systems 2024.6.2",
+    "case": "Home B8 exact moving trajectory at 384x384",
+    "scope": "Full-process trace with two warmup batches and 30 measured batches. Adaptive retry work and warmup remain in the kernel-time numerator; 256 rendered warmup-plus-measured views are used for the per-view diagnostic.",
+    "useful_views": 256,
+    "total_kernel_time_ms": 7218.345753,
+    "kernel_ms_per_view": 28.19666309765625,
+    "base_kernel_ms_per_view": 28.12133775390625,
+    "candidate_to_base_ratio": 1.002678583231324,
+    "stage_percent": {
+      "projection": 34.314042825817516,
+      "sorting": 38.328766100600504,
+      "tile_grouping": 1.5395040747918576,
+      "raster": 24.606711368207858,
+      "other": 1.2109756305822664
+    },
+    "diagnosis": "The 0.27 percent profiled difference conflicts in sign with the roughly one-percent unprofiled gain and is classified as noise. Global radix sorting remains the largest runtime and memory target."
+  },
+  "correctness": {
+    "local_tests": "153 passed, 1 skipped",
+    "remote_isaac_environment_tests": "156 passed",
+    "finite_gpu_ladder": {
+      "custom_backend_smoke": "pass, including pointer alias and physical-versus-logical accounting assertions",
+      "deterministic_cuda_smoke": "pass, including bitwise repeatability, capacity invariance, and equal-depth Gaussian-ID ordering",
+      "kit_extension_smoke": "pass with CustomCudaBackend on cuda:0, compact projection cache, and Fabric Scene Delegate enabled",
+      "fabric_camera_smoke": "pass with CUDA output and zero-copy Torch handoff",
+      "multi_scene_cuda_smoke": "pass with defined inactive-camera background outputs",
+      "projection_cache_cuda_smoke": "pass with coherent cache events, CUDA outputs, zero overflow, and 2,097,152 exact alias-savings bytes"
+    },
+    "compute_sanitizer": "memcheck ERROR SUMMARY: 0 errors"
+  },
+  "next_optimization": {
+    "target": "Reduce the emitted-intersection sorting working set rather than making further small dense-array changes.",
+    "dominant_home_b40_bytes": {
+      "sort_temp": 6529862655,
+      "double_buffered_keys": 8611006400,
+      "double_buffered_values": 4305503200
+    },
+    "candidate_experiment": "Evaluate CUB's DoubleBuffer SortPairs API using the already allocated key/value ping-pong buffers, record which buffer owns the final sorted values, and measure whether CUB temporary storage shrinks without adding a correctness or cache-coherence copy.",
+    "important_prior_negative": "Merely making the existing pointer-API scratch query mode-aware was already tested in issue 28 and saved zero bytes on this nondeterministic path. The DoubleBuffer experiment is a different hypothesis and must be measured before any claim."
+  },
+  "limitations": [
+    "B40 still uses 21,765 MiB of driver-reported process memory on a 23,034 MiB L4. This creates more headroom than the base but is not proof of safe co-residency with a substantial Isaac RTX workload.",
+    "B48 fails physical allocation even though the requested backend workspace is below the configured 20 GiB ceiling; that ceiling is backend-only and is not a whole-process memory guarantee.",
+    "All reported batches miss the 41.67 ms per-batch latency target; throughput per image and synchronous observation latency are different metrics.",
+    "The throughput deltas versus the base are not claimed as speedups because the code changes allocation only and the profiled and unprofiled deltas disagree in sign.",
+    "No L40 result is included. The result must be rerun on the intended L40 before making L40-specific customer claims.",
+    "The strict fidelity gate compares the same screen-space EWA equation family. OVRTX perspective fidelity and RTX compositing remain separate questions.",
+    "Nsight Systems timing is diagnostic and includes adaptive retry and warmup work. No Nsight Compute hardware-counter claim is made."
+  ],
+  "evidence": {
+    "local_root": "outputs/audits/issue-30-phase-scratch-alias/evidence",
+    "availability": "Raw artifacts are intentionally ignored by Git; checksums bind this committed record to the preserved local evidence.",
+    "sha256": {
+      "final-2cd9905/home-scan-lod0/b8-384x384/custom.json": "7e11a7bd69a086eb69318ccfbfab0d76987944bd1bc4d12d1037e2d6d74c6ff6",
+      "final-2cd9905/home-scan-lod0/b40-384x384/custom.json": "991f7622a91a338fd1a06eb15d1ab0580051f615f9ec3514bc3486b37efc9745",
+      "final-2cd9905/garage-high-detail/b8-256x256/custom.json": "6b3a4ef3571cf87689dbc51a15e7c73f70221c6d8a3c7e12d78b238b67a076f6",
+      "final-2cd9905/fidelity/comparison/summary.json": "28397433a191f8b4e650077169da34313e8523c575e397ff44688f2d81ab6da3",
+      "final-2cd9905/fidelity/comparison/per-frame.json": "a6eb5a1d4a9007e059f039a91d70533a35e114edbac7b98fe0bf535cf44267b1",
+      "final-2cd9905/fidelity/renders/garage-high-detail-b8-256x256-custom/tensors/trajectory-output.npz": "cc4ad39b19efd8b62f8deb262967776108eb98a38c2f5d0f70b8e7486c79680d",
+      "final-2cd9905/fidelity/renders/garage-high-detail-b8-256x256-gsplat/tensors/trajectory-output.npz": "a1c2047b1895a8b03a0cb508bef9e18fd3c44fa33e35e40746ec007a0bd7f43b",
+      "final-2cd9905/profile-home-b8/nsys-summary.json": "4a5d8f50890a25395e60f5590800757110ad2969d1781f7e93af9be338b5f3c5",
+      "final-2cd9905/profile-home-b8/nsys/issue30-home-b8.nsys-rep": "485ebbe0ab30ef5fad558b58ccf49ffa171fea8b343bef58dc228c7fb22787a2",
+      "final-2cd9905/profile-home-b8/nsys/issue30-home-b8.sqlite": "cf79c89ec3bdbcaa54ccb7c64634d5aa43f2260d0345d1b39e18ea43c3ca6eac",
+      "final-2cd9905/smoke/custom_backend.log": "7d02948d777e44a23a2b47e108ddc350520aa61d6a10aa9d89d413575528a021",
+      "final-2cd9905/smoke/deterministic.log": "0256a5841a910e4f418f8d3de0ace72e76a99fd1339603444cbd0f2df7faa9e9",
+      "final-2cd9905/smoke/multi_scene.log": "655b773b0537284083e3ac595d4bd189b82c9b8567c7ff49bfbcf25cc4fedeb8",
+      "final-2cd9905/smoke/extension.log": "9d4876350bdfffce6c512bdcea7638f159eb8ee254286b8b5a660d19a09a40af",
+      "final-2cd9905/smoke/fabric_camera.json": "1c53dea52a25583ed5d940b87d7dd45d10c821e390e821989473ca2fdeb8a002",
+      "final-2cd9905/smoke/projection_cache.json": "ea72a84d0d6c87241e0d5c65c251d75790bede49e950cf13f9b5af70dcc5083a",
+      "final-2cd9905/validation/logs/compute-sanitizer-memcheck.log": "80602b673a189e2e6650d79e29cae4bd0e0142e4a30618bc57654051b54cd8ec",
+      "stress-b48/run.log": "54d2f4606bc667bc2f3fb4f38c6aef008aee581ff55dc3ed9dc83ca9acfbba03",
+      "stress-b48/home-scan-lod0/b48-384x384/custom.trajectory.json": "ff4d8af9efd13985da72b7af5880fc7481ad9c696698406302d72a68a78b0377"
+    }
+  }
+}

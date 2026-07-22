@@ -1,0 +1,10 @@
+title = "Vectorized Gaussian renderer secret scanning"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "R2 publisher protocol identifier, not a credential"
+targetRules = ["generic-api-key"]
+regexTarget = "line"
+regexes = ['''"api"\s*:\s*"r2-s3-compatible"''']

@@ -1,0 +1,96 @@
+{
+  "schema_version": "hybrid-compositor-l4-results/v1",
+  "recorded_utc": "2026-07-20",
+  "verdict": {
+    "status": "PASS",
+    "cases": 18,
+    "failed_cases": 0,
+    "errors": 0,
+    "maximum_torch_peak_allocated_bytes": 12146704384,
+    "maximum_torch_peak_reserved_bytes": 12685672448,
+    "maximum_driver_process_memory_bytes": 12912164864,
+    "maximum_steady_state_allocation_delta_bytes": 0,
+    "claim_boundary": "This is a synthetic tensor-compositor-only measurement. It excludes the Gaussian and mesh renderers and is not evidence of custom-renderer, Isaac RTX, OVRTX, end-to-end robotics, or fidelity performance."
+  },
+  "source": {
+    "tested_commit": "aeb9f41ec27d4447550f17a01e61de26b18990a5",
+    "pr_head_after_current_main_merge": "343cc26f9669ba19e57ec3ec28e0b930377d8632",
+    "relevant_files_unchanged_between_commits": true,
+    "files": {
+      "benchmarks/run_hybrid_compositor.py": "846a145178ac908d8f3bf8e34eb75e64f1d0f8a4ec75f1656b109ec157842464",
+      "src/isaacsim_gaussian_renderer/hybrid_compositor.py": "ee827c601530d743209e38a2374f449b8082042d7c58ae9c965addde55013528",
+      "tests/test_hybrid_compositor.py": "5acce3e1d688c84976427b83fa168b461e172e84058e0b62d84c1fc4ba732f24",
+      "tests/test_run_hybrid_compositor.py": "258d95a132a5d11657a1597b6ea8395d3553d0ff1361ea440cd0916d9666094c"
+    }
+  },
+  "machine": {
+    "provider": "GCP",
+    "zone": "us-west1-a",
+    "machine_type": "g2-standard-8",
+    "gpu": "NVIDIA L4",
+    "gpu_memory_mib": 23034,
+    "compute_capability": "8.9",
+    "driver": "580.159.03",
+    "python": "3.12.13",
+    "torch": "2.13.0+cu129",
+    "cuda_runtime": "12.9"
+  },
+  "protocol": {
+    "batches": [1, 8, 32, 64, 128, 256],
+    "resolutions": [[128, 128], [256, 256], [512, 512]],
+    "warmup_iterations": 10,
+    "measured_iterations": 50,
+    "timing": "Per-iteration CUDA events plus one synchronized whole-loop wall clock.",
+    "inputs": "Deterministic seeded synthetic Gaussian and mesh layers with complete compositor-branch coverage.",
+    "required_checks": [
+      "CUDA-resident outputs",
+      "finite RGB and alpha",
+      "alpha in range",
+      "finite or positive-infinity depth",
+      "expected invalid-region depth",
+      "expected front-layer selection",
+      "complete branch coverage",
+      "zero measured-loop allocation growth",
+      "no host transfer in the measured loop"
+    ]
+  },
+  "validation": {
+    "local_current_main_cpu": "287 passed, 1 skipped",
+    "remote_focused": "20 passed",
+    "remote_imports": [
+      "torch",
+      "benchmarks.run_hybrid_compositor",
+      "isaacsim_gaussian_renderer.hybrid_compositor"
+    ],
+    "gpu_lock_used": true,
+    "gpu_occupancy_before": "0 MiB, 0 percent, no compute processes",
+    "gpu_occupancy_after": "0 MiB, 0 percent, no compute processes",
+    "vm_and_boot_disk_deleted_after_evidence_copy": true
+  },
+  "results": [
+    {"batch": 1, "width": 128, "height": 128, "mean_gpu_ms": 0.7934995293617249, "images_per_second": 1260.2401929644243, "peak_allocated_bytes": 2965504, "pass": true},
+    {"batch": 8, "width": 128, "height": 128, "mean_gpu_ms": 0.7778291201591492, "images_per_second": 10285.03535373315, "peak_allocated_bytes": 24248320, "pass": true},
+    {"batch": 32, "width": 128, "height": 128, "mean_gpu_ms": 0.7910393583774566, "images_per_second": 40453.107245683605, "peak_allocated_bytes": 94896128, "pass": true},
+    {"batch": 64, "width": 128, "height": 128, "mean_gpu_ms": 1.4117721605300904, "images_per_second": 45333.09395757553, "peak_allocated_bytes": 189792256, "pass": true},
+    {"batch": 128, "width": 128, "height": 128, "mean_gpu_ms": 3.9621836853027346, "images_per_second": 32305.417963029147, "peak_allocated_bytes": 379584512, "pass": true},
+    {"batch": 256, "width": 128, "height": 128, "mean_gpu_ms": 9.545359325408935, "images_per_second": 26819.31515333841, "peak_allocated_bytes": 759169024, "pass": true},
+    {"batch": 1, "width": 256, "height": 256, "mean_gpu_ms": 0.795896315574646, "images_per_second": 1256.445067568869, "peak_allocated_bytes": 11862016, "pass": true},
+    {"batch": 8, "width": 256, "height": 256, "mean_gpu_ms": 0.7859891188144684, "images_per_second": 10178.25795357911, "peak_allocated_bytes": 94896128, "pass": true},
+    {"batch": 32, "width": 256, "height": 256, "mean_gpu_ms": 3.9602387380599975, "images_per_second": 8080.320939357268, "peak_allocated_bytes": 379584512, "pass": true},
+    {"batch": 64, "width": 256, "height": 256, "mean_gpu_ms": 9.529304943084718, "images_per_second": 6716.124668299539, "peak_allocated_bytes": 759169024, "pass": true},
+    {"batch": 128, "width": 256, "height": 256, "mean_gpu_ms": 21.502446784973145, "images_per_second": 5952.8109186835445, "peak_allocated_bytes": 1518338048, "pass": true},
+    {"batch": 256, "width": 256, "height": 256, "mean_gpu_ms": 45.041643676757815, "images_per_second": 5683.629172975762, "peak_allocated_bytes": 3036676096, "pass": true},
+    {"batch": 1, "width": 512, "height": 512, "mean_gpu_ms": 0.7899097621440887, "images_per_second": 1265.9673901049832, "peak_allocated_bytes": 47448064, "pass": true},
+    {"batch": 8, "width": 512, "height": 512, "mean_gpu_ms": 3.959091191291809, "images_per_second": 2020.6657572314432, "peak_allocated_bytes": 379584512, "pass": true},
+    {"batch": 32, "width": 512, "height": 512, "mean_gpu_ms": 21.496238784790037, "images_per_second": 1488.6325147561186, "peak_allocated_bytes": 1518338048, "pass": true},
+    {"batch": 64, "width": 512, "height": 512, "mean_gpu_ms": 45.0368921661377, "images_per_second": 1421.0572027019277, "peak_allocated_bytes": 3036676096, "pass": true},
+    {"batch": 128, "width": 512, "height": 512, "mean_gpu_ms": 91.2161994934082, "images_per_second": 1403.2595165209664, "peak_allocated_bytes": 6073352192, "pass": true},
+    {"batch": 256, "width": 512, "height": 512, "mean_gpu_ms": 182.07916046142577, "images_per_second": 1405.981878163562, "peak_allocated_bytes": 12146704384, "pass": true}
+  ],
+  "limitations": [
+    "One machine and one measured run per grid point; these timings are validation evidence, not a multi-run performance claim.",
+    "Synthetic layers validate compositor work and branch behavior but do not represent scene rendering cost or real robot visibility.",
+    "The compositor returns RGB, alpha, depth, and mesh-front selection; semantic passthrough remains outside this function.",
+    "The run does not launch Isaac Sim, Fabric, RTX, OVRTX, gsplat, or the custom Gaussian CUDA renderer."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "executor_control": {
+    "cooperative_node_wide_lock": {
+      "lock_observed_held": true,
+      "pass": true,
+      "schema_version": "vgr-cooperative-gpu-lock-v1"
+    },
+    "scope": "all-visible-gpus"
+  },
+  "expected_gpu_uuid": "GPU-test",
+  "pass": true,
+  "sampled_compute_process_telemetry": {
+    "coverage": "periodic-samples-not-continuous-observation",
+    "pass": true,
+    "sample_count": 2,
+    "schema_version": "flashgs-matched-compute-process-sampling-v1"
+  },
+  "schema_version": "flashgs-matched-node-occupancy-v2"
+}

@@ -1,0 +1,360 @@
+{
+  "schema_version": "dynamic-camera-l4-assessment/v1",
+  "recorded_utc": "2026-07-20",
+  "customer_goal": "Make rich-output Gaussian rendering faster for vectorized, independently moving robotics cameras.",
+  "verdict": {
+    "status": "qualified-absolute-throughput-win-with-scaling-failure",
+    "absolute_vectorized_performance": "PASS: at physical B8 the custom renderer is faster than pinned gsplat on both full Home resolutions and on the held-out Garage scene.",
+    "proportional_batch_scaling": "FAIL: throughput is nearly flat from physical B1 through B8/B16 on Home and rises only 1.254x from B1 to B8 on Garage.",
+    "usefulness": "The renderer is useful when a robotics workload needs GPU-resident RGB, depth, alpha, and semantic IDs for large Gaussian scenes under a constrained memory budget. It is not evidence of linear vectorization scaling.",
+    "claim_boundary": "These changing-camera comparisons are against pinned gsplat, not OVRTX or the proprietary RTX renderer. The existing 103.397x OVRTX README result uses a separate cache-heavy multi-RenderProduct protocol and must not be presented as a changing-camera speedup.",
+    "optimization_result": "First-pass projected-record reuse is the only retained kernel-path optimization from this investigation. Seven additional kernel/layout candidates were neutral or slower and were reverted.",
+    "remaining_work": "The dominant compact projection kernel still consumes about 53 percent of P8/P16 kernel time. A future optimization must beat the frozen ABBA control, preserve all-output fidelity, and pass sanitizer and Isaac integration gates."
+  },
+  "source": {
+    "branch": "codex/dynamic-l4-20260720",
+    "standalone_matrix_commit": "c8d5f2ad16c22c663a348ce3b2252516de4906d8",
+    "final_renderer_commit": "f62bdd2fa7e1774ed0b4ceeb8062c7420e798f84",
+    "isaac_integration_commit": "5e1b84699aa72a6cca386a6abc378c37c698bfec",
+    "renderer_source_note": "No renderer source under src/ changed between the standalone matrix commit and the final renderer commit; later commits improve the benchmark contract, packaging, and Isaac verification.",
+    "evidence_root": "outputs/audits/dynamic-l4-20260720/remote-evidence",
+    "evidence_preservation": "Raw JSON, logs, Nsight Systems reports/SQLite/CSV, sanitizer output, driver provenance, and Isaac output were copied off the disposable GPU VM before deletion."
+  },
+  "machine": {
+    "provider": "GCP",
+    "instance": "vgr-l4-vws-20260720-01",
+    "zone": "us-east1-d",
+    "machine_type": "g2-standard-8",
+    "gpu_count": 1,
+    "gpu": "NVIDIA L4 23034 MiB",
+    "driver": "580.159.03 proprietary GRID",
+    "license": "NVIDIA RTX Virtual Workstation, licensed permanently for the life of the VM",
+    "gsp_firmware": "disabled as required by the GRID-on-GCP configuration",
+    "standalone_runtime": {
+      "python": "3.12.13",
+      "torch": "2.9.1+cu129",
+      "cuda_runtime": "12.9"
+    },
+    "isaac_runtime": {
+      "isaac_sim": "6.0.1",
+      "torch": "2.11.0+cu128",
+      "cuda_runtime": "12.8",
+      "base_image_digest": "sha256:783444c706538aa76cf5126e911ddc5e618779e6105305ad4af4260362a30aa9",
+      "derived_image_id": "sha256:a0f4338ef8040c234c0d486f02bcc3c58736072adceedf347e1a4b66505854a2"
+    }
+  },
+  "dependencies": {
+    "gsplat_commit": "77ab983ffe43420b2131669cb35776b883ca4c3c",
+    "home_scene_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "garage_scene_sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a"
+  },
+  "protocol": {
+    "home": "Full 21,497,908-Gaussian Home Scan; one logical observation contains 1,024 distinct cameras exactly once; all 1,024 cameras change between both measured observations; bounded physical microbatches P1/P8/P16; no projection cache; full GPU RGB, expected depth, alpha, and semantic-ID outputs; JIT, scene load, warmup, capacity growth, and validation outside measured ranges.",
+    "garage": "Held-out full 13,943,336-Gaussian Garage High Detail scene; all 72 source views; independently changing cameras; B1/B2/B4/B8; two fresh processes per renderer and batch; full GPU RGB, expected depth, alpha, and semantic-ID outputs.",
+    "timing": "CUDA-event and synchronized-wall timing around the complete render observation. Reported throughput below is CUDA-event images/s; wall throughput was effectively identical for the standalone Home matrix.",
+    "semantic_policy": "Both renderers are compared with semantic foreground defined by alpha >= 0.01. This avoids counting gsplat IDs in effectively transparent pixels as semantic disagreement.",
+    "comparison_limits": [
+      "Custom and gsplat use the same deterministic screen-space EWA equation family, so strict same-equation fidelity is meaningful.",
+      "OVRTX perspective uses a different stochastic 3D-ray model and was not timed in this changing-camera investigation.",
+      "The Isaac integration case is a finite lifecycle and data-path proof, not a large-scene performance benchmark."
+    ]
+  },
+  "home_full_scene": {
+    "gaussians": 21497908,
+    "logical_batch": 1024,
+    "moving_cameras": 1024,
+    "measured_camera_states": 2,
+    "matrix": [
+      {
+        "resolution": [128, 128],
+        "physical_batch": 1,
+        "custom_images_per_second": 197.42587369915006,
+        "gsplat_images_per_second": 3.580150443235911,
+        "custom_driver_process_bytes": 2403336192,
+        "gsplat_driver_process_bytes": 4045406208,
+        "custom_pass": true,
+        "gsplat_pass": true
+      },
+      {
+        "resolution": [128, 128],
+        "physical_batch": 8,
+        "custom_images_per_second": 192.62578691161772,
+        "gsplat_images_per_second": 10.840922497395473,
+        "custom_over_gsplat": 17.768394429339015,
+        "custom_driver_process_bytes": 3034578944,
+        "gsplat_driver_process_bytes": 16443768832,
+        "custom_pass": true,
+        "gsplat_pass": true
+      },
+      {
+        "resolution": [128, 128],
+        "physical_batch": 16,
+        "custom_images_per_second": 193.93731349798347,
+        "gsplat_images_per_second": null,
+        "custom_driver_process_bytes": 3730833408,
+        "gsplat_failure": "CUDA OutOfMemoryError",
+        "custom_pass": true,
+        "gsplat_pass": false
+      },
+      {
+        "resolution": [256, 256],
+        "physical_batch": 1,
+        "custom_images_per_second": 74.47579252285277,
+        "gsplat_images_per_second": 7.76907395023672,
+        "custom_driver_process_bytes": 2556428288,
+        "gsplat_driver_process_bytes": 4049600512,
+        "custom_pass": true,
+        "gsplat_pass": true
+      },
+      {
+        "resolution": [256, 256],
+        "physical_batch": 8,
+        "custom_images_per_second": 78.90622601379438,
+        "gsplat_images_per_second": 16.782693871279587,
+        "custom_over_gsplat": 4.701642454959361,
+        "custom_driver_process_bytes": 5043650560,
+        "gsplat_driver_process_bytes": 16437477376,
+        "custom_pass": true,
+        "gsplat_pass": true
+      },
+      {
+        "resolution": [256, 256],
+        "physical_batch": 16,
+        "custom_images_per_second": 78.98174042123931,
+        "gsplat_images_per_second": null,
+        "custom_driver_process_bytes": 6878658560,
+        "gsplat_failure": "CUDA OutOfMemoryError",
+        "custom_pass": true,
+        "gsplat_pass": false
+      }
+    ],
+    "scaling": {
+      "custom_128_p8_over_p1": 0.9756866377360092,
+      "custom_128_p16_over_p1": 0.9823297720009958,
+      "custom_256_p8_over_p1": 1.0594882355844972,
+      "custom_256_p16_over_p1": 1.060502181255794,
+      "verdict": "No proportional vectorization scaling. Larger physical batches mainly increase workspace and reduce native submission count."
+    },
+    "projected_record_reuse": [
+      {
+        "resolution": [128, 128],
+        "physical_batch": 8,
+        "recompute_images_per_second": 132.1480818303445,
+        "reuse_images_per_second": 192.62578691161772,
+        "speedup": 1.4576510248473848
+      },
+      {
+        "resolution": [256, 256],
+        "physical_batch": 8,
+        "recompute_images_per_second": 66.97473236399998,
+        "reuse_images_per_second": 78.90622601379438,
+        "speedup": 1.1781491799765336
+      }
+    ],
+    "gsplat_core_control": {
+      "purpose": "Remove gsplat semantic rendering to test whether the full-output win is solely semantic overhead. This is an unmatched RGB/depth/alpha-only control; custom still emits all four outputs.",
+      "physical_batch": 8,
+      "results": [
+        {
+          "resolution": [128, 128],
+          "custom_full_output_images_per_second": 192.62578691161772,
+          "gsplat_core_images_per_second": 24.02003636670011,
+          "custom_over_gsplat_core": 8.019379486813024
+        },
+        {
+          "resolution": [256, 256],
+          "custom_full_output_images_per_second": 78.90622601379438,
+          "gsplat_core_images_per_second": 28.617511140916168,
+          "custom_over_gsplat_core": 2.75727073627229
+        }
+      ],
+      "interpretation": "The large full-output speedup is partly affected by gsplat's semantic-output cost, but a substantial win remains when that cost is removed."
+    },
+    "all_output_audits_pass": true,
+    "zero_final_capacity_overflow": true
+  },
+  "garage_held_out": {
+    "gaussians": 13943336,
+    "resolution": [256, 256],
+    "views": 72,
+    "fresh_processes_per_point": 2,
+    "matrix": [
+      {
+        "batch": 1,
+        "custom_images_per_second_mean": 59.69360753560757,
+        "gsplat_images_per_second_mean": 22.60619968462748
+      },
+      {
+        "batch": 2,
+        "custom_images_per_second_mean": 66.54857065465478,
+        "gsplat_images_per_second_mean": 29.007926171035134
+      },
+      {
+        "batch": 4,
+        "custom_images_per_second_mean": 70.12071231639005,
+        "gsplat_images_per_second_mean": 35.05409429341833
+      },
+      {
+        "batch": 8,
+        "custom_images_per_second_mean": 74.84544666521778,
+        "gsplat_images_per_second_mean": 38.74779098111746,
+        "custom_over_gsplat": 1.9316055127295229,
+        "custom_torch_peak_allocated_bytes": 3602586624,
+        "gsplat_torch_peak_allocated_bytes": 9170725376,
+        "custom_memory_reduction_fraction": 0.6071644852185791
+      }
+    ],
+    "custom_b8_over_b1": 1.2538268292894186,
+    "fidelity_against_gsplat": {
+      "same_equation_family": true,
+      "every_frame_required": true,
+      "failed_frames": 0,
+      "worst_rgb_psnr_db": 63.429573552248456,
+      "worst_alpha_mae": 0.000005774742930952925,
+      "worst_depth_relative_error_p95": 0.0029364628717303276,
+      "strict_semantic_agreement": 0.9999966091579862,
+      "pass": true
+    }
+  },
+  "profile": {
+    "tool": "Nsight Systems",
+    "case": "Full Home Scan, logical B1024, 128x128, two measured moving-camera states; raw report, SQLite, CSV, and parsed JSON retained for P1/P8/P16.",
+    "physical_p8_kernel_time_percent": {
+      "compact_projection": 53.23093119201987,
+      "global_radix_sort": 19.705684498978286,
+      "raster_composite": 14.954967353575396,
+      "projected_intersection_emission": 10.340920740691622,
+      "tile_grouping": 1.1052976626551165,
+      "other": 0.6621985520797118
+    },
+    "physical_p16_kernel_time_percent": {
+      "compact_projection": 53.104073137122874,
+      "global_radix_sort": 20.081139665843676,
+      "raster_composite": 15.129048188863223,
+      "projected_intersection_emission": 10.049581595264856,
+      "tile_grouping": 1.0204307439785365,
+      "other": 0.6157266689268318
+    },
+    "pipeline_is_one_kernel": false,
+    "pipeline": [
+      "compact project and accumulate conservative depth information",
+      "emit retained intersections from cached projected records",
+      "global CUB radix sort using multiple kernels",
+      "mark sorted pixel/tile ranges",
+      "fused RGB/depth/alpha/semantic compositing"
+    ]
+  },
+  "rejected_candidates": [
+    {
+      "candidate": "issue-39 camera-rotation broadcast",
+      "candidate_over_baseline": 0.9495417150906953,
+      "percent_change": -5.045828490930471,
+      "decision": "reverted"
+    },
+    {
+      "candidate": "camera-major projection grid",
+      "candidate_over_baseline": 1.0038889206818593,
+      "percent_change": 0.3888920681859309,
+      "decision": "reverted as indistinguishable from process variation; strict fidelity was not run"
+    },
+    {
+      "candidate": "four-term conservative depth tau series",
+      "candidate_over_baseline": 1.0039236662580633,
+      "percent_change": 0.39236662580632853,
+      "decision": "reverted as indistinguishable from process variation; strict fidelity was not run"
+    },
+    {
+      "candidate": "convergent atanh conservative depth tau",
+      "candidate_over_baseline": 1.0037730581381779,
+      "percent_change": 0.3773058138177854,
+      "decision": "reverted as indistinguishable from process variation; strict fidelity was not run"
+    },
+    {
+      "candidate": "dense projection before depth tau accumulation",
+      "candidate_over_baseline": 0.6927587666921355,
+      "percent_change": -30.724123330786448,
+      "decision": "reverted"
+    },
+    {
+      "candidate": "dense projection with impossible-subpixel filtering",
+      "candidate_over_baseline": 0.9262958538311452,
+      "percent_change": -7.370414616885479,
+      "decision": "reverted"
+    },
+    {
+      "candidate": "dense projection storing only pixel-contributing records",
+      "candidate_over_baseline": 0.9849985974420857,
+      "percent_change": -1.5001402557914267,
+      "decision": "reverted"
+    }
+  ],
+  "correctness": {
+    "pytest": {
+      "commit": "5e1b84699aa72a6cca386a6abc378c37c698bfec",
+      "passed": 264,
+      "skipped": 1,
+      "failed": 0
+    },
+    "compute_sanitizer": {
+      "commit": "f62bdd2fa7e1774ed0b4ceeb8062c7420e798f84",
+      "tool": "compute-sanitizer memcheck --target-processes all",
+      "error_summary_zero": true,
+      "pass": true
+    },
+    "cuda_smokes": {
+      "deterministic": true,
+      "multi_scene": true,
+      "pass": true
+    }
+  },
+  "isaac_integration": {
+    "purpose": "Prove the real custom CUDA extension builds and runs inside Isaac Sim with Fabric camera ingestion and physics-coupled motion. This small case is not used as a large-scene speed claim.",
+    "pass": true,
+    "batch": 8,
+    "gaussians": 2000,
+    "resolution": [64, 64],
+    "moving_cameras": 8,
+    "motion_mode": "fully-moving",
+    "backend": "CustomCudaBackend",
+    "fabric_scene_delegate": true,
+    "python_camera_loop": false,
+    "native_submissions_per_render": 1,
+    "fabric_reflected_physics_motion": true,
+    "integrated_gpu_ms_mean": 1.5607839822769165,
+    "observation_wall_ms_mean": 5.387179999843283,
+    "deadline_miss_rate_at_60_hz": 0.0,
+    "outputs": [
+      "GPU RGB",
+      "GPU depth",
+      "GPU alpha",
+      "GPU semantic ID"
+    ],
+    "zero_capacity_overflow": true,
+    "output_contracts_pass": true
+  },
+  "integration_gaps_fixed": [
+    {
+      "gap": "setuptools was absent from the runtime dependencies even though torch.utils.cpp_extension imports it",
+      "fix_commit": "0a236d0"
+    },
+    {
+      "gap": "Ninja was required for clean native JIT builds but was not declared",
+      "fix_commit": "710eb78"
+    },
+    {
+      "gap": "the Isaac extension smoke could lose the original exception during SimulationApp.close()",
+      "fix_commit": "8a6e5d8"
+    },
+    {
+      "gap": "the official Isaac Sim 6.0.1 runtime image has no native CUDA build toolchain",
+      "fix": "add a pinned multi-stage CUDA 12.8 development image",
+      "fix_commit": "7c96c54"
+    },
+    {
+      "gap": "the first derived build image accidentally ended as root, which Kit rejects",
+      "ownership": "introduced during this investigation, not an original renderer defect",
+      "fix": "restore Isaac runtime user 1234:1234",
+      "fix_commit": "5e1b846"
+    }
+  ]
+}

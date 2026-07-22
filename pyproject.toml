@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isaacsim-gaussian-renderer"
+version = "0.1.0"
+description = "GPU-resident batched Gaussian sensor renderer for Isaac Sim"
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = [
+  "LICENSE",
+  "THIRD_PARTY_NOTICES.md",
+  "src/isaacsim_gaussian_renderer/native/flashgs/LICENSE.flashgs",
+]
+authors = [
+  {name = "Cybernetic Physics"},
+]
+keywords = ["isaac-sim", "cuda", "gaussian-splatting", "robotics", "rendering"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=1.26",
+  "pillow>=10",
+  "torch>=2.7",
+  "setuptools>=69",
+  "ninja>=1.11",
+  "plyfile>=1.1,<1.1.4",
+  "lpips>=0.1.4",
+]
+
+[project.scripts]
+compare-fidelity = "isaacsim_gaussian_renderer.fidelity.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
+Repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
+Issues = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+isaacsim_gaussian_renderer = [
+  "native/*.cpp",
+  "native/*.cu",
+  "native/flashgs/*.cpp",
+  "native/flashgs/*.cu",
+  "native/flashgs/*.h",
+  "native/flashgs/README.md",
+  "native/flashgs/LICENSE.flashgs",
+  "native/flashgs_upstream_faithful/*.cpp",
+  "native/flashgs_upstream_faithful/*.cu",
+  "native/flashgs_upstream_faithful/*.h",
+  "native/flashgs_upstream_faithful/README.md",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

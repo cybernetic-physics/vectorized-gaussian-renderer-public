@@ -1,0 +1,108 @@
+{
+  "schema_version": "vectorized-gaussian-r2-assets/v1",
+  "bucket": "vectorized-gaussian-renderer-assets",
+  "public_base_url": "https://pub-243008be935848b6accaf262f04a7b82.r2.dev",
+  "wrangler_version": "4.111.0",
+  "default_cache_control": "public, max-age=31536000, immutable",
+  "assets": [
+    {
+      "source": "datasets/home-scan-lod0.manifest.json",
+      "key": "datasets/home-scan-lod0/29cee1594654/manifest.json",
+      "content_type": "application/json",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 1803,
+      "sha256": "0b147064e5fbd67bd5177c08f695de82f193c296691dca3381d9ebc7d7a36f35"
+    },
+    {
+      "source": ".artifacts/datasets/home-scan-lod0.ply",
+      "key": "datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"home-scan-lod0.ply\"",
+      "upload_method": "multipart-worker",
+      "bytes": 1203883212,
+      "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/custom.mp4",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/custom.mp4",
+      "content_type": "video/mp4",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 1654034,
+      "sha256": "672e731d2ca01fe5107f8f45c63c6d8f177506b4648dd26fee13d8aabbf7588a"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/ovrtx-perspective.mp4",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/ovrtx-perspective.mp4",
+      "content_type": "video/mp4",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 2204571,
+      "sha256": "5ecce8279f3f4f2914f585a804497f5d45d2001c53e59948efa15aef40e262af"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/side-by-side.mp4",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/side-by-side.mp4",
+      "content_type": "video/mp4",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 3845539,
+      "sha256": "dd1350928964a2a4f427bf4fa5c6a5565ad42338ebf2573e252e9dbd4eb8b9e1"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/side-by-side-preview.gif",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/side-by-side-preview.gif",
+      "content_type": "image/gif",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 5954517,
+      "sha256": "54df7f5381cb8ac06b34ad8a220c93aee04114c720c193cdf4d6dbfb5fff348b"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/poster.png",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/poster.png",
+      "content_type": "image/png",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 394342,
+      "sha256": "8e85e8abbb5a1b38beaea6583bfa3a1eddb8bef8c183f3072bb3877fe79f2cbf"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/storyboard.png",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/storyboard.png",
+      "content_type": "image/png",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 1422962,
+      "sha256": "a1464176f593f9a1a9c5b1f1f1215db81d79e1e7e67841b6f370f6405b661f06"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/artifacts/artifact-manifest.json",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/artifact-manifest.json",
+      "content_type": "application/json",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 13159,
+      "sha256": "d69aee2fabd4933c663aefd9d1c61ec3cdad118f1ca11b1aa44c96efbe484dd6"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/camera-path.json",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/camera-path.json",
+      "content_type": "application/json",
+      "content_disposition": "inline",
+      "upload_method": "wrangler",
+      "bytes": 1763,
+      "sha256": "36de906d8ed18e2b4456d8ec0b463cc15b300ba80cc57284f000d2fb9bb4c7ae"
+    },
+    {
+      "source": "outputs/flyby/home-scan-v1/camera-path.npz",
+      "key": "flybys/home-scan/v1-a59ed5ade5b2/camera-path.npz",
+      "content_type": "application/octet-stream",
+      "content_disposition": "attachment; filename=\"home-scan-v1-camera-path.npz\"",
+      "upload_method": "wrangler",
+      "bytes": 10221,
+      "sha256": "397b188176af7b961bc42bac7b4369b4c6d9177901354d57fb17e378d433d035"
+    }
+  ]
+}

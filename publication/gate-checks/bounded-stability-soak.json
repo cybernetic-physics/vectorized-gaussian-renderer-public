@@ -1,0 +1,14 @@
+{
+  "all_outputs_valid": true,
+  "duration_seconds": 600.0,
+  "no_cuda_errors": true,
+  "output_contracts": [
+    "rgb",
+    "alpha",
+    "depth",
+    "semantic_id"
+  ],
+  "outputs_gpu_resident": true,
+  "requested_duration_seconds": 600.0,
+  "zero_overflow": true
+}

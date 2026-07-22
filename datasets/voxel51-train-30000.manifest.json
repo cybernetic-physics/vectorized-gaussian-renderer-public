@@ -1,0 +1,15 @@
+{
+  "dataset_id": "voxel51-gaussian-splatting-train-30000",
+  "download_url": "https://huggingface.co/datasets/Voxel51/gaussian_splatting/resolve/main/FO_dataset/train/point_cloud/iteration_30000/point_cloud.ply?download=true",
+  "feature_channels": 48,
+  "file_sha256": "a4c1906ce0256f5cb2255aa078d18b468dc01d8604f6eda1aaf22b235147a7a1",
+  "license": "apache-2.0",
+  "license_source": "https://huggingface.co/datasets/Voxel51/gaussian_splatting",
+  "record_count": 1074761,
+  "relative_remote_path": "public-gaussian/Voxel51_gaussian_splatting/FO_dataset/train/point_cloud/iteration_30000/point_cloud.ply",
+  "repository": "Voxel51/gaussian_splatting",
+  "repository_revision": "6aaba1b1dd0439c0db464842f8a6600a37e0eae9",
+  "size_bytes": 266542260,
+  "source_scene": "train",
+  "source_training_iteration": 30000
+}

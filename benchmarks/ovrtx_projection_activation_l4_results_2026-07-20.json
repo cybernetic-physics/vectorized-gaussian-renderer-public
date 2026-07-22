@@ -1,0 +1,232 @@
+{
+  "schema_version": "ovrtx-projection-activation-l4-results/v1",
+  "recorded_utc": "2026-07-20T01:24:57Z",
+  "pull_request": 44,
+  "verdict": {
+    "status": "valid-negative",
+    "gate_pass": false,
+    "classification": "NO_OBSERVABLE_MODE_EFFECT",
+    "summary": "The fail-closed seven-process experiment completed successfully, but perspective and tangential produced bitwise-identical RGB, alpha, depth, semantic, and valid-depth outputs in both bracketed comparisons. The tangential benchmark lane remains blocked.",
+    "scope": "NVIDIA L4, Isaac Sim 6.0.1, OVRTX 0.3.0 RealTimePathTracing, the pinned rotated anisotropic off-axis four-Gaussian fixture, 256x256 output, eight warmup frames, and 256 temporally accumulated frames per measured lane.",
+    "does_not_establish": [
+      "global OVRTX tangential-mode support or non-support",
+      "an OpenUSD schema violation or proprietary-renderer defect",
+      "that composed-token readback proves render-kernel consumption",
+      "custom-renderer fidelity, throughput, vectorization, or speedup"
+    ]
+  },
+  "source": {
+    "branch": "codex/pr44-activation-fix-20260719",
+    "tested_commit": "73ef6eede6104554a9fca6428b383becae80b86d",
+    "ovrtx_source_commit": "29d11037fbcaed0f0f53e7f32d17bd0486fd453b",
+    "post_run_repairs": [
+      "Renamed the misleading per-lane custom_fidelity_final_pass_ignored metadata field to separate the observed value from the explicit consumed=false contract.",
+      "Made the parent gate recompute the exact negative classification from the auditor proof fields before accepting the report as coherent.",
+      "These post-run repairs do not alter the preserved candidates, comparisons, controls, or scientific classification."
+    ]
+  },
+  "machine": {
+    "provider": "GCP",
+    "instance": "vgr-l4-pr44-fix-20260719-01",
+    "zone": "us-east1-d",
+    "machine_type": "g2-standard-8",
+    "gpu": "NVIDIA L4",
+    "gpu_uuid": "GPU-5ec2819f-02f4-4715-692b-72b9ff10a52e",
+    "gpu_memory_mib": 23034,
+    "driver": "580.159.03",
+    "ecc": "Enabled",
+    "isaac_sim": "6.0.1.0",
+    "ovrtx": "0.3.0",
+    "torch": "2.11.0+cu130",
+    "torch_cuda": "13.0",
+    "cuda_toolkit": "13.0.3",
+    "nvcc": "13.0.88"
+  },
+  "protocol": {
+    "gate": "scripts/run_projection_mode_activation_gate.py",
+    "auditor": "benchmarks/audit_ovrtx_projection_modes.py",
+    "resolution": [
+      256,
+      256
+    ],
+    "warmup_frames": 8,
+    "measured_temporal_frames": 256,
+    "prime_frames": 16,
+    "lane_order": [
+      "prime",
+      "positive-control-candidate",
+      "perspective-candidate",
+      "tangential-candidate",
+      "tangential-repeat",
+      "perspective-repeat",
+      "positive-control-repeat"
+    ],
+    "base_focal_length": 32.4,
+    "positive_control_focal_length": 34.019999999999996,
+    "positive_control_focal_ratio": 1.05,
+    "sorting_mode": "zDepth",
+    "scene_checksum": "9cb762b168aea3c86f8abb7b6aa350636b410e859b26e02abaa49b398e6989a8",
+    "scene_tensor_checksum": "5a0b14e4d016849068f74ef455804cedaeb224dba4b6a17c608ba76f4557d45f"
+  },
+  "execution_integrity": {
+    "complete": true,
+    "child_process_count": 7,
+    "all_child_return_codes_zero": true,
+    "all_child_signals_null": true,
+    "all_child_timeouts_false": true,
+    "all_logs_pass_fatal_scan": true,
+    "all_logs_have_exact_singleton_cleanup_then_capture_markers": true,
+    "cross_lane_contract_pass": true,
+    "cold_suspect_lanes": [],
+    "median_measured_duration_seconds": 13.311195157999919,
+    "outer_return_code": 1,
+    "outer_return_code_interpretation": "Expected scientific gate rejection for a coherent valid-negative result, not a crash."
+  },
+  "proof_fields": {
+    "token_proof_valid": true,
+    "candidate_outputs_valid": true,
+    "matched_lane_contract_valid": true,
+    "stage_authoring_valid": true,
+    "runtime_readback_valid": true,
+    "repeat_controls_present": true,
+    "positive_control_present": true,
+    "positive_control_stable": true,
+    "positive_control_detected": true,
+    "positive_control_valid": true,
+    "observably_different": false,
+    "effect_above_repeat_noise": false,
+    "activation_proof_valid": false
+  },
+  "mode_comparison": {
+    "candidate_pair": {
+      "rgb": {
+        "compared_elements": 196608,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "alpha": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "depth": {
+        "compared_elements": 3556,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "semantic": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "valid_depth": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      }
+    },
+    "repeat_pair": {
+      "rgb": {
+        "compared_elements": 196608,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "alpha": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "depth": {
+        "compared_elements": 3556,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "semantic": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      },
+      "valid_depth": {
+        "compared_elements": 65536,
+        "different_elements": 0,
+        "bitwise_equal": true
+      }
+    },
+    "same_mode_repeat_noise": "zero for every required output in perspective, tangential, and positive-control lanes"
+  },
+  "positive_control": {
+    "interpretation": "The repeated 5% focal-length change proves that matched camera authoring and output capture were responsive; it does not prove ParticleField projection-mode consumption.",
+    "candidate_and_repeat_metrics_identical": true,
+    "rgb": {
+      "compared_elements": 196608,
+      "different_elements": 20952,
+      "different_fraction": 0.1065673828125,
+      "max_abs_difference": 0.38938482105731964,
+      "mean_abs_difference": 0.003573979518710265
+    },
+    "alpha": {
+      "compared_elements": 65536,
+      "different_elements": 6984,
+      "different_fraction": 0.1065673828125,
+      "max_abs_difference": 0.43359375,
+      "mean_abs_difference": 0.007929444313049316
+    },
+    "semantic": {
+      "compared_elements": 65536,
+      "different_elements": 1785,
+      "different_fraction": 0.0272369384765625
+    },
+    "valid_depth": {
+      "compared_elements": 65536,
+      "different_elements": 1622,
+      "different_fraction": 0.024749755859375
+    },
+    "signed_alpha_radial_second_moment": {
+      "candidate_control_minus_base": 767.6951169741515,
+      "repeat_control_minus_base": 767.6951169741515,
+      "repeat_noise": 0.0
+    }
+  },
+  "validation": {
+    "remote_cpu_suite_before_cuda_selector_only_commit": {
+      "commit": "23ea788a7891d8605755ef6b723584ca9f4c3d15",
+      "delta_to_tested_commit": "scripts/remote_env.sh CUDA toolkit selection only",
+      "passed": 234,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "isaac_headless_lifecycle": {
+      "explicit_default_rtx_renderer": "pass",
+      "additional_no_argument_run": "process and fatal-log checks passed; renderer identity is not used as evidence because its receipt did not embed a source commit"
+    },
+    "post_run_full_suite_after_repairs": {
+      "passed": 233,
+      "skipped": 1
+    },
+    "post_run_repair_targeted_suite": {
+      "tests": [
+        "tests/test_projection_activation_gate.py",
+        "tests/test_projection_mode_audit.py"
+      ],
+      "passed": 53,
+      "failed": 0
+    },
+    "preserved_negative_audit_revalidated_with_post_run_parent_gate": true
+  },
+  "raw_evidence": {
+    "local_root": "outputs/audits/pr44-activation-fix-20260719/gcp-l4-final",
+    "file_count": 180,
+    "all_copied_files_checksum_verified": true,
+    "sha256_manifest_sha256": "f31b161ae35308a5e29e3b1f21ecc2ab423e4d8aeb020369040bdeeac7b94e99",
+    "activation_gate_report_sha256": "192035ca48da04217b8a22317789bfa22fde7c3d825ad1226b10bc8d6160c973",
+    "projection_mode_audit_sha256": "088be8b5ea3a9a0ba4ae1134114aecb640fdc40f7d027c1f2f546583c73b504f",
+    "machine_provenance_sha256": "c69605bde67f1f62af77b2dfa01479a4325613b57098f2440cebf4e0e861bb4d",
+    "outer_log_sha256": "dad453cb72e389512524f2457d048987f4abf4f58b16fc1211fe29c869c63b37"
+  },
+  "resource_cleanup": {
+    "gcp_instance_deleted_after_evidence_copy": true,
+    "matching_instance_count_after_delete": 0,
+    "matching_disk_count_after_delete": 0
+  }
+}

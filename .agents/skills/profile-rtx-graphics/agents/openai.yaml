@@ -1,0 +1,4 @@
+interface:
+  display_name: "Profile RTX Graphics"
+  short_description: "Profile CUDA, Vulkan, and RTX rendering workloads"
+  default_prompt: "Use $profile-rtx-graphics to capture and analyze a reproducible RTX rendering profile."

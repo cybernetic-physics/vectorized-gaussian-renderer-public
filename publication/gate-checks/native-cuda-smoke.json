@@ -1,0 +1,8 @@
+{
+  "all_outputs_valid": true,
+  "cuda_resident": true,
+  "finite_values": true,
+  "json_pass": true,
+  "sentinel": "CUSTOM_CUDA_BACKEND_SMOKE_OK",
+  "zero_overflow": true
+}

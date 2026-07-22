@@ -1,0 +1,263 @@
+{
+  "cuda_api_summary": {
+    "allocator": {
+      "calls": 29.0,
+      "time_ms": 8.500386,
+      "time_ns": 8500386.0
+    },
+    "kernel_launch": {
+      "calls": 845.0,
+      "time_ms": 215.31156,
+      "time_ns": 215311560.0
+    },
+    "other_cuda_api": {
+      "calls": 534.0,
+      "time_ms": 8.028897,
+      "time_ns": 8028897.0
+    },
+    "synchronization": {
+      "calls": 88.0,
+      "time_ms": 106.527078,
+      "time_ns": 106527078.0
+    }
+  },
+  "input_csv_files": [
+    "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats/gsplat-synth-shared-c64-n100k-128-nsys_cuda_api_sum.csv",
+    "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats/gsplat-synth-shared-c64-n100k-128-nsys_cuda_gpu_kern_sum.csv",
+    "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats/gsplat-synth-shared-c64-n100k-128-nsys_cuda_gpu_mem_size_sum.csv",
+    "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats/gsplat-synth-shared-c64-n100k-128-nsys_cuda_gpu_mem_time_sum.csv",
+    "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats/gsplat-synth-shared-c64-n100k-128-nsys_nvtx_sum.csv"
+  ],
+  "kernel_summary": {
+    "stages": {
+      "concat_or_fill": {
+        "calls": 99.0,
+        "percent": 8.660853184535094,
+        "time_ms": 11.530588,
+        "time_ns": 11530588.0
+      },
+      "offsets": {
+        "calls": 59.0,
+        "percent": 1.0112979612632638,
+        "time_ms": 1.346387,
+        "time_ns": 1346387.0
+      },
+      "other_kernel": {
+        "calls": 211.0,
+        "percent": 9.23957072570891,
+        "time_ms": 12.301061,
+        "time_ns": 12301061.0
+      },
+      "projection": {
+        "calls": 56.0,
+        "percent": 6.455818520017392,
+        "time_ms": 8.594925,
+        "time_ns": 8594925.0
+      },
+      "raster": {
+        "calls": 28.0,
+        "percent": 47.508829620043564,
+        "time_ms": 63.250667,
+        "time_ns": 63250667.0
+      },
+      "sorting": {
+        "calls": 336.0,
+        "percent": 17.119371965283452,
+        "time_ms": 22.791799,
+        "time_ns": 22791799.0
+      },
+      "tile_intersection": {
+        "calls": 56.0,
+        "percent": 10.004258023148326,
+        "time_ms": 13.319124,
+        "time_ns": 13319124.0
+      }
+    },
+    "top_kernels": [
+      {
+        "calls": 28.0,
+        "name": "void gsplat::rasterize_to_pixels_3dgs_fwd_kernel<(unsigned int)5, (unsigned int)16, (unsigned int)256>(unsigned int, unsigned int, bool, const glm::vec<(int)2, float, (glm::qualifier)0> *, const glm::vec<(int)3, float, (glm::qualifier)0> *, const float *, const float *, const float *, const bool *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, const int *, const int *, float *, float *, int *)",
+        "stage": "raster",
+        "time_ns": 63250667.0
+      },
+      {
+        "calls": 168.0,
+        "name": "void cub::CUB_200700_890_NS::DeviceRadixSortOnesweepKernel<cub::CUB_200700_890_NS::DeviceRadixSortPolicy<long, int, unsigned long long>::Policy900, (bool)0, long, int, unsigned long long, int, int, cub::CUB_200700_890_NS::detail::identity_decomposer_t>(T7 *, T7 *, T5 *, const T5 *, T3 *, const T3 *, T4 *, const T4 *, T6, int, int, T8)",
+        "stage": "sorting",
+        "time_ns": 20496851.0
+      },
+      {
+        "calls": 56.0,
+        "name": "void gsplat::intersect_tile_kernel<float>(long, long, bool, unsigned int, unsigned int, unsigned int, const long *, const long *, const T1 *, const int *, const T1 *, const float *, const float *, const long *, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, long, long, const bool *, int *, long *, int *)",
+        "stage": "tile_intersection",
+        "time_ns": 13319124.0
+      },
+      {
+        "calls": 56.0,
+        "name": "void at::native::<unnamed>::CatArrayBatchedCopy_alignedK_contig<at::native::<unnamed>::OpaqueType<(unsigned int)4>, unsigned int, (int)2, (int)128, (int)1, (int)16>(T1 *, at::native::<unnamed>::CatArrInputTensorMetadata<T1, T2, T4, T5>, at::native::<unnamed>::TensorSizeStride<T2, (unsigned int)4>, int, T2)",
+        "stage": "concat_or_fill",
+        "time_ns": 10607949.0
+      },
+      {
+        "calls": 56.0,
+        "name": "void gsplat::projection_ewa_3dgs_packed_fwd_kernel<float>(unsigned int, unsigned int, unsigned int, const T1 *, const T1 *, const T1 *, const T1 *, const T1 *, const T1 *, const T1 *, unsigned int, unsigned int, float, float, float, float, const int *, gsplat::CameraModelType, int *, int *, long *, long *, long *, int *, T1 *, T1 *, T1 *, T1 *)",
+        "stage": "projection",
+        "time_ns": 8594925.0
+      },
+      {
+        "calls": 84.0,
+        "name": "void at::native::index_elementwise_kernel<(int)128, (int)4, void at::native::gpu_index_kernel<void at::native::index_kernel_impl<at::native::OpaqueType<(int)4>>(at::TensorIteratorBase &, c10::ArrayRef<long>, c10::ArrayRef<long>)::[lambda(char *, const char *, long) (instance 1)]>(at::TensorIteratorBase &, c10::ArrayRef<long>, c10::ArrayRef<long>, const T1 &, bool)::[lambda(int) (instance 1)]>(long, T3)",
+        "stage": "other_kernel",
+        "time_ns": 7568898.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)2, at::native::CUDAFunctor_add<long>, std::array<char *, (unsigned long)3>>(int, T2, T3)",
+        "stage": "other_kernel",
+        "time_ns": 1580854.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void cub::CUB_200700_890_NS::DeviceRadixSortHistogramKernel<cub::CUB_200700_890_NS::DeviceRadixSortPolicy<long, int, unsigned long long>::Policy900, (bool)0, long, unsigned long long, cub::CUB_200700_890_NS::detail::identity_decomposer_t>(T4 *, const T3 *, T4, int, int, T5)",
+        "stage": "sorting",
+        "time_ns": 1534998.0
+      },
+      {
+        "calls": 29.0,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, void at::native::compare_scalar_kernel<int>(at::TensorIteratorBase &, at::native::<unnamed>::OpType, T1)::[lambda(int) (instance 1)], std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "stage": "other_kernel",
+        "time_ns": 1285070.0
+      },
+      {
+        "calls": 29.0,
+        "name": "void at::native::reduce_kernel<(int)512, (int)1, at::native::ReduceOp<bool, at::native::func_wrapper_t<bool, at::native::and_kernel_cuda(at::TensorIterator &)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 12)]::operator ()() const::[lambda(bool, bool) (instance 1)]>, unsigned int, bool, (int)4, (int)4>>(T3)",
+        "stage": "other_kernel",
+        "time_ns": 1130419.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at::native::<unnamed>::CatArrayBatchedCopy<at::native::<unnamed>::OpaqueType<(unsigned int)4>, unsigned int, (int)4, (int)64, (int)64>(T1 *, at::native::<unnamed>::CatArrInputTensorMetadata<T1, T2, T4, T5>, at::native::<unnamed>::TensorSizeStride<T2, (unsigned int)4>, int, T2)",
+        "stage": "concat_or_fill",
+        "time_ns": 903887.0
+      },
+      {
+        "calls": 28.0,
+        "name": "gsplat::intersect_offset_kernel(unsigned int, unsigned int, unsigned int, const long *, unsigned int, unsigned int, unsigned int, int *)",
+        "stage": "offsets",
+        "time_ns": 817741.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)2, at::native::AUnaryFunctor<long, long, long, at::native::binary_internal::MulFunctor<long>>, std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "stage": "other_kernel",
+        "time_ns": 694732.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at_cuda_detail::cub::DeviceScanKernel<at_cuda_detail::cub::DeviceScanPolicy<long, std::plus<long>>::Policy900, const long *, long *, at_cuda_detail::cub::ScanTileState<long, (bool)1>, std::plus<long>, at_cuda_detail::cub::NullType, unsigned int, long, (bool)0>(T2, T3, T4, int, T5, T6, T7)",
+        "stage": "sorting",
+        "time_ns": 602507.0
+      },
+      {
+        "calls": 30.0,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(long) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "stage": "offsets",
+        "time_ns": 526214.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at_cuda_detail::cub::DeviceScanKernel<at_cuda_detail::cub::DeviceScanPolicy<int, std::plus<int>>::Policy900, const int *, int *, at_cuda_detail::cub::ScanTileState<int, (bool)1>, std::plus<int>, at_cuda_detail::cub::NullType, unsigned int, int, (bool)0>(T2, T3, T4, int, T5, T6, T7)",
+        "stage": "sorting",
+        "time_ns": 65507.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void cub::CUB_200700_890_NS::DeviceRadixSortExclusiveSumKernel<cub::CUB_200700_890_NS::DeviceRadixSortPolicy<long, int, unsigned long long>::Policy900, unsigned long long>(T2 *)",
+        "stage": "sorting",
+        "time_ns": 34144.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at_cuda_detail::cub::DeviceScanInitKernel<at_cuda_detail::cub::ScanTileState<long, (bool)1>>(T1, int)",
+        "stage": "sorting",
+        "time_ns": 32320.0
+      },
+      {
+        "calls": 28.0,
+        "name": "void at_cuda_detail::cub::DeviceScanInitKernel<at_cuda_detail::cub::ScanTileState<int, (bool)1>>(T1, int)",
+        "stage": "sorting",
+        "time_ns": 25472.0
+      },
+      {
+        "calls": 2.0,
+        "name": "void at::native::reduce_kernel<(int)512, (int)1, at::native::ReduceOp<long, at::native::func_wrapper_t<long, at::native::sum_functor<long, long, long>::operator ()(at::TensorIterator &)::[lambda(long, long) (instance 1)]>, unsigned int, long, (int)4, (int)4>>(T3)",
+        "stage": "other_kernel",
+        "time_ns": 20480.0
+      },
+      {
+        "calls": 7.0,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::FillFunctor<float>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "stage": "concat_or_fill",
+        "time_ns": 8544.0
+      },
+      {
+        "calls": 5.0,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)4, at::native::FillFunctor<float>, std::array<char *, (unsigned long)1>>(int, T2, T3)",
+        "stage": "concat_or_fill",
+        "time_ns": 5600.0
+      },
+      {
+        "calls": 3.0,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "stage": "concat_or_fill",
+        "time_ns": 4608.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::<unnamed>::distribution_elementwise_grid_stride_kernel<float, (int)4, void at::native::templates::cuda::normal_and_transform<float, float, at::CUDAGeneratorImpl *, void at::native::templates::cuda::normal_kernel<at::CUDAGeneratorImpl *>(const at::TensorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T3, T4)::[lambda(curandStatePhilox4_32_10 *) (instance 2)], void at::native::<unnamed>::distribution_nullary_kernel<float, float, float4, at::CUDAGeneratorImpl *, void at::native::templates::cuda::normal_and_transform<float, float, at::CUDAGeneratorImpl *, void at::native::templates::cuda::normal_kernel<at::CUDAGeneratorImpl *>(const at::TensorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T3, T4)::[lambda(curandStatePhilox4_32_10 *) (instance 2)], void at::native::templates::cuda::normal_kernel<at::CUDAGeneratorImpl *>(const at::TensorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T4, const T5 &, T6)::[lambda(int, float) (instance 1)]>(long, at::PhiloxCudaState, T3, T4)",
+        "stage": "other_kernel",
+        "time_ns": 3776.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::<unnamed>::distribution_elementwise_grid_stride_kernel<float, (int)4, void at::native::templates::cuda::uniform_and_transform<float, float, at::CUDAGeneratorImpl *, void at::native::templates::cuda::uniform_kernel<at::CUDAGeneratorImpl *>(at::TensorIteratorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T3, T4)::[lambda(curandStatePhilox4_32_10 *) (instance 2)], void at::native::<unnamed>::distribution_nullary_kernel<float, float, float4, at::CUDAGeneratorImpl *, void at::native::templates::cuda::uniform_and_transform<float, float, at::CUDAGeneratorImpl *, void at::native::templates::cuda::uniform_kernel<at::CUDAGeneratorImpl *>(at::TensorIteratorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T3, T4)::[lambda(curandStatePhilox4_32_10 *) (instance 2)], void at::native::templates::cuda::uniform_kernel<at::CUDAGeneratorImpl *>(at::TensorIteratorBase &, double, double, T1)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 2)]::operator ()() const::[lambda(float) (instance 1)]>(at::TensorIteratorBase &, T4, const T5 &, T6)::[lambda(int, float) (instance 1)]>(long, at::PhiloxCudaState, T3, T4)",
+        "stage": "other_kernel",
+        "time_ns": 2976.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::AUnaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float>>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "stage": "other_kernel",
+        "time_ns": 2656.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 3)]::operator ()() const::[lambda() (instance 7)]::operator ()() const::[lambda(float) (instance 1)], std::array<char *, (unsigned long)2>, (int)4, TrivialOffsetCalculator<(int)1, unsigned int>, TrivialOffsetCalculator<(int)1, unsigned int>, at::native::memory::LoadWithCast<(int)1>, at::native::memory::StoreWithCast<(int)1>>(int, T1, T2, T4, T5, T6, T7)",
+        "stage": "offsets",
+        "time_ns": 2432.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::elementwise_kernel<(int)128, (int)2, void at::native::gpu_kernel_impl_nocast<at::native::AbsFunctor<float>>(at::TensorIteratorBase &, const T1 &)::[lambda(int) (instance 1)]>(int, T3)",
+        "stage": "other_kernel",
+        "time_ns": 2080.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void at::native::vectorized_elementwise_kernel<(int)2, at::native::BUnaryFunctor<long, long, long, at::native::remainder_kernel_cuda(at::TensorIteratorBase &)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(long, long) (instance 1)]>, std::array<char *, (unsigned long)2>>(int, T2, T3)",
+        "stage": "other_kernel",
+        "time_ns": 1920.0
+      },
+      {
+        "calls": 1.0,
+        "name": "void <unnamed>::elementwise_kernel_with_index<int, at::native::arange_cuda_out(const c10::Scalar &, const c10::Scalar &, const c10::Scalar &, at::Tensor &)::[lambda() (instance 1)]::operator ()() const::[lambda() (instance 4)]::operator ()() const::[lambda(long) (instance 1)]>(T1, T2, function_traits<T2>::result_type *)",
+        "stage": "other_kernel",
+        "time_ns": 1664.0
+      }
+    ],
+    "total_kernel_time_ms": 133.134551
+  },
+  "limitations": [],
+  "schema_version": 1,
+  "stats_dir": "/workspace/agent-worktrees/profiling/outputs/profiles/gsplat-synth-shared-c64-n100k-128-nsys/nsys/stats"
+}

@@ -1,0 +1,1682 @@
+{
+  "claimed_vs_measured": {
+    "gas": {
+      "claimed": {
+        "build_ms": 39.0,
+        "compacted_gb": 0.54
+      },
+      "measured": {
+        "build_ms": 39.7,
+        "compacted_gb": 0.54
+      }
+    },
+    "isaac_rtx_hybrid_4envs": {
+      "claimed": {
+        "frame_ms": 201,
+        "images_per_second": 19.9,
+        "rtx_ms": 204
+      },
+      "measured": {
+        "fps": 1.29,
+        "note": "slower than claimed (rtx 349 vs 204 ms at 4 envs); per-env RTX loses even harder on this host",
+        "rtx_ms": 349.1
+      }
+    },
+    "optix_dense128x128_kbuf": {
+      "claimed": {
+        "mrays_s": 107,
+        "ms": 19.6
+      },
+      "measured": {
+        "mrays_s": 109.6,
+        "ms": 19.13
+      }
+    },
+    "optix_dense128x128_v1": {
+      "claimed": {
+        "mrays_s": 27,
+        "ms": 76.4
+      },
+      "measured": {
+        "mrays_s": 28.0,
+        "ms": 74.78
+      }
+    },
+    "optix_dense32x256_kbuf": {
+      "claimed": {
+        "mrays_s": 154,
+        "ms": 13.6
+      },
+      "measured": {
+        "mrays_s": 156.7,
+        "ms": 13.38
+      }
+    },
+    "optix_dense32x256_v1": {
+      "claimed": {
+        "mrays_s": 42,
+        "ms": 49.6
+      },
+      "measured": {
+        "mrays_s": 43.7,
+        "ms": 47.94
+      }
+    },
+    "optix_sparse30k_kbuf": {
+      "claimed": {
+        "mrays_s": 3.7,
+        "ms": 8.0
+      },
+      "measured": {
+        "mrays_s": 3.8,
+        "ms": 7.95
+      }
+    },
+    "optix_sparse30k_v1": {
+      "claimed": {
+        "mrays_s": 0.9,
+        "ms": 33.0
+      },
+      "measured": {
+        "mrays_s": 0.9,
+        "ms": 32.71
+      }
+    },
+    "optix_sparse3m_kbuf": {
+      "claimed": {
+        "mrays_s": 13.7,
+        "ms": 219.0
+      },
+      "measured": {
+        "mrays_s": 13.9,
+        "ms": 216.3
+      }
+    },
+    "optix_sparse3m_v1": {
+      "claimed": {
+        "mrays_s": 3.3,
+        "ms": 915.0
+      },
+      "measured": {
+        "mrays_s": 3.3,
+        "ms": 906.34
+      }
+    },
+    "optix_unified_hybrid_32robots": {
+      "claimed": {
+        "ms": 13.9
+      },
+      "measured": {
+        "ms": 13.34,
+        "reflection_px_per_frame": 29760
+      }
+    },
+    "ovrtx_unified_32envs": {
+      "claimed": {
+        "images_per_second": 221,
+        "with_robots_ms": 144.8
+      },
+      "measured": {
+        "images_per_second": 148.7,
+        "note": "DOES NOT REPRODUCE claimed 221 img/s; ~1.45x slower, repeatable, splats-only also slower (189-211 vs 128.7 claimed)",
+        "with_robots_ms": 215.1,
+        "with_robots_ms_repeat": 212.5
+      }
+    },
+    "quality_parity": {
+      "claimed": null,
+      "measured": {
+        "mae": 0.00163,
+        "pass": true,
+        "psnr_db": 36.27
+      }
+    },
+    "tracer_vs_raster_speedup": {
+      "claimed": {
+        "note": "PR #54 context: raster 132.5 ms vs tracer 13.6 ms \u2014 NOT ray-matched (tracer used its own identity-orientation cameras, hit_frac 0.085)",
+        "speedup": 10.0
+      },
+      "measured": {
+        "after_optimization": {
+          "defaults": "adaptive AABB export + KBUF=16",
+          "exterior_bundle_speedup": 5.97,
+          "exterior_tracer_ms": 12.23,
+          "interior_ego_speedup": 1.91,
+          "interior_tracer_ms": 49.28,
+          "note": "identical parity PSNR to the pre-optimization baseline; sweep in runs.optimization_sweep",
+          "parity_psnr_db": [
+            35.8,
+            40.1
+          ]
+        },
+        "exterior_bundle_speedup": 4.21,
+        "exterior_raster_ms": 73.41,
+        "exterior_tracer_ms": 17.42,
+        "interior_ego_speedup": 1.54,
+        "interior_raster_ms": 95.56,
+        "interior_tracer_ms": 61.97,
+        "note": "ray-matched (identical cameras via gs_tracer --cams), 3 repeats, env-0 PSNR 35.8/40.1 dB; raster pays full output contract, tracer RGBA-only"
+      }
+    },
+    "warp_hybrid_128sq_64_128envs": {
+      "claimed": {
+        "images_per_second": 418
+      },
+      "measured": {
+        "images_per_second": 518.6
+      }
+    },
+    "warp_hybrid_32envs_256": {
+      "claimed": {
+        "frame_ms": 134.4,
+        "images_per_second": 238.2
+      },
+      "measured": {
+        "frame_ms": 74.0,
+        "images_per_second": 432.2,
+        "note": "1.8x faster than claimed; main's gaussian kernel improved since the stack branched"
+      }
+    },
+    "warp_mesh_tracer_dense_32envs": {
+      "claimed": {
+        "total_ms": 4.3
+      },
+      "measured": {
+        "note": "~5.4x faster than claimed; same 6130 hit px/env workload; warp 1.15.0",
+        "total_ms": 0.79
+      }
+    }
+  },
+  "environment": {
+    "compute_capability": "8.9",
+    "cpu": "AMD EPYC 7742 64-Core",
+    "cuda_toolkit": "12.8 (nvcc 12.8.r12.8/compiler.35583870_0)",
+    "driver": "590.48.01",
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "hourly_cost_usd": 0.349,
+    "instance": 45419418,
+    "isaac_sim": "6.0.1 (/isaac-sim)",
+    "libnvoptix": "shipped with driver in nvcr.io/nvidia/isaac-sim:6.0.1 image",
+    "machine_id": 54495,
+    "optix": "9.1.0 (headers NVIDIA/optix-dev v9.1.0, OPTIX_VERSION 90100)",
+    "os": "Ubuntu 24.04.3",
+    "ovrtx": "0.3.0.312915",
+    "provider": "Vast.ai",
+    "torch": "2.11.0+cu128",
+    "warp": "1.15.0"
+  },
+  "purpose": "Same-hardware validation of the claims in PRs #51/#53/#54 for the RTX Gaussian compositing PR",
+  "recorded": "2026-07-20",
+  "runs": {
+    "dense128x128_kbuf": {
+      "avg_traces_per_ray": 1.2,
+      "envs": 128,
+      "gas_build_ms": 39.7,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 128,
+      "hit_fraction": 0.0852,
+      "mean_launch_ms": 19.1322,
+      "mode": "dense",
+      "mrays_per_second": 109.61,
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 128
+    },
+    "dense128x128_v1": {
+      "avg_traces_per_ray": 3.0,
+      "envs": 128,
+      "gas_build_ms": 39.7,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 128,
+      "hit_fraction": 0.0851,
+      "mean_launch_ms": 74.7825,
+      "mode": "dense",
+      "mrays_per_second": 28.04,
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 128
+    },
+    "dense32x256_kbuf": {
+      "avg_traces_per_ray": 1.19,
+      "envs": 32,
+      "gas_build_ms": 39.8,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.0854,
+      "mean_launch_ms": 13.3814,
+      "mode": "dense",
+      "mrays_per_second": 156.72,
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "dense32x256_v1": {
+      "avg_traces_per_ray": 2.99,
+      "envs": 32,
+      "gas_build_ms": 39.9,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.0854,
+      "mean_launch_ms": 47.9401,
+      "mode": "dense",
+      "mrays_per_second": 43.75,
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "g1_hybrid_multirobot_e4": {
+      "chrome_bound_meshes": 244,
+      "component_ms": {
+        "compositor": 1.1725163009638588,
+        "gait_physics": 0.5953116342425346,
+        "gaussian_render": 9.323468354220191,
+        "rtx_mesh": 349.055660655722
+      },
+      "distinct_pose_per_robot": true,
+      "dof_count": 29,
+      "envs": 4,
+      "fps": 1.287133775628109,
+      "images_per_second": 5.148535102512436,
+      "pass": true,
+      "pose_cache": false,
+      "resolution": [
+        256,
+        256
+      ],
+      "robots": 4,
+      "rt_subframes": 8,
+      "rtx_ms_per_env": 87.2639151639305,
+      "schema_version": "g1-hybrid-multirobot/v1",
+      "wall_frame_ms": 776.920021007148
+    },
+    "g1_hybrid_warp": {
+      "fit_frame_ms": {
+        "intercept_ms": 0.42730189401735785,
+        "ms_per_env": 2.294008715573682
+      },
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "mesh_source": "synthetic-ellipsoid-399424tris",
+      "ovrtx_unified_reference": {
+        "images_per_second_ceiling": 256,
+        "ms_per_env": 4.45
+      },
+      "points": [
+        {
+          "component_ms": {
+            "compositor": 0.7262213233237466,
+            "gaussian": 2.4262413304919996,
+            "mesh": 0.16876368317753077
+          },
+          "envs": 1,
+          "fps": 309.3969231574384,
+          "images_per_second": 309.3969231574384,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 3.232094197301194
+        },
+        {
+          "component_ms": {
+            "compositor": 0.705121667124331,
+            "gaussian": 4.691009681361417,
+            "mesh": 0.16527370704958835
+          },
+          "envs": 2,
+          "fps": 191.74591914170392,
+          "images_per_second": 383.49183828340784,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 5.215234850766137
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7055576425045729,
+            "gaussian": 9.133408350559572,
+            "mesh": 0.1655843419333299
+          },
+          "envs": 4,
+          "fps": 108.12040286348986,
+          "images_per_second": 432.48161145395943,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 9.248948149615899
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7031376784046491,
+            "gaussian": 18.24672062260409,
+            "mesh": 0.18257430444161096
+          },
+          "envs": 8,
+          "fps": 54.28162419151155,
+          "images_per_second": 434.2529935320924,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 18.42244064901024
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7040946511551738,
+            "gaussian": 36.6079059895128,
+            "mesh": 0.20837034874906143
+          },
+          "envs": 16,
+          "fps": 27.08373227563552,
+          "images_per_second": 433.3397164101683,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 36.922533047618344
+        },
+        {
+          "component_ms": {
+            "compositor": 0.9980226944511136,
+            "gaussian": 73.18096165545285,
+            "mesh": 0.26578068112333614
+          },
+          "envs": 32,
+          "fps": 13.505280849265517,
+          "images_per_second": 432.16898717649656,
+          "mesh_hit_px_per_env": 936.0,
+          "wall_frame_ms": 74.04510955093428
+        }
+      ],
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "g1-hybrid-warp/v1",
+      "triangles": 399424
+    },
+    "g1_hybrid_warp_128": {
+      "fit_frame_ms": {
+        "intercept_ms": -0.09413887455593795,
+        "ms_per_env": 1.929469451001101
+      },
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "mesh_source": "/workspace/outputs/g1_mesh.npz",
+      "ovrtx_unified_reference": {
+        "images_per_second_ceiling": 256,
+        "ms_per_env": 4.45
+      },
+      "points": [
+        {
+          "component_ms": {
+            "compositor": 0.7110279984772205,
+            "gaussian": 61.39001126090685,
+            "mesh": 0.2941639783481757
+          },
+          "envs": 32,
+          "fps": 16.214192163448413,
+          "images_per_second": 518.8541492303492,
+          "mesh_hit_px_per_env": 534.78125,
+          "wall_frame_ms": 61.67436465038918
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7197452941909432,
+            "gaussian": 122.85731236139934,
+            "mesh": 0.38438732735812664
+          },
+          "envs": 64,
+          "fps": 8.106770424152202,
+          "images_per_second": 518.833307145741,
+          "mesh_hit_px_per_env": 535.453125,
+          "wall_frame_ms": 123.3536843501497
+        },
+        {
+          "component_ms": {
+            "compositor": 1.005452669536074,
+            "gaussian": 245.72769133374095,
+            "mesh": 0.6225343095138669
+          },
+          "envs": 128,
+          "fps": 4.050375469116768,
+          "images_per_second": 518.4480600469464,
+          "mesh_hit_px_per_env": 535.4765625,
+          "wall_frame_ms": 246.89069140003994
+        }
+      ],
+      "resolution": [
+        128,
+        128
+      ],
+      "schema_version": "g1-hybrid-warp/v1",
+      "triangles": 382618
+    },
+    "g1_hybrid_warp_realg1": {
+      "fit_frame_ms": {
+        "intercept_ms": 0.43815054791163277,
+        "ms_per_env": 2.303934799314973
+      },
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "mesh_source": "/workspace/outputs/g1_mesh.npz",
+      "ovrtx_unified_reference": {
+        "images_per_second_ceiling": 256,
+        "ms_per_env": 4.45
+      },
+      "points": [
+        {
+          "component_ms": {
+            "compositor": 0.6852716905996203,
+            "gaussian": 2.418891953614851,
+            "mesh": 0.25095767341554165
+          },
+          "envs": 1,
+          "fps": 313.9364259168378,
+          "images_per_second": 313.9364259168378,
+          "mesh_hit_px_per_env": 1987.0,
+          "wall_frame_ms": 3.1853583001066
+        },
+        {
+          "component_ms": {
+            "compositor": 0.6898716480160753,
+            "gaussian": 4.703337675891817,
+            "mesh": 0.25019437695542973
+          },
+          "envs": 2,
+          "fps": 193.38352397403764,
+          "images_per_second": 386.7670479480753,
+          "mesh_hit_px_per_env": 2199.5,
+          "wall_frame_ms": 5.171071348013356
+        },
+        {
+          "component_ms": {
+            "compositor": 0.6911916813502709,
+            "gaussian": 9.129574328350524,
+            "mesh": 0.24164402081320682
+          },
+          "envs": 4,
+          "fps": 107.01307000565801,
+          "images_per_second": 428.05228002263203,
+          "mesh_hit_px_per_env": 2012.5,
+          "wall_frame_ms": 9.344652947038412
+        },
+        {
+          "component_ms": {
+            "compositor": 0.7114479861532649,
+            "gaussian": 18.25243537314236,
+            "mesh": 0.27865035614619654
+          },
+          "envs": 8,
+          "fps": 53.60492649001078,
+          "images_per_second": 428.83941192008626,
+          "mesh_hit_px_per_env": 2156.125,
+          "wall_frame_ms": 18.655001797014847
+        },
+        {
+          "component_ms": {
+            "compositor": 0.6923479959368706,
+            "gaussian": 36.59125731792301,
+            "mesh": 0.36726100370287895
+          },
+          "envs": 16,
+          "fps": 26.975336375047167,
+          "images_per_second": 431.6053820007547,
+          "mesh_hit_px_per_env": 2147.9375,
+          "wall_frame_ms": 37.07090010284446
+        },
+        {
+          "component_ms": {
+            "compositor": 0.9853723458945751,
+            "gaussian": 73.19134504844745,
+            "mesh": 0.5342276999726892
+          },
+          "envs": 32,
+          "fps": 13.449933288895469,
+          "images_per_second": 430.397865244655,
+          "mesh_hit_px_per_env": 2144.84375,
+          "wall_frame_ms": 74.34981114929542
+        }
+      ],
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "g1-hybrid-warp/v1",
+      "triangles": 382618
+    },
+    "g1_import_report": {
+      "articulation_root_count": 1,
+      "articulation_root_examples": [
+        "/g1_29dof/Geometry/pelvis"
+      ],
+      "collision_prim_count": 12,
+      "collision_prim_examples": [
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_1",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_2",
+        "/g1_29dof/Geometry/pelvis/left_hip_pitch_link/left_hip_roll_link/left_hip_yaw_link/left_knee_link/left_ankle_pitch_link/left_ankle_roll_link/sphere_3",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_1",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_2",
+        "/g1_29dof/Geometry/pelvis/right_hip_pitch_link/right_hip_roll_link/right_hip_yaw_link/right_knee_link/right_ankle_pitch_link/right_ankle_roll_link/sphere_3",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/left_shoulder_pitch_link/left_shoulder_roll_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/left_shoulder_pitch_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/right_shoulder_pitch_link/right_shoulder_roll_link/cylinder",
+        "/g1_29dof/Geometry/pelvis/waist_yaw_link/waist_roll_link/torso_link/right_shoulder_pitch_link/cylinder"
+      ],
+      "imported_usd": "/workspace/assets/g1/g1_29dof/g1_29dof.usda",
+      "package_root": "/workspace/src/unitree_ros/robots/g1_description",
+      "result": "PASS",
+      "schema_version": "isaacsim-g1-urdf-import-smoke/v1",
+      "scope": "Validates robot collision/articulation authoring only. A Gaussian scene requires a separate PhysX collision proxy.",
+      "urdf": "/workspace/src/unitree_ros/robots/g1_description/g1_29dof.urdf"
+    },
+    "hybrid32x256_kbuf": {
+      "avg_traces_per_ray": 1.21,
+      "envs": 32,
+      "gas_build_ms": 39.7,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.0996,
+      "mean_launch_ms": 13.3392,
+      "mode": "dense",
+      "mrays_per_second": 157.22,
+      "rays_per_launch": 2097152,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "optimization_sweep": {
+      "adaptive": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.75980584921784,
+            "raster_mean_ms": 73.0683049846751,
+            "raster_ms": [
+              73.01981985219754,
+              72.99648585030809,
+              73.18860925151967
+            ],
+            "speedup_raster_over_tracer": 5.0801028733461715,
+            "tracer": {
+              "avg_traces_per_ray": 1.23,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 145.55
+            },
+            "tracer_mean_ms": 14.383233333333331,
+            "tracer_ms": [
+              14.3816,
+              14.36,
+              14.4081
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 40.11920518836409,
+            "raster_mean_ms": 94.1998968172508,
+            "raster_ms": [
+              94.19042110093869,
+              94.20038114767522,
+              94.20888820313849
+            ],
+            "speedup_raster_over_tracer": 1.6883275290394588,
+            "tracer": {
+              "avg_traces_per_ray": 2.55,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 37.65
+            },
+            "tracer_mean_ms": 55.7948,
+            "tracer_ms": [
+              55.8649,
+              55.8169,
+              55.7026
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      },
+      "adaptive_it128": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.75984039928069,
+            "raster_mean_ms": 73.00757736666128,
+            "raster_ms": [
+              73.00529935164377,
+              73.00519535201602,
+              73.01223739632405
+            ],
+            "speedup_raster_over_tracer": 5.062377084835336,
+            "tracer": {
+              "avg_traces_per_ray": 1.23,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 145.38
+            },
+            "tracer_mean_ms": 14.4216,
+            "tracer_ms": [
+              14.4783,
+              14.3613,
+              14.4252
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 40.1187617790268,
+            "raster_mean_ms": 94.18278033457075,
+            "raster_ms": [
+              94.12999485502951,
+              94.20648204977624,
+              94.21186409890652
+            ],
+            "speedup_raster_over_tracer": 1.6876819756759263,
+            "tracer": {
+              "avg_traces_per_ray": 2.55,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 37.57
+            },
+            "tracer_mean_ms": 55.806000000000004,
+            "tracer_ms": [
+              55.9324,
+              55.6707,
+              55.8149
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      },
+      "adaptive_k16": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.775810163824815,
+            "raster_mean_ms": 73.01891850268778,
+            "raster_ms": [
+              73.01506465300918,
+              73.02312765386887,
+              73.01856320118532
+            ],
+            "speedup_raster_over_tracer": 5.932976241961095,
+            "tracer": {
+              "avg_traces_per_ray": 1.1,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 170.51
+            },
+            "tracer_mean_ms": 12.3073,
+            "tracer_ms": [
+              12.3604,
+              12.2623,
+              12.2992
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 40.13459542313719,
+            "raster_mean_ms": 94.2051106695241,
+            "raster_ms": [
+              94.21700215316378,
+              94.19446115498431,
+              94.20386870042421
+            ],
+            "speedup_raster_over_tracer": 1.909717896103551,
+            "tracer": {
+              "avg_traces_per_ray": 1.68,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 42.57
+            },
+            "tracer_mean_ms": 49.32933333333333,
+            "tracer_ms": [
+              49.3817,
+              49.3466,
+              49.2597
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      },
+      "adaptive_k4": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.62734004274869,
+            "raster_mean_ms": 73.00561099740055,
+            "raster_ms": [
+              73.01980349584483,
+              72.99954199697822,
+              72.99748749937862
+            ],
+            "speedup_raster_over_tracer": 3.3082564561508696,
+            "tracer": {
+              "avg_traces_per_ray": 1.51,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 94.96
+            },
+            "tracer_mean_ms": 22.067700000000002,
+            "tracer_ms": [
+              22.085,
+              22.0324,
+              22.0857
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 40.01016746069395,
+            "raster_mean_ms": 94.19565160060301,
+            "raster_ms": [
+              94.17951655341312,
+              94.20224910136312,
+              94.2051891470328
+            ],
+            "speedup_raster_over_tracer": 1.1949178331401997,
+            "tracer": {
+              "avg_traces_per_ray": 4.28,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 26.59
+            },
+            "tracer_mean_ms": 78.83023333333334,
+            "tracer_ms": [
+              78.8265,
+              78.8001,
+              78.8641
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      },
+      "adaptive_tmin05": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.51246570095091,
+            "raster_mean_ms": 73.00462826776008,
+            "raster_ms": [
+              73.00584324984811,
+              72.99553725169972,
+              73.0125043017324
+            ],
+            "speedup_raster_over_tracer": 5.6982780011833,
+            "tracer": {
+              "avg_traces_per_ray": 1.2,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 164.13
+            },
+            "tracer_mean_ms": 12.8117,
+            "tracer_ms": [
+              12.8245,
+              12.8336,
+              12.777
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 37.637551785798074,
+            "raster_mean_ms": 94.08793241600506,
+            "raster_ms": [
+              94.09089084947482,
+              94.08588195219636,
+              94.087024446344
+            ],
+            "speedup_raster_over_tracer": 1.8656888483727836,
+            "tracer": {
+              "avg_traces_per_ray": 2.37,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 41.62
+            },
+            "tracer_mean_ms": 50.43066666666667,
+            "tracer_ms": [
+              50.4053,
+              50.5032,
+              50.3835
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      },
+      "base": {
+        "camera_sets": {
+          "exterior": {
+            "env0_parity_psnr_db": 35.75838185799362,
+            "raster_mean_ms": 72.99624186513635,
+            "raster_ms": [
+              72.98919634777121,
+              73.00747489789501,
+              72.99205434974283
+            ],
+            "speedup_raster_over_tracer": 4.322620819433629,
+            "tracer": {
+              "avg_traces_per_ray": 1.23,
+              "hit_fraction": 0.0995,
+              "mrays_per_second": 123.72
+            },
+            "tracer_mean_ms": 16.887033333333335,
+            "tracer_ms": [
+              16.7819,
+              16.9278,
+              16.9514
+            ]
+          },
+          "interior": {
+            "env0_parity_psnr_db": 40.124956152129144,
+            "raster_mean_ms": 94.09226668261302,
+            "raster_ms": [
+              94.08080129651353,
+              94.08865579753183,
+              94.1073429537937
+            ],
+            "speedup_raster_over_tracer": 1.5655586505907184,
+            "tracer": {
+              "avg_traces_per_ray": 2.55,
+              "hit_fraction": 0.4001,
+              "mrays_per_second": 34.81
+            },
+            "tracer_mean_ms": 60.101400000000005,
+            "tracer_ms": [
+              60.0734,
+              59.9861,
+              60.2447
+            ]
+          }
+        },
+        "envs": 32,
+        "frames": 20,
+        "gaussians": 21497908,
+        "height": 256,
+        "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+        "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+        "repeats": 3,
+        "schema_version": "rt-vs-raster/v1",
+        "warmup": 5,
+        "width": 256
+      }
+    },
+    "ovrtx_multirobot_e1": {
+      "envs": 1,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 4808,
+      "robot_increment_ms": 23.774505220353603,
+      "robot_increment_ms_per_env": 23.774505220353603,
+      "robots": 1,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 205.98869288840467,
+        "images_per_second": 205.98869288840467,
+        "label": "splats-only",
+        "mean_frame_ms": 4.854635397593181,
+        "samples_ms": [
+          2.586715971119702,
+          2.5898460298776627,
+          2.6874160394072533,
+          2.5776249822229147,
+          2.5663559790700674,
+          2.5847359793260694,
+          2.6269559748470783,
+          2.625784953124821,
+          2.5659860111773014,
+          2.527895965613425,
+          2.5974559830501676,
+          2.732696011662483,
+          20.37829498294741,
+          14.906313037499785,
+          6.265453062951565
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 34.92944525806439,
+        "images_per_second": 34.92944525806439,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 28.629140617946785,
+        "samples_ms": [
+          12.155117001384497,
+          4.951560986228287,
+          4.694091039709747,
+          4.763771081343293,
+          4.7986009158194065,
+          4.960061050951481,
+          5.814863019622862,
+          5.848553031682968,
+          82.54420198500156,
+          60.852534021250904,
+          26.230078074149787,
+          92.42107393220067,
+          53.86883905157447,
+          57.44601704645902,
+          8.0877470318228
+        ]
+      }
+    },
+    "ovrtx_multirobot_e16": {
+      "envs": 16,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 2396,
+      "robot_increment_ms": 1.7149321967735887,
+      "robot_increment_ms_per_env": 0.10718326229834929,
+      "robots": 16,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 14.21028086377297,
+        "images_per_second": 227.36449382036753,
+        "label": "splats-only",
+        "mean_frame_ms": 70.37158586705725,
+        "samples_ms": [
+          67.5825719954446,
+          73.06436391081661,
+          69.6483759675175,
+          68.94051400013268,
+          70.03960700239986,
+          70.66904800012708,
+          70.75778895523399,
+          70.48394798766822,
+          70.35512803122401,
+          70.69205900188535,
+          69.76901704911143,
+          69.57600603345782,
+          70.08835708256811,
+          72.96323403716087,
+          70.94376895111054
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 13.872219478190424,
+        "images_per_second": 221.95551165104678,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 72.08651806383084,
+        "samples_ms": [
+          70.27795806061476,
+          69.4661260349676,
+          68.7299850396812,
+          68.6935749836266,
+          70.28775790240616,
+          69.49830590747297,
+          74.83549800235778,
+          73.68599495384842,
+          73.3951450092718,
+          73.01729405298829,
+          73.92739690840244,
+          72.51765299588442,
+          74.39396705012769,
+          74.27166705019772,
+          74.29944700561464
+        ]
+      }
+    },
+    "ovrtx_multirobot_e2": {
+      "envs": 2,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 3728,
+      "robot_increment_ms": 10.359364406516155,
+      "robot_increment_ms_per_env": 5.179682203258078,
+      "robots": 2,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 73.30849408337689,
+        "images_per_second": 146.61698816675377,
+        "label": "splats-only",
+        "mean_frame_ms": 13.640984070176879,
+        "samples_ms": [
+          3.7279280368238688,
+          14.245261088944972,
+          7.3424059664830565,
+          69.70161502249539,
+          6.979955011047423,
+          6.989064975641668,
+          6.816765060648322,
+          7.757876999676228,
+          20.255624898709357,
+          9.755061008036137,
+          9.565701009705663,
+          10.144833009690046,
+          10.469852946698666,
+          10.541812982410192,
+          10.321003035642207
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 41.66606168119223,
+        "images_per_second": 83.33212336238446,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 24.000348476693034,
+        "samples_ms": [
+          4.528099903836846,
+          4.549139994196594,
+          4.568069940432906,
+          4.621161031536758,
+          4.597330000251532,
+          4.582030000165105,
+          4.749490064568818,
+          4.686460015363991,
+          4.847540054470301,
+          4.566831048578024,
+          4.740489996038377,
+          4.537920001894236,
+          190.28679199982435,
+          85.99504001904279,
+          28.14883308019489
+        ]
+      }
+    },
+    "ovrtx_multirobot_e32": {
+      "envs": 32,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 3038,
+      "robot_increment_ms": 4.589055199176073,
+      "robot_increment_ms_per_env": 0.14340797497425228,
+      "robots": 32,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 4.7492874178481,
+        "images_per_second": 151.9771973711392,
+        "label": "splats-only",
+        "mean_frame_ms": 210.55790311656892,
+        "samples_ms": [
+          135.81760693341494,
+          133.7805719813332,
+          133.44693195540458,
+          131.88152795191854,
+          1273.5939780250192,
+          140.98900801036507,
+          134.2228929279372,
+          135.7029170030728,
+          133.47270095255226,
+          134.7427450818941,
+          134.04429296497256,
+          133.65671189967543,
+          133.89996299520135,
+          135.3310049744323,
+          133.78569309134036
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 4.64798576669823,
+        "images_per_second": 148.73554453434335,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 215.146958315745,
+        "samples_ms": [
+          219.22246599569917,
+          95.51415592432022,
+          94.29876389913261,
+          96.30000800825655,
+          95.55871703196317,
+          94.60185398347676,
+          106.35519993957132,
+          107.53741301596165,
+          104.9471179721877,
+          105.74064892716706,
+          1680.4399329703301,
+          106.10402002930641,
+          107.0838930318132,
+          107.4392240261659,
+          106.0609599808231
+        ]
+      }
+    },
+    "ovrtx_multirobot_e32_repeat": {
+      "envs": 32,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 5809,
+      "robot_increment_ms": 23.151347824993223,
+      "robot_increment_ms_per_env": 0.7234796195310382,
+      "robots": 32,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 5.2800763841163505,
+        "images_per_second": 168.96244429172322,
+        "label": "splats-only",
+        "mean_frame_ms": 189.39119953041276,
+        "samples_ms": [
+          132.1158519713208,
+          130.74832898564637,
+          130.28112798929214,
+          129.2760669020936,
+          130.59209799394011,
+          129.87461709417403,
+          130.33590803388506,
+          1005.4781819926575,
+          134.94500902015716,
+          131.6158720292151,
+          130.98891999106854,
+          130.9517800109461,
+          130.4018379887566,
+          131.47605094127357,
+          131.78634201176465
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 4.704940316386799,
+        "images_per_second": 150.55809012437757,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 212.542547355406,
+        "samples_ms": [
+          94.49817601125687,
+          107.35087702050805,
+          104.90042099263519,
+          95.92282003723085,
+          106.45481501705945,
+          105.26781203225255,
+          106.37768392916769,
+          107.2125859791413,
+          105.16564105637372,
+          1781.633794074878,
+          93.9348250394687,
+          94.3772760219872,
+          94.75966705940664,
+          96.33159101940691,
+          93.95022504031658
+        ]
+      }
+    },
+    "ovrtx_multirobot_e4": {
+      "envs": 4,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 825,
+      "robot_increment_ms": -9.870708516488474,
+      "robot_increment_ms_per_env": -2.4676771291221185,
+      "robots": 4,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 31.533428502899664,
+        "images_per_second": 126.13371401159866,
+        "label": "splats-only",
+        "mean_frame_ms": 31.712377863004804,
+        "samples_ms": [
+          14.835922978818417,
+          16.72059705015272,
+          16.49507600814104,
+          107.88277094252408,
+          83.60951591748744,
+          37.338663008995354,
+          39.57865806296468,
+          20.44571505393833,
+          19.452663022093475,
+          19.552092999219894,
+          19.795144093222916,
+          19.688664004206657,
+          19.919954938814044,
+          20.878716954030097,
+          19.491512910462916
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 45.78404627114715,
+        "images_per_second": 183.1361850845886,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 21.84166934651633,
+        "samples_ms": [
+          19.973984104581177,
+          21.401518024504185,
+          21.883448003791273,
+          21.967499051243067,
+          26.562709943391383,
+          21.292767953127623,
+          21.7255080351606,
+          21.46683807950467,
+          21.15417702589184,
+          21.314368001185358,
+          21.46618696860969,
+          21.363658015616238,
+          21.926588960923254,
+          22.520620026625693,
+          21.605168003588915
+        ]
+      }
+    },
+    "ovrtx_multirobot_e8": {
+      "envs": 8,
+      "pass": true,
+      "resolution": [
+        256,
+        256
+      ],
+      "rgb_delta_pixels_cam0": 1634,
+      "robot_increment_ms": 1.9063062577818854,
+      "robot_increment_ms_per_env": 0.23828828222273568,
+      "robots": 8,
+      "robots_static": true,
+      "schema_version": "ovrtx-multirobot/v1",
+      "scope": "Unified OVRTX scene (splats + G1 meshes, no compositor). Robots are static: accel structures may cache, so this is an optimistic lower bound vs walking robots.",
+      "splats_only": {
+        "fps": 27.086795724893857,
+        "images_per_second": 216.69436579915086,
+        "label": "splats-only",
+        "mean_frame_ms": 36.91835720092058,
+        "samples_ms": [
+          34.97792803682387,
+          34.91742897313088,
+          33.99860591161996,
+          36.64799209218472,
+          36.862942040897906,
+          36.46624193061143,
+          37.672484992071986,
+          36.32836102042347,
+          36.9645319879055,
+          36.35080100502819,
+          37.44128404650837,
+          36.05931997299194,
+          38.71633706148714,
+          42.41605394054204,
+          37.95504500158131
+        ]
+      },
+      "splats_plus_robots": {
+        "fps": 25.756823393039667,
+        "images_per_second": 206.05458714431734,
+        "label": "splats-plus-robots",
+        "mean_frame_ms": 38.82466345870247,
+        "samples_ms": [
+          37.627023993991315,
+          38.77098695375025,
+          38.381975959055126,
+          39.34457805007696,
+          39.45913794450462,
+          38.935057003982365,
+          39.51688902452588,
+          39.43694802001119,
+          38.66867593023926,
+          38.83554704952985,
+          38.50917599629611,
+          38.4370859246701,
+          39.4095879746601,
+          39.30431802291423,
+          37.73296403232962
+        ]
+      }
+    },
+    "parity": {
+      "camera": {
+        "fx": 230.4,
+        "fy": 230.4,
+        "origin": [
+          -5.5935413360595705,
+          -5.650021553039551,
+          -43.05939664840699
+        ],
+        "rotation": "identity"
+      },
+      "envs": 32,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "mae": 0.001631832746119281,
+      "max_mae": 0.03,
+      "min_psnr_db": 25.0,
+      "pass": true,
+      "psnr_db": 36.2734842596642,
+      "schema_version": "optix-tracer-raster-parity/v1",
+      "width": 256
+    },
+    "rt_vs_raster": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.75801090370107,
+          "raster_mean_ms": 73.40923748367156,
+          "raster_ms": [
+            73.31025224993937,
+            73.60877745086327,
+            73.30868275021203
+          ],
+          "speedup_raster_over_tracer": 4.21474731828849,
+          "tracer": {
+            "avg_traces_per_ray": 1.23,
+            "hit_fraction": 0.0995,
+            "mrays_per_second": 120.75
+          },
+          "tracer_mean_ms": 17.417233333333332,
+          "tracer_ms": [
+            17.4621,
+            17.4223,
+            17.3673
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.12536173223887,
+          "raster_mean_ms": 95.56207421701401,
+          "raster_ms": [
+            95.54433365119621,
+            95.55935075040907,
+            95.58253824943677
+          ],
+          "speedup_raster_over_tracer": 1.5421487443607846,
+          "tracer": {
+            "avg_traces_per_ray": 2.55,
+            "hit_fraction": 0.4001,
+            "mrays_per_second": 33.8
+          },
+          "tracer_mean_ms": 61.966833333333334,
+          "tracer_ms": [
+            61.9197,
+            61.9433,
+            62.0375
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "rt_vs_raster_new_defaults": {
+      "camera_sets": {
+        "exterior": {
+          "env0_parity_psnr_db": 35.776363754455026,
+          "raster_mean_ms": 72.98982574914892,
+          "raster_ms": [
+            72.99056974588893,
+            72.99586925073527,
+            72.98303825082257
+          ],
+          "speedup_raster_over_tracer": 5.97009837714597,
+          "tracer": {
+            "avg_traces_per_ray": 1.1,
+            "hit_fraction": 0.0995,
+            "mrays_per_second": 171.82
+          },
+          "tracer_mean_ms": 12.225900000000001,
+          "tracer_ms": [
+            12.2285,
+            12.2438,
+            12.2054
+          ]
+        },
+        "interior": {
+          "env0_parity_psnr_db": 40.135362863777324,
+          "raster_mean_ms": 94.08283315133303,
+          "raster_ms": [
+            94.07680145232007,
+            94.08184695057571,
+            94.08985105110332
+          ],
+          "speedup_raster_over_tracer": 1.909054135273347,
+          "tracer": {
+            "avg_traces_per_ray": 1.68,
+            "hit_fraction": 0.4001,
+            "mrays_per_second": 42.56
+          },
+          "tracer_mean_ms": 49.28243333333333,
+          "tracer_ms": [
+            49.2932,
+            49.2845,
+            49.2696
+          ]
+        }
+      },
+      "envs": 32,
+      "frames": 20,
+      "gaussians": 21497908,
+      "height": 256,
+      "home_scan_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "output_contract_note": "raster renders rgb+depth+alpha+semantic (protocol contract); tracer writes RGBA only \u2014 tracer full contract is a follow-up",
+      "repeats": 3,
+      "schema_version": "rt-vs-raster/v1",
+      "warmup": 5,
+      "width": 256
+    },
+    "sparse30k_kbuf": {
+      "avg_traces_per_ray": 2.5,
+      "envs": 32,
+      "gas_build_ms": 39.3,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.3912,
+      "mean_launch_ms": 7.9456,
+      "mode": "sparse",
+      "mrays_per_second": 3.78,
+      "rays_per_launch": 30000,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "sparse30k_v1": {
+      "avg_traces_per_ray": 14.1,
+      "envs": 32,
+      "gas_build_ms": 39.8,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.3911,
+      "mean_launch_ms": 32.7065,
+      "mode": "sparse",
+      "mrays_per_second": 0.92,
+      "rays_per_launch": 30000,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "sparse3m_kbuf": {
+      "avg_traces_per_ray": 2.5,
+      "envs": 32,
+      "gas_build_ms": 39.7,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.3932,
+      "mean_launch_ms": 216.2967,
+      "mode": "sparse",
+      "mrays_per_second": 13.87,
+      "rays_per_launch": 3000000,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "sparse3m_v1": {
+      "avg_traces_per_ray": 14.11,
+      "envs": 32,
+      "gas_build_ms": 39.7,
+      "gas_compacted_gb": 0.538,
+      "gaussians": 21497908,
+      "height": 256,
+      "hit_fraction": 0.3931,
+      "mean_launch_ms": 906.3436,
+      "mode": "sparse",
+      "mrays_per_second": 3.31,
+      "rays_per_launch": 3000000,
+      "schema_version": "optix-gs-tracer/v1",
+      "width": 256
+    },
+    "warp_mesh_tracer": {
+      "bvh_build_ms_once": 179.70686696935445,
+      "fit": {
+        "intercept_ms": 0.2861088002216423,
+        "ms_per_env": 0.015605512177503257,
+        "r_squared": 0.996587697584526
+      },
+      "gate_pass": true,
+      "gate_target_ms_per_env": 4.0,
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "per_frame_geometry_rebuild": false,
+      "points": [
+        {
+          "envs": 1,
+          "hit_pixels_per_env": 6130.0,
+          "hit_pixels_total": 6130,
+          "images_per_second": 3134.4123200346194,
+          "mean_frame_ms": 0.3190390726861854,
+          "ms_per_env": 0.3190390726861854
+        },
+        {
+          "envs": 2,
+          "hit_pixels_per_env": 6130.0,
+          "hit_pixels_total": 12260,
+          "images_per_second": 6307.580908650296,
+          "mean_frame_ms": 0.3170787706039846,
+          "ms_per_env": 0.1585393853019923
+        },
+        {
+          "envs": 4,
+          "hit_pixels_per_env": 6125.0,
+          "hit_pixels_total": 24500,
+          "images_per_second": 11591.454512252609,
+          "mean_frame_ms": 0.34508180106058717,
+          "ms_per_env": 0.08627045026514679
+        },
+        {
+          "envs": 8,
+          "hit_pixels_per_env": 6125.5,
+          "hit_pixels_total": 49004,
+          "images_per_second": 20105.031862612464,
+          "mean_frame_ms": 0.39791033680861193,
+          "ms_per_env": 0.04973879210107649
+        },
+        {
+          "envs": 16,
+          "hit_pixels_per_env": 6126.75,
+          "hit_pixels_total": 98028,
+          "images_per_second": 30286.858770836465,
+          "mean_frame_ms": 0.528281923228254,
+          "ms_per_env": 0.03301762020176587
+        },
+        {
+          "envs": 32,
+          "hit_pixels_per_env": 6125.625,
+          "hit_pixels_total": 196020,
+          "images_per_second": 40383.22855411001,
+          "mean_frame_ms": 0.7924081641249359,
+          "ms_per_env": 0.024762755128904246
+        }
+      ],
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "warp-mesh-tracer-gate/v1",
+      "triangles": 799236,
+      "vertices": 400512
+    },
+    "warp_mesh_tracer_realg1": {
+      "bvh_build_ms_once": 177.22941609099507,
+      "fit": {
+        "intercept_ms": 0.3148248474380838,
+        "ms_per_env": 0.017817047694567798,
+        "r_squared": 0.9990977114353676
+      },
+      "gate_pass": true,
+      "gate_target_ms_per_env": 4.0,
+      "isaac_rtx_reference_ms_per_env": 36.6,
+      "per_frame_geometry_rebuild": false,
+      "points": [
+        {
+          "envs": 1,
+          "hit_pixels_per_env": 3263.0,
+          "hit_pixels_total": 3263,
+          "images_per_second": 2924.6165963574936,
+          "mean_frame_ms": 0.34192516080414254,
+          "ms_per_env": 0.34192516080414254
+        },
+        {
+          "envs": 2,
+          "hit_pixels_per_env": 3883.5,
+          "hit_pixels_total": 7767,
+          "images_per_second": 5816.1773942647515,
+          "mean_frame_ms": 0.3438684662493567,
+          "ms_per_env": 0.17193423312467834
+        },
+        {
+          "envs": 4,
+          "hit_pixels_per_env": 3505.25,
+          "hit_pixels_total": 14021,
+          "images_per_second": 10264.931770845065,
+          "mean_frame_ms": 0.38967623841017485,
+          "ms_per_env": 0.09741905960254371
+        },
+        {
+          "envs": 8,
+          "hit_pixels_per_env": 3842.625,
+          "hit_pixels_total": 30741,
+          "images_per_second": 17661.3266625508,
+          "mean_frame_ms": 0.45296710450202227,
+          "ms_per_env": 0.05662088806275278
+        },
+        {
+          "envs": 16,
+          "hit_pixels_per_env": 3886.875,
+          "hit_pixels_total": 62190,
+          "images_per_second": 26909.34349982407,
+          "mean_frame_ms": 0.594589013295869,
+          "ms_per_env": 0.03716181333099181
+        },
+        {
+          "envs": 32,
+          "hit_pixels_per_env": 3884.3125,
+          "hit_pixels_total": 124298,
+          "images_per_second": 36019.92822735286,
+          "mean_frame_ms": 0.888397106124709,
+          "ms_per_env": 0.027762409566397157
+        }
+      ],
+      "resolution": [
+        256,
+        256
+      ],
+      "schema_version": "warp-mesh-tracer-gate/v1",
+      "triangles": 382618,
+      "vertices": 191434
+    }
+  },
+  "scene": {
+    "gaussians": 21497908,
+    "name": "Home Scan LOD0",
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267"
+  },
+  "schema_version": "rtx-compositing-validation/v1"
+}

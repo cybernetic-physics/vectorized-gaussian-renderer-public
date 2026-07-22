@@ -1,0 +1,97 @@
+{
+  "schema_version": "trajectory-initial-results-v1",
+  "recorded_utc": "2026-07-16",
+  "source": {
+    "branch": null,
+    "detached_head": true,
+    "head": "6a54ea67a1203683a8d5b708b78d235ea0395092",
+    "diff_sha256": "1bb1bb93d038e113a8349bbd96f013c18c98e9e705ab0ffed647d0ad85186d9d",
+    "native_extension_sha256": "263257f82131a89d997b11513d946baf98b0467a1df32bdee1a0098855147835"
+  },
+  "machine": {
+    "vast_instance_id": 45120960,
+    "vast_offer_id": 36846332,
+    "gpu": "NVIDIA RTX 4090 24564 MiB",
+    "driver": "580.119.02",
+    "cuda_runtime": "12.8",
+    "isaac_sim": "6.0.1"
+  },
+  "routes": {
+    "representative_sha256": "8b5b55fc6717ec8ff76df433f99bd511b9ff8d327c27ba508d250a1b66eb4ff8",
+    "representative_validation": "pass",
+    "stress_sha256": "fc053d46e0ccc56414b93c8b14eec1ebcb8913a3a9dfec2d38c95fbb9ed53cc9",
+    "stress_validation": "pass"
+  },
+  "static_cache_hit": {
+    "b1_128_mean_gpu_ms": 0.13109580799937248,
+    "b1_128_images_per_second": 7628.0089749688,
+    "b1024_128_mean_gpu_ms": 41.273794651031494,
+    "b1024_128_images_per_second": 24809.931062987656,
+    "scope": "unchanged-camera projection-cache hits only"
+  },
+  "dynamic": {
+    "sequential_b1_t120_256_mean_gpu_ms": 6.366597576936086,
+    "sequential_b1_t120_256_images_per_second": 157.06976731537793,
+    "phase_b256_t120_128_images_per_second": [482.38614044053423, 482.21345317820874, 482.135006677538],
+    "phase_b256_relative_spread": 0.0005209,
+    "mixed_b256_images_per_second_by_moved_fraction": {
+      "0.01": 481.8387130643206,
+      "0.25": 479.09438899111905,
+      "0.50": 472.53826391785907,
+      "1.00": 481.96186502068895
+    }
+  },
+  "fidelity": {
+    "ewa_vs_pinned_gsplat": "fail",
+    "strict_semantic_agreement": 0.9927087148030599,
+    "semantic_threshold": 0.999,
+    "lpips_available": true,
+    "ovrtx_perspective": "fail-artifact-integrity",
+    "ovrtx_static_all_black_frames": 24,
+    "ovrtx_dynamic_chunks_black_frames": 60
+  },
+  "isaac_fabric_b256": {
+    "static_integrated_mean_ms": 16.552433880666893,
+    "static_deadline_misses": 92,
+    "mixed_integrated_mean_ms": 21.34635630995035,
+    "mixed_deadline_misses": 300,
+    "moving_integrated_mean_ms": 24.529742520923417,
+    "moving_deadline_misses": 300,
+    "steps_per_case": 300,
+    "deadline_ms": 16.6666667
+  },
+  "cache_audit": {
+    "pass": true,
+    "api_requests": 20,
+    "native_submissions": 20,
+    "renderer_executions": 20,
+    "hits": 6,
+    "misses": 14
+  },
+  "soak": {
+    "pass": true,
+    "measured_seconds": 642.3764985436574,
+    "native_submissions": 1200,
+    "mean_gpu_ms": 531.1404475402832,
+    "images_per_second": 481.9817454790698,
+    "allocation_growth_bytes": 0,
+    "capacity_overflow": 0,
+    "artifact_audit": "pass"
+  },
+  "profiles": {
+    "moving_projection_percent": 69.33335497214647,
+    "moving_sorting_percent": 17.908553818809214,
+    "moving_raster_percent": 11.768197290314424,
+    "nsight_compute": "blocked_by_host_counter_permissions"
+  },
+  "durable_artifact": {
+    "bucket": "vectorized-gaussian-renderer-assets",
+    "key": "trajectory-evals/2026-07-16-instance-45120960/e5b48320baebf382a0c6c550eaf114e4a6ba3c9a258d4a90e6f903406c8eef02.tar",
+    "index_key": "trajectory-evals/2026-07-16-instance-45120960/e5b48320baebf382a0c6c550eaf114e4a6ba3c9a258d4a90e6f903406c8eef02.tar.index.json",
+    "bytes": 1532497920,
+    "sha256": "e5b48320baebf382a0c6c550eaf114e4a6ba3c9a258d4a90e6f903406c8eef02",
+    "part_count": 6,
+    "round_trip_verification": "pass"
+  },
+  "overall_verdict": "fail"
+}

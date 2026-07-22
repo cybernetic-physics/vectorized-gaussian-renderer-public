@@ -1,0 +1,216 @@
+{
+  "attribution": {
+    "author": "Eric Cornwell (https://superspl.at/user?id=eecorn)",
+    "license": "CC Attribution (Creative Commons Attribution)",
+    "license_url": "http://creativecommons.org/licenses/by/4.0/",
+    "source": "https://superspl.at/scene/81763c34",
+    "title": "Kitchen Island Display"
+  },
+  "canonical_ply": {
+    "byte_count": 81103821,
+    "format": "binary_little_endian",
+    "gaussian_count": 343654,
+    "path": "/workspace/datasets/external-canonical/kitchen-island-display.ply",
+    "sha256": "668df1ded92fd28118e2d2a848d88777a47178a80566839b0b8e57e6f39eb81d"
+  },
+  "conversion": {
+    "command": [
+      "splat-transform",
+      "--mem",
+      "/workspace/datasets/external-source/kitchen-island-display/0_0/meta.json",
+      "/workspace/datasets/external-canonical/kitchen-island-display.ply"
+    ],
+    "tool": "splat-transform",
+    "version": ""
+  },
+  "dataset_id": "kitchen-island-display",
+  "schema_version": "vectorized-gaussian-renderer-external-scene/v1",
+  "source": {
+    "format": "PlayCanvas SOG LOD",
+    "inputs": [
+      {
+        "bytes": 15510,
+        "path": "/workspace/datasets/external-source/kitchen-island-display/0_0/meta.json",
+        "sha256": "faf6f91301adecfeacf52795adee707e0b529195b2759af9616e8dd5e629f4f1"
+      }
+    ],
+    "inventory": {
+      "file_count": 34,
+      "files": [
+        {
+          "bytes": 878866,
+          "path": "0_0/means_l.webp",
+          "sha256": "00a0af65eb55775050884a0af72dcf5648138c432204012badf4ffab4c109c1c"
+        },
+        {
+          "bytes": 161422,
+          "path": "0_0/means_u.webp",
+          "sha256": "5f71795c2177ce03c1b53d75adf72d9bb2b68269616624795fe97945d7766d31"
+        },
+        {
+          "bytes": 15510,
+          "path": "0_0/meta.json",
+          "sha256": "faf6f91301adecfeacf52795adee707e0b529195b2759af9616e8dd5e629f4f1"
+        },
+        {
+          "bytes": 1095432,
+          "path": "0_0/quats.webp",
+          "sha256": "6671d138ce1fb1f860f07116ba04395a1691c37af1626c8cfcc4c967d7babe33"
+        },
+        {
+          "bytes": 946116,
+          "path": "0_0/scales.webp",
+          "sha256": "0f30c6f7df3c18c717ecacfaa3e092727c95715ccf2df87ccc07c8e9b6dfd704"
+        },
+        {
+          "bytes": 1026580,
+          "path": "0_0/sh0.webp",
+          "sha256": "7eb30c63041f9ddac31d7710ebab61de6a630de120294ffa8a39eb5ffe909c8d"
+        },
+        {
+          "bytes": 2275620,
+          "path": "0_0/shN_centroids.webp",
+          "sha256": "52f3aa2a5fdef1f6a0f0b29dc661a42d3362f91bdcdb12321a8663df1af16d75"
+        },
+        {
+          "bytes": 556980,
+          "path": "0_0/shN_labels.webp",
+          "sha256": "ecd1f9ff9026e39a769a714c6efda2d4acaa7e72aa0019cd961d00280c822508"
+        },
+        {
+          "bytes": 468972,
+          "path": "1_0/means_l.webp",
+          "sha256": "a75ce570b8ec0977ef8e747c94b80608e342f1b8f2518d60222069608730a6a0"
+        },
+        {
+          "bytes": 102414,
+          "path": "1_0/means_u.webp",
+          "sha256": "a5558a9ca2c47f60ec61b7ba41199800d986eba4b0629c486166f7dadfbc4a2e"
+        },
+        {
+          "bytes": 15534,
+          "path": "1_0/meta.json",
+          "sha256": "f467a8ef2ae7e6aca9cdf2f06b5e4f5927437ccab1d25f00d4cbbb6e86deb201"
+        },
+        {
+          "bytes": 540384,
+          "path": "1_0/quats.webp",
+          "sha256": "678fd1834b7bcbbc7d9754ddfa6593fda52a78c08a709db0d57f7e3d98ea791c"
+        },
+        {
+          "bytes": 442778,
+          "path": "1_0/scales.webp",
+          "sha256": "a409db63a09e6ef4af0be210b1ac0ac44b2130e55b26b97650f84ccfc248d7c6"
+        },
+        {
+          "bytes": 533302,
+          "path": "1_0/sh0.webp",
+          "sha256": "7a9f117e5cdb4273ca5f9daca5cfcd490f5015161c51d818cf3ac00be283818c"
+        },
+        {
+          "bytes": 2290088,
+          "path": "1_0/shN_centroids.webp",
+          "sha256": "1902621700368c83b69ddb5b33d6039b315ff7013b45f4d738a1e2368a817205"
+        },
+        {
+          "bytes": 323486,
+          "path": "1_0/shN_labels.webp",
+          "sha256": "c0b7ef811311b13f1288685d32546cb7658860807aee6e041100ec1f547affd7"
+        },
+        {
+          "bytes": 246630,
+          "path": "2_0/means_l.webp",
+          "sha256": "b9627cca1dd2de32898de65533124bef7a5cffbe8fa5441e49276b227fd6ef3d"
+        },
+        {
+          "bytes": 67598,
+          "path": "2_0/means_u.webp",
+          "sha256": "8ff8899d43f4225efd61857e44f946eda79f99afff99babc12a8990551a00f49"
+        },
+        {
+          "bytes": 15556,
+          "path": "2_0/meta.json",
+          "sha256": "02be507a4f052260122b94728b6311e7f38112baad4e79f249bc707337023eab"
+        },
+        {
+          "bytes": 268890,
+          "path": "2_0/quats.webp",
+          "sha256": "4e18eb14d5a292c2e3af5c434c09c55a700d5a4d85d3ec29d555dd3632ef86d5"
+        },
+        {
+          "bytes": 215886,
+          "path": "2_0/scales.webp",
+          "sha256": "c5466aae3277e04ea33783d022655c55d66d9e59131ff836edb69e712d93a31a"
+        },
+        {
+          "bytes": 272636,
+          "path": "2_0/sh0.webp",
+          "sha256": "df074a959ae1dafc653d692c14ca17d60bf2de133231a4dc1f89ede58fd321a4"
+        },
+        {
+          "bytes": 2303184,
+          "path": "2_0/shN_centroids.webp",
+          "sha256": "756e64b39097d6fccc0ccd827c988993075fc9ed96df44126f52fa0c72d91e4e"
+        },
+        {
+          "bytes": 132980,
+          "path": "2_0/shN_labels.webp",
+          "sha256": "d7329e2f75c3d19b187632dfe5f1458c25fc30167d0d3e13128effeced466996"
+        },
+        {
+          "bytes": 126318,
+          "path": "3_0/means_l.webp",
+          "sha256": "c4dbe339b57a7b3d8c064cd5891a42e2c6ce73b6edb7d2d0fc8220698064b613"
+        },
+        {
+          "bytes": 39434,
+          "path": "3_0/means_u.webp",
+          "sha256": "8d5d2cf570f56eeac42f1c11564a5b031d00ba5fabc0b92a4f472674669b9021"
+        },
+        {
+          "bytes": 15584,
+          "path": "3_0/meta.json",
+          "sha256": "d9d43f396b7a651bd2c3fd4ad443398f321f5a266bf047caf74769e9a80631dd"
+        },
+        {
+          "bytes": 134420,
+          "path": "3_0/quats.webp",
+          "sha256": "53a0aa323fd4480bc6c9181c2561e2193e46dd36d684097eb32c85b9192e50a0"
+        },
+        {
+          "bytes": 106366,
+          "path": "3_0/scales.webp",
+          "sha256": "d18c91d3017ab365edc259834f444d203326539e2d538beb43cb5e5cc2b40693"
+        },
+        {
+          "bytes": 139158,
+          "path": "3_0/sh0.webp",
+          "sha256": "15d83f063ee0b9d0839b8f03b3b9aaca4ab968271c8c9aac72293ae73617c2f2"
+        },
+        {
+          "bytes": 1153582,
+          "path": "3_0/shN_centroids.webp",
+          "sha256": "3b91a572ee86b874206e8da234611cd35f67248c849ecb8dcefdf7538743539d"
+        },
+        {
+          "bytes": 64812,
+          "path": "3_0/shN_labels.webp",
+          "sha256": "9796a02ddac9c62a3cbe12232cb53f747c51b7482e2090e7b4be8c27bb8feacd"
+        },
+        {
+          "bytes": 309,
+          "path": "license.txt",
+          "sha256": "fd6d3ee24e06bd6a391d4e93d3c516e69534aaec83aefd3bfccd6d1b9a129e12"
+        },
+        {
+          "bytes": 60770,
+          "path": "lod-meta.json",
+          "sha256": "1614572189a778cde7ba2c1d0f8410c53e1540c0a3b659cae660332d2f9f33a8"
+        }
+      ],
+      "relative_file_manifest_sha256": "6832fa9291a24d6c5ff9d6fe3619047c58a86058d605b760affa2ee6c89eb275"
+    },
+    "local_path": "/workspace/datasets/external-source/kitchen-island-display",
+    "lod": 0
+  }
+}

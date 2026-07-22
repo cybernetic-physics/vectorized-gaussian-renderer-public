@@ -1,0 +1,16 @@
+[package]
+version = "0.1.0"
+category = "Simulation"
+title = "Isaac Sim Gaussian Renderer"
+description = "Lifecycle extension for the Isaac Sim-native Gaussian renderer service."
+authors = ["Cybernetic Physics"]
+repository = "https://github.com/cybernetic-physics/vectorized-gaussian-renderer"
+keywords = ["isaacsim", "gaussian", "renderer"]
+
+[dependencies]
+"usdrt.scenegraph" = {}
+"omni.hydra.usdrt_delegate" = {}
+"omni.warp.core" = {}
+
+[[python.module]]
+name = "isaacsim_gaussian_renderer_extension"

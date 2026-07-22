@@ -1,0 +1,219 @@
+{
+  "schema_version": "pr68-independent-l4-validation/v1",
+  "recorded_date": "2026-07-21",
+  "purpose": "Independent stress test of PR #68 under its intended static-Gaussian-map, many-changing-cameras, and sparse-secondary-ray use cases.",
+  "product_contract": {
+    "in_scope": [
+      "Reuse one static Gaussian acceleration structure across many independently changing cameras.",
+      "Trace device-resident sparse secondary rays, such as robot reflections, through the Gaussian map.",
+      "Coexist with Isaac Sim RTX in one process and compose its mesh output with the custom Gaussian layer."
+    ],
+    "out_of_scope": [
+      "Replacing Isaac Sim RTX mesh rendering.",
+      "Claiming a drop-in Isaac Sim renderer backend.",
+      "Claiming universal equivalence to projected-splat rasterization."
+    ]
+  },
+  "revisions": {
+    "pull_request": 68,
+    "source_head_tested_before_fixes": "06bdac2027fac0beb3942e783f76b16c3b3cb8b3",
+    "hardening_commit_tested": "f15a37f1cf06cdf0db46a4dbd4bfedf0fe0fab5b",
+    "nvidia_3dgrt_reference_commit": "a37ef721",
+    "optix_headers_commit": "fff65c2a7c592f1ea5f1661ad7d2381cf965f9bd"
+  },
+  "machine": {
+    "provider": "Google Cloud",
+    "machine_type": "g2-standard-8",
+    "gpu": "NVIDIA L4 vWS",
+    "gpu_count": 1,
+    "gpu_memory_bytes": 23921033216,
+    "driver": "580.159.03",
+    "cuda_toolkit": "12.9",
+    "optix": "9.0.0",
+    "torch": "2.11.0+cu128",
+    "warp": "1.15.0 standalone; 1.13.0 bundled with Isaac Sim",
+    "isaac_sim": "6.0.1.0",
+    "os": "Ubuntu 22.04, Linux 6.8.0-1064-gcp"
+  },
+  "scenes": {
+    "home_scan_lod0": {
+      "gaussians_source": 21497908,
+      "gaussians_after_alpha_filter": 21488698,
+      "ply_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "stable_dump_sha256": "8fbcaec3e8d35d148b4cf55bb84ab8f40cfd150026b51924d0ff672fd7b92d57"
+    },
+    "voxel51_train_30000": {
+      "gaussians_source": 1074761,
+      "gaussians_after_alpha_filter": 1031905,
+      "ply_sha256": "a4c1906ce0256f5cb2255aa078d18b468dc01d8604f6eda1aaf22b235147a7a1",
+      "stable_dump_sha256": "5081cd649bfb5bd9ad7594461bc9db881c5c84749e3311cede767e7aa148b934"
+    }
+  },
+  "exact_pr_findings": {
+    "cuda_camera_inputs_stayed_on_device": false,
+    "per_camera_intrinsics_correct": false,
+    "nondefault_torch_stream_correct": false,
+    "bytes_retained_after_close": 2336227328,
+    "evidence_sha256": "506fe1edd48425b0b8d2f299ab741ccaadeda825cc7378f3b82a00884dda6e18"
+  },
+  "hardening": {
+    "changes": [
+      "Consume CUDA view matrices and intrinsics with a small same-stream camera-unpack kernel.",
+      "Use independent intrinsics for every camera.",
+      "Launch and synchronize on the caller's current Torch stream; serialize shared native scratch.",
+      "Release the GAS, pipeline, SBT, scene arrays, scratch, and static AABB build input on close.",
+      "Add per-call near/far planes with dense camera-z and sparse ray-distance semantics.",
+      "Use a square-root precision representation to avoid squaring ill-conditioned covariance ratios.",
+      "Validate dump headers before allocating and retain compatibility with legacy no-semantic and semantic dumps.",
+      "Allocate explicit float32 outputs regardless of Torch's default dtype."
+    ],
+    "inside_isaac_contract": {
+      "pass": true,
+      "bitwise_cli_and_device_camera_parity": true,
+      "heterogeneous_intrinsics_bitwise_parity": true,
+      "nondefault_stream_bitwise_parity": true,
+      "retained_after_close_bytes": 6291456,
+      "reclaimed_on_close_bytes": 1761607680,
+      "evidence_sha256": "8cf5153b09e6c8ce66f5839bd20882666e42bb87ab598492999165363048ff64"
+    }
+  },
+  "performance": {
+    "home_changing_camera_128": {
+      "batch_1": {
+        "tracer_median_ms": 6.845075999990513,
+        "tracer_images_per_second": 146.09041594299114,
+        "custom_raster_median_ms": 6.131168000138132,
+        "custom_raster_images_per_second": 163.10106002273474,
+        "tracer_speedup_vs_custom": 0.8957048833565368,
+        "gsplat_median_ms": 102.66167200006748,
+        "tracer_speedup_vs_gsplat": 14.997886363892786
+      },
+      "batch_8": {
+        "tracer_median_ms": 24.350934999347373,
+        "tracer_images_per_second": 328.52947947232445,
+        "custom_raster_median_ms": 58.62646199966548,
+        "custom_raster_images_per_second": 136.45715138064529,
+        "tracer_speedup_vs_custom": 2.4075651305067636
+      }
+    },
+    "home_1024_distinct_moving_cameras_128": {
+      "trajectory_id": "978dca4a244bd6326468dcbee0c6b1736734f7394110493d3f9c42f35c6ccb7c",
+      "all_cameras_distinct_per_step": true,
+      "all_1024_cameras_moved_between_steps": true,
+      "points": [
+        {"batch": 1, "median_ms": 7.231342000068253, "images_per_second": 138.2869182498299},
+        {"batch": 8, "median_ms": 22.71948100019472, "images_per_second": 352.1207196560272},
+        {"batch": 32, "median_ms": 83.70020100005604, "images_per_second": 382.3168835637393},
+        {"batch": 128, "median_ms": 302.21987400000216, "images_per_second": 423.53270255151745},
+        {"batch": 1024, "median_ms": 2420.1931630000217, "images_per_second": 423.10672373384887}
+      ],
+      "throughput_gain_batch_1024_vs_batch_1": 3.0596294218478564,
+      "interpretation": "The single OptiX launch vectorizes correctly and wins throughput, but saturates around batch 128; scaling is not linear with batch size.",
+      "evidence_sha256": "4a5d0fbe13663a11fab607c59659be557c1acaede74e7c2864b1f8f0b3192146"
+    },
+    "sparse_reflections_real_g1_256_batch_32": {
+      "reflection_rays": 68618,
+      "reflection_component_ms": 3.06708600002518,
+      "without_reflections_wall_ms": 276.82663739997224,
+      "with_reflections_wall_ms": 277.3933651999869,
+      "without_reflections_images_per_second": 115.59581224029711,
+      "with_reflections_images_per_second": 115.35964451395435,
+      "wall_throughput_change_fraction": -0.002043050443211132,
+      "interpretation": "Luc's sparse-secondary-ray claim reproduces in order of magnitude; adding 68.6k rays changed total wall throughput by about -0.2% in this L4 run.",
+      "without_evidence_sha256": "d22d03452ba8f3feae5591262c6bbb77fa2239261bc70eb699ccae021e1b727e",
+      "with_evidence_sha256": "ec1797f0b1c27e01434b5fa95c9a927c17e6aba0824f88dae3fc32b62dfe1ca7"
+    },
+    "per_link_cost_probe_real_g1_256": {
+      "triangles": 382618,
+      "links": 36,
+      "batch_32_frame_ms": 21.01548269997693,
+      "batch_32_ms_per_environment": 0.656733834374279,
+      "batch_32_articulate_and_refit_ms": 17.42599869994592,
+      "gate_ms_per_environment": 4.0,
+      "gate_pass": true,
+      "interpretation": "This is a cost probe only: the animation is synthetic and pivots are link centroids, not URDF joints.",
+      "evidence_sha256": "d2730f68460403f9d3a327c4db67899443610cbd87b8dee0135316102a254509"
+    }
+  },
+  "fidelity": {
+    "home_changing_camera_128": {
+      "batch_1": {
+        "rgb_psnr_db": 34.168519845089286,
+        "alpha_mae": 0.015330063179135323,
+        "depth_mean_relative_error_alpha_gt_0_5": 0.005090221296995878,
+        "semantic_overall_pixel_agreement": 0.99114990234375
+      },
+      "batch_8": {
+        "rgb_psnr_db": 35.24065381088482,
+        "alpha_mae": 0.01794014498591423,
+        "depth_mean_relative_error_alpha_gt_0_5": 0.0036081885918974876,
+        "semantic_overall_pixel_agreement": 0.9955978393554688
+      },
+      "verdict": "pass_for_tested_home_route"
+    },
+    "voxel51_changing_camera_128_batch_8": {
+      "tracer_speedup_vs_custom": 3.1706177290681508,
+      "rgb_psnr_db": 25.66087219612642,
+      "alpha_mae": 0.049341119825839996,
+      "depth_mean_relative_error_alpha_gt_0_5": 0.10785497725009918,
+      "semantic_overall_pixel_agreement": 0.81439208984375,
+      "false_foreground_pixels": 24328,
+      "root_cause": "Ray-volume intersection and projected-splat support diverge on very large, thin, oblique Gaussians; this is not a sort-key collision.",
+      "verdict": "fail_as_general_projected_raster_replacement",
+      "evidence_sha256": "5eff6f7d44ae421ce8d4a6d1e9abcf48647b1711aa6552daf58ef1e1b91f2dff"
+    }
+  },
+  "profiling": {
+    "nsight_systems_batch_128": {
+      "nvidia_internal_optix_ms": 705.590408,
+      "nvidia_internal_optix_calls": 8,
+      "camera_unpack_ms": 0.023072,
+      "camera_unpack_calls": 6,
+      "interpretation": "OptiX traversal/marching dominates; the new device camera-unpack kernel is negligible.",
+      "evidence_sha256": "6b717d1a34c53ca20b5d895b3a5498449ebe4b7ffcec520e7488f67613125eb8"
+    },
+    "nsight_compute": {
+      "status": "blocked_by_host_counter_permissions",
+      "driver_setting": "RmProfilingAdminOnly=1"
+    }
+  },
+  "correctness_and_integration": {
+    "python_tests": {"pass": true, "passed": 296},
+    "native_cuda_optix_build": {"pass": true},
+    "compute_sanitizer_memcheck": {
+      "pass": true,
+      "error_summary": "0 errors",
+      "evidence_sha256": "115187292d0ac94ccf9c7348d1c2d03209521412fe1cdfbea0a056334336e794"
+    },
+    "legacy_dump_compatibility": {
+      "no_semantics": true,
+      "legacy_semantics": true,
+      "stable_precision_v3": true
+    },
+    "isaac_rtx_and_optix_same_process": {
+      "pass": true,
+      "sparse_probe_bitwise_stable_across_rtx_frame": true,
+      "probe_rays": 1024,
+      "foreground_rays": 91,
+      "evidence_sha256": "f16aa78b71b52743615ddcaa1af2def6b0af70707e667885e0b94c9fcd5f4885"
+    },
+    "actual_custom_gaussian_plus_isaac_rtx_g1_composite": {
+      "pass": true,
+      "cuda_resident_aovs": true,
+      "evidence_sha256": "763f83d97b7747d4d1061560b0562f81cd6dd96c4e73096a925a36113642142a"
+    }
+  },
+  "verdict": {
+    "performance": "conditional_pass",
+    "fidelity": "home_route_pass_general_replacement_fail",
+    "isaac_integration_after_hardening": "pass",
+    "sanitizer": "pass",
+    "sparse_secondary_rays": "pass",
+    "static_map_many_changing_cameras": "pass_with_saturation",
+    "drop_in_isaac_backend": false,
+    "replaces_isaac_rtx": false,
+    "replaces_projected_splat_rasterizer_generally": false,
+    "merge_recommendation": "merge_after_hardening_and_claim_correction",
+    "summary": "The work is useful for a static Gaussian world reused by batched changing cameras and especially for sparse secondary rays. It is not universally faster at batch 1, does not scale linearly past saturation, and is not a fidelity-equivalent replacement for projected rasterization on every Gaussian geometry."
+  }
+}

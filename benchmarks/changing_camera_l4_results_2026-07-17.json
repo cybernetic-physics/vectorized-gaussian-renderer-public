@@ -1,0 +1,278 @@
+{
+  "schema_version": "changing-camera-l4-results-v1",
+  "recorded_utc": "2026-07-17",
+  "customer_goal": "make Gaussian rendering faster when vectorized",
+  "verdict": {
+    "status": "not-met",
+    "summary": "The custom renderer is faster for one moving camera, but it does not gain throughput from B1 to B4 or B8 and loses to gsplat at both vectorized batch sizes on both real scenes.",
+    "useful_scope_today": "A valid Isaac Sim/Fabric-integrated single-camera renderer with RGB, depth, alpha, semantic IDs, bounded adaptive capacity, and lower peak Torch allocation than gsplat at B4/B8 in this matrix.",
+    "unsupported_claim": "The current evidence does not support a claim that the custom renderer is faster than gsplat when camera rendering is vectorized.",
+    "remaining_hardware_gate": "Repeat the frozen matrix on an L40 before closing the L40-specific acceptance issue."
+  },
+  "source": {
+    "branch": "codex/issue-9-changing-camera",
+    "matrix_commit": "a1f5639f629265c156beeffb1b60f3fe61f99b34",
+    "profile_commit": "0b4854cbbd620a5320e318e567e14dbd46246c03",
+    "fidelity_render_commit": "4e66c24721e81019d1253ef517692936f3f29ae8",
+    "fidelity_comparison_commit": "5d9c8d9f63008d77415c0c0388ceadc1c6589713"
+  },
+  "machine": {
+    "instance": "vgr-l4-audit-20260717-02",
+    "platform": "GCP g2-standard-16",
+    "gpu": "NVIDIA L4 23034 MiB",
+    "driver": "580.159.03",
+    "ecc": "enabled",
+    "cuda_runtime": "12.8",
+    "torch": "2.11.0+cu128",
+    "isaac_sim": "6.0.1.0",
+    "nsight_systems": "2024.6.2"
+  },
+  "dependencies": {
+    "gsplat": "77ab983ffe43420b2131669cb35776b883ca4c3c",
+    "ovrtx_public_source": "29d11037fbcaed0f0f53e7f32d17bd0486fd453b",
+    "ovrtx_runtime": "0.3.0",
+    "kit_app_template": "76542106c2e97d1bbc76bf04259bec19887da554",
+    "lpips": "0.1.4"
+  },
+  "scenes": {
+    "home-scan-lod0": {
+      "gaussian_count": 21497908,
+      "scene_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+      "resolution": [384, 384],
+      "source_views": 240,
+      "camera_contract_sha256": "a59ed5ade5b276cebc6535b1bbe4de2abe2bc50c9f4cd5e3f6906f90096df45f",
+      "camera_npz_sha256": "397b188176af7b961bc42bac7b4369b4c6d9177901354d57fb17e378d433d035",
+      "route_sha256": "c408c29bd0914a53386e0379ebe01ec3fcbfc270f1a332d2659c82595f6cc43f",
+      "source_indices_sha256": "7665d96fa931a4044c006494c2416185a206d7745973f0051b0fc94522a9068e"
+    },
+    "garage-high-detail": {
+      "gaussian_count": 13943336,
+      "scene_sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a",
+      "resolution": [256, 256],
+      "source_views": 72,
+      "camera_contract_sha256": "2061260aecba934745dc235266cc3888c66af077c7bc4126ceb2561c8c9775b1",
+      "camera_npz_sha256": "0002d9db764f9b3a3e8455f0fa24219b35afc3dbb7ebd21db2c95dd97a8f4aac",
+      "route_sha256": "40c73e0f454db40d767f3ad85d9559ea8f0a041cbdd3bc82fa3ff69755e49658",
+      "source_indices_sha256": "036c0836cd86cc6ae126f3bcf5c78983cf0cde99e8959b68433aad2b6fdc8763"
+    }
+  },
+  "protocol": {
+    "batch_sizes": [1, 4, 8],
+    "trajectory_layout": "view-population-pack",
+    "coverage": "Every source view appears exactly once at every batch size.",
+    "camera_tensor_validation": "Custom-input and gsplat-replayed viewmats, intrinsics, and scene_ids have identical shapes and maximum absolute error 0 in all six cases.",
+    "custom_path": "Headless Isaac Sim MinimalRendering, USDRT/Fabric CUDA camera ingestion, then CustomCudaBackend.",
+    "gsplat_path": "Direct gsplat contract-exact replay of the persisted custom measured trajectory.",
+    "warmup": "Shader, JIT, extension, capacity, and per-renderer warmup occur outside measured ranges.",
+    "custom_wall_scope": "Integrated observation wall time includes USD authoring, Fabric ingestion, custom rendering, output validation, and artifact bookkeeping.",
+    "gsplat_wall_scope": "Synchronized direct-render wall time.",
+    "separate_verdicts": [
+      "performance",
+      "fidelity",
+      "Isaac integration",
+      "capacity correctness"
+    ]
+  },
+  "matrix": [
+    {
+      "scene": "home-scan-lod0",
+      "batch": 1,
+      "total_views": 240,
+      "custom_render_gpu_mean_ms_per_batch": 62.22702569961548,
+      "custom_gpu_images_per_second": 16.070187973,
+      "custom_integrated_wall_mean_ms_per_batch": 65.74040719583725,
+      "custom_integrated_wall_images_per_second": 15.211344782533093,
+      "gsplat_gpu_mean_ms_per_batch": 86.37882951895396,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 86.45005330418105,
+      "gsplat_wall_images_per_second": 11.567372856109461,
+      "custom_to_gsplat_gpu_throughput_ratio": 1.388124,
+      "custom_to_gsplat_wall_throughput_ratio": 1.3150215672782624,
+      "custom_torch_peak_allocated_bytes": 2970194432,
+      "custom_workspace_bytes": 1064129895,
+      "gsplat_torch_peak_allocated_bytes": 2982734848,
+      "custom_realtime_24_fps_deadline_pass": false,
+      "correctness_pass": true
+    },
+    {
+      "scene": "home-scan-lod0",
+      "batch": 4,
+      "total_views": 240,
+      "custom_render_gpu_mean_ms_per_batch": 274.75774434407555,
+      "custom_gpu_images_per_second": 14.558279366,
+      "custom_integrated_wall_mean_ms_per_batch": 279.25702988333495,
+      "custom_integrated_wall_images_per_second": 14.323721775853155,
+      "gsplat_gpu_mean_ms_per_batch": 187.62538998921713,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 187.70428613336207,
+      "gsplat_wall_images_per_second": 21.31011540758339,
+      "custom_to_gsplat_gpu_throughput_ratio": 0.682876,
+      "custom_to_gsplat_wall_throughput_ratio": 0.6721559926773524,
+      "custom_torch_peak_allocated_bytes": 6242964992,
+      "custom_workspace_bytes": 4303734279,
+      "gsplat_torch_peak_allocated_bytes": 8088420352,
+      "custom_realtime_24_fps_deadline_pass": false,
+      "correctness_pass": true
+    },
+    {
+      "scene": "home-scan-lod0",
+      "batch": 8,
+      "total_views": 240,
+      "custom_render_gpu_mean_ms_per_batch": 559.7089569091797,
+      "custom_gpu_images_per_second": 14.293142715,
+      "custom_integrated_wall_mean_ms_per_batch": 565.0418976999541,
+      "custom_integrated_wall_images_per_second": 14.158242127822037,
+      "gsplat_gpu_mean_ms_per_batch": 313.9395512898763,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 314.0017636666319,
+      "gsplat_wall_images_per_second": 25.47756390468369,
+      "custom_to_gsplat_gpu_throughput_ratio": 0.560898,
+      "custom_to_gsplat_wall_throughput_ratio": 0.5557141248194158,
+      "custom_torch_peak_allocated_bytes": 11024656896,
+      "custom_workspace_bytes": 9040611879,
+      "gsplat_torch_peak_allocated_bytes": 14725545984,
+      "custom_realtime_24_fps_deadline_pass": false,
+      "correctness_pass": true
+    },
+    {
+      "scene": "garage-high-detail",
+      "batch": 1,
+      "total_views": 72,
+      "custom_render_gpu_mean_ms_per_batch": 32.43714271651374,
+      "custom_gpu_images_per_second": 30.828855943,
+      "custom_integrated_wall_mean_ms_per_batch": 35.913118513892385,
+      "custom_integrated_wall_images_per_second": 27.84497814115382,
+      "gsplat_gpu_mean_ms_per_batch": 44.03360573450724,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 44.097088930540295,
+      "gsplat_wall_images_per_second": 22.67723390029564,
+      "custom_to_gsplat_gpu_throughput_ratio": 1.357506,
+      "custom_to_gsplat_wall_throughput_ratio": 1.2278824773594106,
+      "custom_torch_peak_allocated_bytes": 1513896960,
+      "custom_workspace_bytes": 280981079,
+      "gsplat_torch_peak_allocated_bytes": 1874021376,
+      "custom_realtime_24_fps_deadline_pass": true,
+      "correctness_pass": true
+    },
+    {
+      "scene": "garage-high-detail",
+      "batch": 4,
+      "total_views": 72,
+      "custom_render_gpu_mean_ms_per_batch": 139.14890797932944,
+      "custom_gpu_images_per_second": 28.746183194,
+      "custom_integrated_wall_mean_ms_per_batch": 143.48263872223774,
+      "custom_integrated_wall_images_per_second": 27.877937258621504,
+      "gsplat_gpu_mean_ms_per_batch": 112.36721462673611,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 112.44479977775275,
+      "gsplat_wall_images_per_second": 35.573010116128124,
+      "custom_to_gsplat_gpu_throughput_ratio": 0.807532,
+      "custom_to_gsplat_wall_throughput_ratio": 0.783682268315612,
+      "custom_torch_peak_allocated_bytes": 2339637760,
+      "custom_workspace_bytes": 1087755103,
+      "gsplat_torch_peak_allocated_bytes": 5016931328,
+      "custom_realtime_24_fps_deadline_pass": false,
+      "correctness_pass": true
+    },
+    {
+      "scene": "garage-high-detail",
+      "batch": 8,
+      "total_views": 72,
+      "custom_render_gpu_mean_ms_per_batch": 285.38645426432294,
+      "custom_gpu_images_per_second": 28.032164388,
+      "custom_integrated_wall_mean_ms_per_batch": 290.6684407778105,
+      "custom_integrated_wall_images_per_second": 27.52276779203309,
+      "gsplat_gpu_mean_ms_per_batch": 203.6962432861328,
+      "gsplat_synchronized_wall_mean_ms_per_batch": 203.7774614444364,
+      "gsplat_wall_images_per_second": 39.25851241493331,
+      "custom_to_gsplat_gpu_throughput_ratio": 0.713756,
+      "custom_to_gsplat_wall_throughput_ratio": 0.7010649690731499,
+      "custom_torch_peak_allocated_bytes": 3399198720,
+      "custom_workspace_bytes": 2129162327,
+      "gsplat_torch_peak_allocated_bytes": 9058173952,
+      "custom_realtime_24_fps_deadline_pass": false,
+      "correctness_pass": true
+    }
+  ],
+  "fidelity": {
+    "case": "garage-high-detail B8 256x256",
+    "views": 72,
+    "trajectory_id": "d7941d89b7cb349a51abd1f75a8e38c3c6592280468d68d3e13f1e8398931c5d",
+    "same_equation_family": true,
+    "lpips_required_and_available": true,
+    "failed_frames": 0,
+    "worst_rgb_psnr_db": 63.432756682736546,
+    "worst_rgb_ssim": 0.9999961955373395,
+    "worst_lpips": 0.000008055819307628553,
+    "worst_alpha_mae": 0.000005774775672762189,
+    "worst_depth_relative_error_mean": 0.00022327984333969653,
+    "worst_semantic_agreement": 0.999847412109375,
+    "strict_semantic_agreement_all_pixels": 0.9999499850802951,
+    "pass": true
+  },
+  "profiles": {
+    "scope": "Nsight Systems full-process traces of the exact Home trajectory using the standalone custom adapter. Two warmup batches and all measured batches are traced; adaptive retry work remains in the numerator of per-useful-view normalization.",
+    "b1": {
+      "useful_views_in_trace": 242,
+      "total_kernel_time_ms": 16352.0119,
+      "kernel_ms_per_useful_view": 67.570297107438,
+      "stage_percent": {
+        "sorting": 62.72034205772563,
+        "tile_grouping": 6.9582802468484015,
+        "projection": 18.77272267029111,
+        "raster": 11.001991033286858
+      },
+      "stage_ms_per_useful_view": {
+        "sorting": 42.380321475207,
+        "tile_grouping": 4.701730636364,
+        "projection": 12.684784483471,
+        "raster": 7.434078028926
+      }
+    },
+    "b8": {
+      "useful_views_in_trace": 256,
+      "total_kernel_time_ms": 18628.085796,
+      "kernel_ms_per_useful_view": 72.765960140625,
+      "stage_percent": {
+        "sorting": 60.40277461260196,
+        "tile_grouping": 16.293601979499922,
+        "projection": 13.370947655474284,
+        "raster": 9.459511139777875
+      },
+      "stage_ms_per_useful_view": {
+        "sorting": 43.952658898437,
+        "tile_grouping": 11.856195921875,
+        "projection": 9.729498441406,
+        "raster": 6.883304105469
+      }
+    },
+    "diagnosis": "Segmented radix sorting receives essentially no per-image speedup at B8, while tile grouping costs 2.52x more per useful image. Projection and raster improve modestly, but cannot offset intersection construction and ordering."
+  },
+  "evidence": {
+    "local_root": "outputs/audits/issue-9-changing-camera/evidence/replacement-l4",
+    "availability": "Raw artifacts are intentionally ignored by Git; checksums below bind this result record to the preserved local evidence.",
+    "sha256": {
+      "matrix/garage-b1/custom.json": "0cc98b242db980116ee6d89efdca7433f53a88388bf7675008fa3923ea51fbe3",
+      "matrix/garage-b1/gsplat-timing.json": "0f00736abc8dc4354073628713339f61d7037c8ea2f626a3ffb24c88913df9f5",
+      "matrix/garage-b4/custom.json": "1f95bd743cebdc0c2a7c085eeefcee559d5602845088c6bb2765cffc7246694a",
+      "matrix/garage-b4/gsplat-timing.json": "1bc776205c4a289c1b0c20689419d4110890c328952f3e9de8e1d8b860151044",
+      "matrix/garage-b8/custom.json": "f4c2f6d2dfb9952cbca893b006e9b13963745739ec2fd460769e37decf8ab67a",
+      "matrix/garage-b8/gsplat-timing.json": "a2b103a2cf194c1723f47d2e9fc632e9891a675b8c82c0e4ac01a09843eb01e0",
+      "matrix/home-b1/custom.json": "7f4cd1f8f230f6e5307aa9f495a68069a49098364a32b4ec639e2916ff10c1ba",
+      "matrix/home-b1/gsplat-timing.json": "76c6ae31e30d73430d7168433da5d2ec8a62247010916de882f1f369d6de1dcd",
+      "matrix/home-b4/custom.json": "790f9f10b760a70870ca8bb53cf40f4479a9f44246483bf4011d49525b71730c",
+      "matrix/home-b4/gsplat-timing.json": "3819d2158aa1b5443621c76882e433072d768722e800a37f4ea351b299101197",
+      "matrix/home-b8/custom.json": "5e1efbd27caa6854cc5c5a58425651c3f1b9a1cb3b1644f14b5bbb10044980f4",
+      "matrix/home-b8/gsplat-timing.json": "a41abe5b9d92718fd9998735562fa1859c8699e6a7c6240dc4913690fd479d4d",
+      "profiles/home-b1/nsys-summary.json": "c028d6e82f01eb5b59c139f35850cead8403ebeda3a3535724416165eb84c6de",
+      "profiles/home-b1/home-b1-exact-custom.nsys-rep": "c7765d6d996b37bc34988f81234e8735503b0958a189ac959a0d1bc5630a98b4",
+      "profiles/home-b8/nsys-summary.json": "e351648c1ec0e3000d8deeb82be83e8230ea1af93c20de87404e5b71a0e48809",
+      "profiles/home-b8/home-b8-exact-custom.nsys-rep": "ffa1ae9e6b5ce311796bfbb3e501b731454d2a7cb274273c7937255fe6c25ac8",
+      "fidelity/comparison/summary.json": "90a965d6db28f22e53bedb7008c9cc5f513ec5b8994cc6c848d5203374db37d1",
+      "fidelity/comparison/per-frame.json": "a051fe649a98307ce24b3840f7674b4444456bead30e479bdc7bafe75f9c2b41",
+      "fidelity/custom-trajectory-output.npz": "eeb954a5be39c3414ca26902748b07937836534e7ed637c7d64e241f28ce876c",
+      "fidelity/gsplat-trajectory-output.npz": "a1c2047b1895a8b03a0cb508bef9e18fd3c44fa33e35e40746ec007a0bd7f43b"
+    }
+  },
+  "limitations": [
+    "This is L4 evidence, not the final L40 hardware gate.",
+    "The complete strict fidelity comparison was run on Garage B8; the Home matrix validated output contracts but did not persist every output tensor for full fidelity comparison.",
+    "OVRTX is installed and provenance-pinned but is not used as the gsplat-equation performance baseline in this result.",
+    "Nsight Systems stage totals include warmup and adaptive retry work and are diagnostic, not acceptance timing."
+  ]
+}

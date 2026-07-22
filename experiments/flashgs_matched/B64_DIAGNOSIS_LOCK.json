@@ -1,0 +1,117 @@
+{
+  "schema_version": "flashgs-b64-diagnosis-lock-v1",
+  "known_failure_manifest": {
+    "path": "experiments/flashgs_matched/B64_KNOWN_FAILURE_CASES.json",
+    "bytes": 2766,
+    "sha256": "f11017b2dcb1fa5765b0fb5adba61744da4d5d933f147e7c23a9beebbf3a6a89"
+  },
+  "pre_fix_source_identity": {
+    "manifest_sha256": "998671a0065e6d13bcb40d30e056cde544cb3c580999c993f7e6a6eb72dde2ee",
+    "source_tree_sha256": "3f86d0b5ee807e54f5518af7aebf432c4f867d63ab2e7317ccc0d26d9a7b4568",
+    "head": "5eca4e640aabd234158d08b4ed61d061e530ee3f",
+    "dirty": false,
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "adapter_attestation": {
+    "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/provenance/flashgs-adapter-attestation.json",
+    "bytes": 4735,
+    "sha256": "e05b464ef73df67bb30730c85e2f32548c4664b5614169048a743bcb654bb894"
+  },
+  "production_native_extension": {
+    "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/binaries/isaacsim_flashgs_adapter_ab6fa103edc1.so",
+    "bytes": 1557312,
+    "sha256": "88141ac665c8713efda3be95316426ca22c75fff9e8e2e14786d04b9e718253e"
+  },
+  "debug_native_extension": {
+    "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/binaries/isaacsim_flashgs_debug_2ad88bf930a7.so",
+    "bytes": 375592,
+    "sha256": "d50157a7cc275211ec20683a09653c9b318fb13b1449aa4c00a59a2cb2f159eb"
+  },
+  "cases": [
+    {
+      "case_id": "camera18-tile0-0",
+      "diagnosis": {
+        "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/diagnostics/pre-fix/camera18-tile0-0.json",
+        "bytes": 70026,
+        "sha256": "f1d59f4ae647ac0c8ca328e30be193e3bac58a4f9395928fb6450b6b6a6727fb"
+      },
+      "culprits": [
+        {
+          "gaussian_id": 9237708,
+          "range_start": 0,
+          "range_end": 1,
+          "sorted_position": 0,
+          "range_relative_slot": 0
+        }
+      ]
+    },
+    {
+      "case_id": "camera36-tile7-0",
+      "diagnosis": {
+        "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/diagnostics/pre-fix/camera36-tile7-0.json",
+        "bytes": 48291,
+        "sha256": "227c8beae7868fece3c6d5aa3fd657592f4b8acc72b06a664efd1fba74dd06eb"
+      },
+      "culprits": [
+        {
+          "gaussian_id": 6714150,
+          "range_start": 2,
+          "range_end": 4,
+          "sorted_position": 3,
+          "range_relative_slot": 1
+        }
+      ]
+    },
+    {
+      "case_id": "camera45-tile0-1",
+      "diagnosis": {
+        "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/diagnostics/pre-fix/camera45-tile0-1.json",
+        "bytes": 47284,
+        "sha256": "9cd7f5f9fa8a9940872dd77c7362adfbb5b21900e691a426e0299d7835635c83"
+      },
+      "culprits": [
+        {
+          "gaussian_id": 7914263,
+          "range_start": 19370,
+          "range_end": 19371,
+          "sorted_position": 19370,
+          "range_relative_slot": 0
+        }
+      ]
+    },
+    {
+      "case_id": "camera54-tile5-0",
+      "diagnosis": {
+        "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/diagnostics/pre-fix/camera54-tile5-0.json",
+        "bytes": 46463,
+        "sha256": "f61103a96f456bb2a4d6b2052b54f5fc3be7775a628bac7ce3146c54e6020be1"
+      },
+      "culprits": [
+        {
+          "gaussian_id": 17816633,
+          "range_start": 0,
+          "range_end": 1,
+          "sorted_position": 0,
+          "range_relative_slot": 0
+        }
+      ]
+    },
+    {
+      "case_id": "camera63-tile6-1",
+      "diagnosis": {
+        "path": "outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6/evidence/diagnostics/pre-fix/camera63-tile6-1.json",
+        "bytes": 48064,
+        "sha256": "24767d0e1a6a991a261fe3ded8adcf5fafc7b0f3f48f814696451318ad012d32"
+      },
+      "culprits": [
+        {
+          "gaussian_id": 6373708,
+          "range_start": 2002,
+          "range_end": 2004,
+          "sorted_position": 2003,
+          "range_relative_slot": 1
+        }
+      ]
+    }
+  ]
+}

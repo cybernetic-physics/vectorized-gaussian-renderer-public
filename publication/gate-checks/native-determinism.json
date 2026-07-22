@@ -1,0 +1,9 @@
+{
+  "all_outputs_valid": true,
+  "bitwise_equal": true,
+  "cuda_resident": true,
+  "finite_values": true,
+  "json_pass": true,
+  "sentinel": "DETERMINISTIC_CUDA_SMOKE_OK",
+  "zero_overflow": true
+}

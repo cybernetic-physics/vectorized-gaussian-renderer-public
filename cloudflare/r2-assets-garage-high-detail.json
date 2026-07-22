@@ -1,0 +1,116 @@
+{
+  "assets": [
+    {
+      "bytes": 1746,
+      "content_disposition": "inline",
+      "content_type": "application/json",
+      "key": "datasets/garage-high-detail/cf8d65138dbc/manifest.json",
+      "sha256": "10332e41c39d22e2063c5e0c08d28aa9bcc4e71b773058775f43bc2452381478",
+      "source": "datasets/garage-high-detail.manifest.json",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 1282787492,
+      "content_disposition": "attachment; filename=\"garage-high-detail.ply\"",
+      "content_type": "application/octet-stream",
+      "key": "datasets/garage-high-detail/cf8d65138dbc/garage-high-detail.ply",
+      "sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a",
+      "source": ".artifacts/datasets/garage-high-detail.ply",
+      "upload_method": "multipart-worker"
+    },
+    {
+      "bytes": 827790,
+      "content_disposition": "inline",
+      "content_type": "video/mp4",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/custom.mp4",
+      "sha256": "33a1da09d4eefc43813b54b29c28207ada0f20b5eef38311f76dfc7716b29c09",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/custom.mp4",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 982661,
+      "content_disposition": "inline",
+      "content_type": "video/mp4",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/ovrtx-perspective.mp4",
+      "sha256": "c4a3b887ab79521601a3ad07c4cc9276d8dc1c34dcf031c9a825ea347d929208",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/ovrtx-perspective.mp4",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 1732670,
+      "content_disposition": "inline",
+      "content_type": "video/mp4",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/side-by-side.mp4",
+      "sha256": "fb6f351173b9c233fade91579ca0c98b715537e0339c0d7333b0262acc1c0acb",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/side-by-side.mp4",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 2536498,
+      "content_disposition": "inline",
+      "content_type": "image/gif",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/side-by-side-preview.gif",
+      "sha256": "48e8ee409453f542173fb4ecc2fa650b8995dffae4a880d19a90a998ab3ae82d",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/side-by-side-preview.gif",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 255824,
+      "content_disposition": "inline",
+      "content_type": "image/png",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/poster.png",
+      "sha256": "1f8533f8163939794a469a7b26b703166ced21128b4750890466e5f5364ab8af",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/poster.png",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 1977164,
+      "content_disposition": "inline",
+      "content_type": "image/png",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/storyboard.png",
+      "sha256": "7cd5e444f907f627a5ae64f843b179769117044c272e69cc3d55153d29e3d994",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/storyboard.png",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 13479,
+      "content_disposition": "inline",
+      "content_type": "application/json",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/artifact-manifest.json",
+      "sha256": "03f6949835028ddca1ad7f0438a448a6f1e63fea1c5fe89d7a413921e2faa957",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/artifacts/artifact-manifest.json",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 1697,
+      "content_disposition": "inline",
+      "content_type": "application/json",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/camera-path.json",
+      "sha256": "7b4f8232800c28e85b25d775faf6f67a6e253cd7d879e7b30f5a81f1ab3c101a",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/camera-path.json",
+      "upload_method": "wrangler"
+    },
+    {
+      "bytes": 4923,
+      "content_disposition": "attachment",
+      "content_type": "application/octet-stream",
+      "key": "flybys/garage-high-detail/v3-cf8d65138dbc/camera-path.npz",
+      "sha256": "0002d9db764f9b3a3e8455f0fa24219b35afc3dbb7ebd21db2c95dd97a8f4aac",
+      "source": "outputs/flyby/garage-high-detail-walkthrough-v3/camera-path.npz",
+      "upload_method": "wrangler"
+    }
+  ],
+  "bucket": "vectorized-gaussian-renderer-assets",
+  "default_cache_control": "public, max-age=31536000, immutable",
+  "public_base_url": "https://pub-243008be935848b6accaf262f04a7b82.r2.dev",
+  "release": {
+    "author": "Ethan (https://superspl.at/user?id=ethan3111)",
+    "license": "CC Attribution (Creative Commons Attribution)",
+    "license_url": "http://creativecommons.org/licenses/by/4.0/",
+    "scene_id": "garage-high-detail",
+    "scene_sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a",
+    "source": "https://superspl.at/scene/8f4d8e05"
+  },
+  "schema_version": "vectorized-gaussian-r2-assets/v1",
+  "wrangler_version": "4.111.0"
+}

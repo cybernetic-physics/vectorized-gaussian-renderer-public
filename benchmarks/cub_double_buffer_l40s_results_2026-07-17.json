@@ -1,0 +1,352 @@
+{
+  "schema_version": "cub-double-buffer-l40s-results/v1",
+  "recorded_utc": "2026-07-17T19:49:05Z",
+  "issue": 32,
+  "customer_goal": "Increase simultaneous-camera capacity for changing-camera vectorized Gaussian rendering without changing the rendering equation, output contracts, deterministic path, or projection-cache behavior.",
+  "verdict": {
+    "status": "pass-as-capacity-optimization",
+    "summary": "Replacing the emitted-prefix CUB pointer-API radix sort with CUB DoubleBuffer SortPairs reduces Home Scan workspace by 1,300,553,215 bytes at B8, 4,352,236,239 bytes at B40, and 5,364,637,335 bytes at B48 on an NVIDIA L40S. Every trajectory run passes cache-event and zero-overflow gates, a separate full B48 capture validates all outputs and fidelity across all 240 views, and four Compute Sanitizer access-safety runs report zero errors.",
+    "performance_interpretation": "No rendering-speed improvement is demonstrated. Candidate mean throughput changes by -0.0367 percent at B8, +0.0449 percent at B40, and +0.0356 percent at B48, all smaller than independent-run spread and treated as noise.",
+    "capacity_interpretation": "The change removes the multi-gigabyte pointer-API scratch allocation while reusing the already-required key/value ping-pong buffers. Home B48 completes at 384x384 with a 21,570,944,816-byte backend workspace and 23,662,621,184 peak Torch-allocated bytes on the 46,068 MiB L40S.",
+    "customer_interpretation": "This is useful when vectorized changing-camera Gaussian observations are limited by renderer memory. It does not replace RTX rendering, make the Gaussian renderer many times faster, prove L4 B48 capacity, or prove safe memory co-residency with a substantial Isaac RTX workload."
+  },
+  "source": {
+    "branch": "codex/issue-32-cub-double-buffer-impl",
+    "base_commit": "307c85af854ed72694e8e1e45ec26f7887d9b845",
+    "renderer_commit": "af5c76cb8b0e88603837f2186435097bf2bef52d",
+    "retained_change": "The nondeterministic emitted-prefix path queries and executes CUB DeviceRadixSort::SortPairs with cub::DoubleBuffer key/value storage. The native call returns the final buffer selector and Python swaps workspace tensor handles when needed, preserving values_out as the sorted projection-cache buffer without a device copy.",
+    "unchanged_paths": [
+      "deterministic segmented sorting and Gaussian-ID tie breaking",
+      "key construction and 64-bit ordering semantics",
+      "projection, rasterization, semantic, depth, and alpha equations"
+    ]
+  },
+  "machine": {
+    "platform": "MatX Slurm matx-interactive",
+    "node": "matx1",
+    "gpu": "NVIDIA L40S",
+    "gpu_memory_mib": 46068,
+    "driver": "610.43.02",
+    "cuda_runtime": "12.1",
+    "cuda_compiler": "12.8",
+    "torch": "2.5.1+cu121",
+    "nsight_systems": "2024.6.2.225-246235244400v0",
+    "compute_sanitizer": "2025.1.0.0"
+  },
+  "protocol": {
+    "harness": "benchmarks/run_trajectory.py",
+    "integration_scope": "standalone project-owned CUDA renderer; this A/B does not launch Isaac Sim, Fabric, OVRTX, or RTX rendering",
+    "scenario": "contract-exact",
+    "trajectory_layout": "The same immutable 240 source views are packed as 30xB8, 6xB40, or 5xB48 calls.",
+    "measured_repetitions_per_run": 3,
+    "rendered_views_per_run": 720,
+    "independent_runs_per_implementation_and_batch": 2,
+    "run_order": "ABBA",
+    "warmup": "Native extension and workload warmup occur before measured repetitions.",
+    "resolution": [384, 384],
+    "fps_metadata": 24.0,
+    "cache": "enabled, but every changing-camera contract step is a projection miss; coherent warmup/reuse events are validated separately",
+    "initial_visible_records_per_view": 100000,
+    "initial_intersections_per_view_at_128": 170000,
+    "depth_bucket_count": 128,
+    "depth_bucket_group_size": 8,
+    "semantic_min_alpha": 0.01,
+    "run_gates": [
+      "projection-cache event expectations pass at every API request",
+      "final visible and intersection counters report zero overflow"
+    ],
+    "post_run_persisted_output_gates": [
+      "RGB finite",
+      "alpha finite and in range",
+      "foreground depth finite and background depth valid",
+      "foreground and background semantic policy valid"
+    ]
+  },
+  "scene": {
+    "name": "home-scan-lod0",
+    "gaussian_count": 21497908,
+    "ply_bytes": 1203883212,
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "trajectory_contracts": {
+      "b8": {
+        "json_sha256": "1dfff16179f1ceafb593d46d666f6d76a95b119966cd2a0df2802a569bbecbda",
+        "npz_sha256": "c4c9d2a74ffbf9fe807c129e0784d3e1a4d0d296437d337bddcfe680ce1aa81a",
+        "input_trajectory_id": "ec196f752a318dce0b2ef564756275f9ff7fdd4561322097894a4de568d46f88"
+      },
+      "b40": {
+        "json_sha256": "b596e619485017cff8b7b68f9acc093a03039b8d20f7f8fd1d1f1930f76d7a37",
+        "npz_sha256": "f0f73d3548f5773ff4203a2a46e2e45580bf7de8a0a1737f55d3cd7e1dc99d1c",
+        "input_trajectory_id": "1bf13617c0be9d4eb69f7ed74057da5704a1e8369075ba51d6b03e7398937f0a"
+      },
+      "b48": {
+        "json_sha256": "ff4d8af9efd13985da72b7af5880fc7481ad9c696698406302d72a68a78b0377",
+        "npz_sha256": "a7bd85280466c5ad2c57b76f048e92af189e9504452cb2026e2d9701fb793a4d",
+        "input_trajectory_id": "8a18c71b4eb9f7bd1bca24ff1d6e7e383c261db5f7c7c176994df21fff27523a"
+      }
+    }
+  },
+  "raw_cub_storage_query": {
+    "interpretation": "These values measure CUB temporary-storage queries only, not total renderer or process memory.",
+    "cases": {
+      "garage_b8": {
+        "items": 56929704,
+        "segments": 524288,
+        "pointer_api_bytes": 698347263,
+        "double_buffer_bytes": 15190527,
+        "reduction_bytes": 683156736,
+        "reduction_percent": 97.82478892596447
+      },
+      "home_b8": {
+        "items": 155791264,
+        "segments": 1179648,
+        "pointer_api_bytes": 1911048703,
+        "double_buffer_bytes": 41553407,
+        "reduction_bytes": 1869495296,
+        "reduction_percent": 97.82562281459553
+      },
+      "home_b40": {
+        "items": 538187900,
+        "segments": 5898240,
+        "pointer_api_bytes": 6529862655,
+        "double_buffer_bytes": 71607807,
+        "reduction_bytes": 6458254848,
+        "reduction_percent": 98.90337958417595
+      },
+      "home_b48_observed": {
+        "items": 575647560,
+        "segments": 7077888,
+        "pointer_api_bytes": 6979378943,
+        "double_buffer_bytes": 71607807,
+        "reduction_bytes": 6907771136,
+        "reduction_percent": 98.97400889699765
+      }
+    }
+  },
+  "ab_results": {
+    "b8": {
+      "baseline_images_per_second": [89.24644875520313, 89.31574709865838],
+      "candidate_images_per_second": [89.28013362594218, 89.21651700552917],
+      "baseline_mean_images_per_second": 89.28109792693076,
+      "candidate_mean_images_per_second": 89.24832531573567,
+      "throughput_change_percent": -0.036707222420018226,
+      "baseline_workspace_bytes": 5649648863,
+      "candidate_workspace_bytes": 4349095648,
+      "workspace_reduction_bytes": 1300553215,
+      "workspace_reduction_gib": 1.211234568618238,
+      "workspace_reduction_percent": 23.020071628122352,
+      "baseline_torch_peak_allocated_bytes": 7574555136,
+      "candidate_torch_peak_allocated_bytes": 6274001920,
+      "torch_peak_reduction_bytes": 1300553216,
+      "final_intersection_capacity": 155260035,
+      "all_runs_pass": true
+    },
+    "b40": {
+      "baseline_images_per_second": [94.2800323672016, 94.2411715998593],
+      "candidate_images_per_second": [94.35008626671001, 94.25567704147784],
+      "baseline_mean_images_per_second": 94.26060198353045,
+      "candidate_mean_images_per_second": 94.30288165409392,
+      "throughput_change_percent": 0.044854021376683484,
+      "baseline_workspace_bytes": 22067563839,
+      "candidate_workspace_bytes": 17715327600,
+      "workspace_reduction_bytes": 4352236239,
+      "workspace_reduction_gib": 4.053335859440267,
+      "workspace_reduction_percent": 19.722323092630162,
+      "baseline_torch_peak_allocated_bytes": 24125513216,
+      "candidate_torch_peak_allocated_bytes": 19773276672,
+      "torch_peak_reduction_bytes": 4352236544,
+      "final_intersection_capacity": 608377257,
+      "all_runs_pass": true
+    },
+    "b48": {
+      "baseline_images_per_second": [94.43917361976412, 94.5060525815616],
+      "candidate_images_per_second": [94.49437879851585, 94.51811320742017],
+      "baseline_mean_images_per_second": 94.47261310066287,
+      "candidate_mean_images_per_second": 94.50624600296801,
+      "throughput_change_percent": 0.03560069019081791,
+      "baseline_workspace_bytes": 26935582151,
+      "candidate_workspace_bytes": 21570944816,
+      "workspace_reduction_bytes": 5364637335,
+      "workspace_reduction_gib": 4.996207854710519,
+      "workspace_reduction_percent": 19.91654498100697,
+      "baseline_torch_peak_allocated_bytes": 29027258880,
+      "candidate_torch_peak_allocated_bytes": 23662621184,
+      "torch_peak_reduction_bytes": 5364637696,
+      "final_intersection_capacity_max": 743075697,
+      "all_runs_pass": true
+    }
+  },
+  "fidelity": {
+    "scope": "Each performance run renders 720 views and validates every cache event plus final overflow counters; its repeat-envelope samples use the final persisted B8, B40, or B48 output. A separate B48 baseline/candidate/baseline capture persists all 240 source views, validates every production output, and runs every-view repository metrics plus pinned LPIPS.",
+    "strict_bitwise_equal": false,
+    "strict_interpretation": "The nondeterministic fast path changes atomic emission order between independent executions, so both baseline-versus-baseline and candidate-versus-candidate repeats are also not bitwise equal. Cross-implementation deltas are assessed against the within-implementation repeat envelope and repository thresholds.",
+    "thresholds": {
+      "rgb_psnr_db_min": 40.0,
+      "rgb_ssim_min": 0.995,
+      "lpips_max": 0.01,
+      "alpha_mae_max": 0.005,
+      "depth_relative_error_mean_max": 0.01,
+      "semantic_agreement_min": 0.999
+    },
+    "worst_cross_implementation": {
+      "b8": {
+        "rgb_psnr_db": 104.14956032489437,
+        "rgb_ssim": 0.9999999995685789,
+        "lpips": 1.2982298569497175e-9,
+        "alpha_mae": 3.115726738340325e-9,
+        "depth_relative_error_mean": 3.44736100776899e-10,
+        "semantic_agreement": 0.9999660915798612,
+        "pass": true
+      },
+      "b40": {
+        "rgb_psnr_db": 95.81843328846817,
+        "rgb_ssim": 0.9999999970863073,
+        "lpips": 1.0948594919568677e-8,
+        "alpha_mae": 3.057923297294312e-9,
+        "depth_relative_error_mean": 2.3244961511181828e-10,
+        "semantic_agreement": 0.9999593098958334,
+        "pass": true
+      },
+      "b48": {
+        "rgb_psnr_db": 90.62591149933445,
+        "rgb_ssim": 0.9999999901402497,
+        "lpips": 8.947117891011658e-8,
+        "alpha_mae": 2.5627539596623845e-9,
+        "depth_relative_error_mean": 1.721624093287133e-10,
+        "semantic_agreement": 0.9999525282118056,
+        "pass": true
+      }
+    },
+    "full_b48_trajectory": {
+      "views": 240,
+      "output_contracts": {
+        "baseline_repeat_1": true,
+        "candidate_repeat_1": true,
+        "baseline_repeat_2": true
+      },
+      "cross_implementation_worst": {
+        "rgb_psnr_db": 98.53483813998439,
+        "rgb_ssim": 0.9999999985787028,
+        "lpips": 7.061768947380642e-9,
+        "alpha_mae": 4.843887779770739e-8,
+        "depth_relative_error_mean": 3.528079828285513e-9,
+        "semantic_agreement": 0.9996066623263888
+      },
+      "cross_strict_semantic_agreement_all_pixels": 0.9999885276511863,
+      "within_baseline_repeat_worst": {
+        "rgb_psnr_db": 95.90838649922753,
+        "rgb_ssim": 0.9999999971465167,
+        "lpips": 1.4430259653863686e-8,
+        "alpha_mae": 7.466344875695086e-9,
+        "depth_relative_error_mean": 5.470049746492123e-9,
+        "semantic_agreement": 0.9998440212673612
+      },
+      "within_baseline_strict_semantic_agreement_all_pixels": 0.9999920032642505,
+      "failed_cross_implementation_views": 0,
+      "failed_within_baseline_views": 0,
+      "pass": true
+    },
+    "lpips_environment": {
+      "package": "lpips 0.1.4",
+      "network": "AlexNet",
+      "torch": "2.8.0",
+      "torchvision": "0.23.0",
+      "imagenet_weights_sha256": "7be5be791159472b1fbf3c69796f7cb30dca7ad8466c2df70058c37116cdee02",
+      "linear_weights_sha256": "df73285e35b22355a2df87cdb6b70b343713b667eddbda73e1977e0c860835c0"
+    },
+    "pass": true
+  },
+  "profiling": {
+    "tool": "Nsight Systems 2024.6.2",
+    "case": "candidate Home B8 contract-exact moving trajectory",
+    "scope": "Full-process diagnostic trace; setup, adaptive retry, and warmup work remain in the kernel-time total.",
+    "total_kernel_time_ms": 2896.58268,
+    "stage_percent": {
+      "projection": 42.21924350524667,
+      "sorting": 36.41714535833653,
+      "raster": 18.644326285897698,
+      "tile_grouping": 1.5139721818677725,
+      "other": 1.2053126686513225
+    },
+    "radix_onesweep": {
+      "calls": 264,
+      "sort_invocations": 33,
+      "passes_per_sort": 8,
+      "time_ms": 1017.557202
+    },
+    "diagnosis": "DoubleBuffer eliminates the oversized scratch allocation but still performs all eight 8-bit radix passes over each 64-bit key, explaining why memory improves and throughput does not. Projection is now the largest stage and sorting remains the second largest.",
+    "next_hypothesis": "The high 32 key bits contain global_tile, whose maximum is known from batch and resolution. Sorting only through bit 32 + bit_width(global_tile_count - 1) could reduce typical B8/B40/B48 sorts from eight to seven passes without changing key order. This must be implemented with matched CUB storage queries, boundary tests, numeric fidelity, and a fresh profile before any speed claim."
+  },
+  "correctness": {
+    "local_tests_at_renderer_commit": "155 passed, 1 skipped",
+    "compute_sanitizer_access_checks": {
+      "custom_backend_smoke": "ERROR SUMMARY: 0 errors",
+      "projection_cache_cuda_smoke": "ERROR SUMMARY: 0 errors",
+      "deterministic_cuda_smoke": "ERROR SUMMARY: 0 errors",
+      "double_buffer_selector_ownership": "ERROR SUMMARY: 0 errors"
+    },
+    "selector_ownership": {
+      "first_projection_miss_swapped": true,
+      "coherent_hit_preserved_ownership": true,
+      "moving_camera_miss_swapped": true,
+      "coherent_hit_outputs_bitwise_equal": true,
+      "cache_stats": {"hits": 1, "misses": 2},
+      "zero_overflow": true,
+      "pass": true
+    },
+    "full_leak_control": {
+      "baseline_reported_allocations_bytes": [2097152, 1, 8],
+      "candidate_reported_allocations_bytes": [2097152, 1, 8],
+      "classification": "Matched PyTorch CUDA and pinned-memory caching-allocator teardown reports. Neither log contains an invalid-access marker; access safety is judged by the four leak-disabled memcheck runs.",
+      "introduced_by_change": false
+    },
+    "pass": true
+  },
+  "discovered_issue": {
+    "issue": 33,
+    "title": "Fail closed when projection-cache inputs are inference tensors",
+    "finding": "An input tensor created inside torch.inference_mode() has no readable version counter. The current cache token records version=None, so an in-place camera mutation with stable storage can be mistaken for a hit and reuse stale geometry/capacity counters.",
+    "relation_to_change": "pre-existing and independent of CUB DoubleBuffer",
+    "status": "open; must be fixed before treating inference-created mutable camera tensors as supported cache inputs"
+  },
+  "limitations": [
+    "This A/B isolates the project-owned CUDA renderer and does not measure simultaneous Isaac RTX plus Gaussian-renderer co-residency.",
+    "The candidate was measured on an L40S, not the 23 GiB L4. The L40S memory result is not proof that Home B48 will allocate on L4.",
+    "Only Home Scan LOD0 at 384x384 received the full candidate A/B. Garage appears only in the raw CUB storage query.",
+    "The separate full-output fidelity capture covers every B48 source view. B8 and B40 numeric comparisons still cover only the final persisted batch from each performance run.",
+    "Two independent runs per implementation are sufficient to reject a large speed claim, but not to resolve sub-0.1-percent timing effects.",
+    "The fast path is intentionally nondeterministic, so strict cross-process bitwise identity is not an appropriate acceptance rule; deterministic mode remains separate and unchanged.",
+    "The fresh inference-tensor cache bug in issue 33 is a real correctness limitation when mutable inputs are created inside torch.inference_mode()."
+  ],
+  "evidence": {
+    "local_root": "outputs/audits/issue-32-cub-double-buffer",
+    "availability": "Raw reports, NPZ outputs, profiler captures, sanitizer logs, and job logs are intentionally ignored by Git; hashes bind this committed record to the preserved local evidence.",
+    "sha256": {
+      "l40-trajectory-ab/summary.json": "4f37839858407c3e63906144890feadba91a83878a5b3b3eb4dfc71620cb3b63",
+      "l40-trajectory-ab/repeat-noise.json": "4868bc89ee64074b7641018aef483e08c6a6eda6d1368765ca40b1f14e4edb5d",
+      "l40-trajectory-ab/repeat-lpips.json": "117abf1b69a5ebf70e5a437d496dc1e1521e15e5338ffeab506299747300bba6",
+      "l40-profile-sanitize/nsys/contract-exact-b8.nsys-rep": "44c797c296223006eb11581c14210c5caba6e2b7bbde3623ed5e05f0aa275ae3",
+      "l40-profile-sanitize/nsys/summary.json": "9a188557fddf6b25e31c010af999969dbb4f284a029a5ab04f005ec95fd03391",
+      "l40-profile-sanitize/sanitizer-followup.json": "5d51099492d5ccdf28491ec42aaabe9cf0aa7d1ef7b000af57b4673c1b9b38e0",
+      "l40-profile-sanitize/selector-ownership.json": "1542034908da6714f1a45395e290c2da75d88f2c802b71c0958e0f0977d55e16",
+      "l40-full-b48-fidelity/full-output-contract.json": "1a3acdb3454ebc36432990b6b4ec0a07096ddb7786179e2fe351f607eee0b653",
+      "l40-full-b48-fidelity/baseline-r1-trajectory-output.npz": "de31250345340ca4d9eb76bd4b413e9d33cf2b3a79ee2ed1ab2b5135c6abc831",
+      "l40-full-b48-fidelity/candidate-r1-trajectory-output.npz": "c430bfcc565da0ebbc8131cb060266796200009eceb46af370a8a2a3a23bc15d",
+      "l40-full-b48-fidelity/baseline-r2-trajectory-output.npz": "3050c804e812adf0d8164d2ea21e0fe520ed70464ae198951155e7d4326157f4",
+      "l40-full-b48-fidelity/comparisons/cross/summary.json": "401d716738bbeecb7771f4b72228eed4f777841eb08e11b953b3303b1a97fcf4",
+      "l40-full-b48-fidelity/comparisons/cross/per-frame.json": "deaca1d3c9e50b846e8fbf9f3622def47b2f2a643399fa8a612cac97278c99fb",
+      "l40-full-b48-fidelity/comparisons/within-baseline/summary.json": "f188468b26dcc7a06519237894bfeace36ae8fd77f93cee0edcd8a5d5753dada",
+      "l40-full-b48-fidelity/comparisons/within-baseline/per-frame.json": "6f7ca739ed8e841f27afbd0c8c208c3286118aecedaad7e3757e50406f8ae1bc",
+      "l40-full-b48-fidelity/comparisons/full-b48-lpips.json": "afa3a7eba782721fb05e023451bd413fef48dd6ea8140a6c6b2b2f23d90fa144",
+      "l40-full-b48-fidelity/comparisons/full-b48-fidelity-verdict.json": "12e2cc769d4c4f96b99d0d2054bab130e5a1e1db0cf02ac574e29890ac301844",
+      "slurm-16222590.out": "051752587f5db37535e1fdc8663c89f1cc54574ea3fcbc1f9f067f14471ec687"
+    },
+    "slurm_jobs": {
+      "build_and_query": 16222590,
+      "trajectory_ab": 16222818,
+      "profile_and_initial_sanitizer": 16222840,
+      "matched_sanitizer_followup": 16222881,
+      "selector_followup": 16222886,
+      "full_b48_fidelity": 16222915
+    }
+  }
+}

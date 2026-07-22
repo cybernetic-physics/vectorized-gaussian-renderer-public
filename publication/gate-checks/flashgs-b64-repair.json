@@ -1,0 +1,24 @@
+{
+  "cases_expected": 5,
+  "cases_passed": 5,
+  "historical_pixels_expected": 92,
+  "historical_pixels_passed": 92,
+  "max_intermediate_ulp": 128,
+  "oracle_comparisons": {
+    "primary_full": true,
+    "primary_rgb": true,
+    "repeat_full": true,
+    "repeat_rgb": true
+  },
+  "oracle_pinned": true,
+  "output_contracts": [
+    "full",
+    "rgb"
+  ],
+  "primary_full_views_passed": 64,
+  "primary_rgb_views_passed": 64,
+  "repeat_full_views_passed": 64,
+  "repeat_rgb_views_passed": 64,
+  "rgb_only_pixels_passed": 92,
+  "zero_overflow": true
+}

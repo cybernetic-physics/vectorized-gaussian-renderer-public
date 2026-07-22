@@ -1,0 +1,9 @@
+{
+  "all_outputs_valid": true,
+  "cuda_resident": true,
+  "finite_values": true,
+  "json_pass": true,
+  "scene_count": 2,
+  "sentinel": "MULTI_SCENE_CUDA_SMOKE_OK",
+  "zero_overflow": true
+}

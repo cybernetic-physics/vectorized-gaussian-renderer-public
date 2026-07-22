@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "dataset_id": "home-scan-lod0",
+  "generated_at": "2026-07-16",
+  "source": {
+    "format": "PlayCanvas SOG LOD",
+    "generator": "splat-transform v2.7.1",
+    "asset_title": "Home Scan (Creation process in description)",
+    "author": "Isaiah Sweeney",
+    "source_url": "https://superspl.at/scene/3f89bbd3",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "file_count": 434,
+    "webp_count": 360,
+    "all_lod_record_count": 42323301,
+    "relative_file_manifest_sha256": "ac0c8226d8f0e5359deb09026d12954bb7096143ebff8061c50303909e8f285d"
+  },
+  "selection": {
+    "lod": 0,
+    "chunk_count": 32,
+    "record_count": 21497908,
+    "reason": "LOD0 is the full-resolution scene; other LOD levels are redundant lower-resolution representations."
+  },
+  "canonical_ply": {
+    "remote_path": "/workspace/datasets/home-scan-lod0.ply",
+    "byte_count": 1203883212,
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "format": "binary_little_endian",
+    "vertex_properties": [
+      "x",
+      "y",
+      "z",
+      "scale_0",
+      "scale_1",
+      "scale_2",
+      "f_dc_0",
+      "f_dc_1",
+      "f_dc_2",
+      "opacity",
+      "rot_0",
+      "rot_1",
+      "rot_2",
+      "rot_3"
+    ],
+    "spherical_harmonic_bands": 0,
+    "semantic_ids": "not_present"
+  },
+  "conversion": {
+    "tool": "splat-transform",
+    "version": "2.7.1",
+    "build": "b42b60c",
+    "script": "scripts/convert_home_scan_lod0.sh",
+    "peak_host_memory_bytes_approx": 2450000000,
+    "elapsed_seconds": 43.17
+  },
+  "benchmark_notes": [
+    "All renderers must ingest the same decoded attributes and preserve the canonical record order.",
+    "A deterministic per-Gaussian semantic-label sidecar must be defined and shared by RTX, gsplat, and custom runs because the source asset has no semantic IDs."
+  ]
+}

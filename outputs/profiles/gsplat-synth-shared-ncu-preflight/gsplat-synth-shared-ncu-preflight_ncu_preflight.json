@@ -1,0 +1,11 @@
+{
+  "capabilities": "cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap=ep",
+  "counter_access_restricted": true,
+  "ncu_path": "/opt/nvidia/nsight-compute/2025.1.1/ncu",
+  "ncu_version": "NVIDIA (R) Nsight Compute Command Line Profiler\nCopyright (c) 2018-2025 NVIDIA Corporation\nVersion 2025.1.1.0 (build 35528883) (public-release)",
+  "nvidia_params": "ResmanDebugLevel: 4294967295\nRmLogonRC: 1\nModifyDeviceFiles: 1\nDeviceFileUID: 0\nDeviceFileGID: 0\nDeviceFileMode: 438\nInitializeSystemMemoryAllocations: 1\nUsePageAttributeTable: 4294967295\nEnableMSI: 1\nEnablePCIeGen3: 0\nMemoryPoolSize: 0\nKMallocHeapMaxSize: 0\nVMallocHeapMaxSize: 0\nIgnoreMMIOCheck: 0\nEnableStreamMemOPs: 0\nEnableUserNUMAManagement: 1\nNvLinkDisable: 0\nRmProfilingAdminOnly: 1\nPreserveVideoMemoryAllocations: 0\nEnableS0ixPowerManagement: 0\nS0ixPowerManagementVideoMemoryThreshold: 256\nDynamicPowerManagement: 3\nDynamicPowerManagementVideoMemoryThreshold: 200\nTegraGpuPgMask: 0\nRegisterPCIDriver: 1\nEnablePCIERelaxedOrderingMode: 0\nEnableResizableBar: 0\nEnableGpuFirmware: 18\nEnableGpuFirmwareLogs: 2\nRmNvlinkBandwidthLinkCount: 0\nEnableDbgBreakpoint: 0\nOpenRmEnableUnsupportedGpus: 1\nDmaRemapPeerMmio: 1\nImexChannelCount: 2048\nCreateImexChannel0: 0\nGrdmaPciTopoCheckOverride: 0\nEnableSystemMemoryPools: 529\nCoherentGPUMemoryMode: \"\"\nRegistryDwords: \"\"\nRegistryDwordsPerDevice: \"\"\nRmMsg: \"\"\nGpuBlacklist: \"\"\nTemporaryFilePath: \"\"\nExcludedGpus: \"\"\n",
+  "nvidia_params_path": "/proc/driver/nvidia/params",
+  "schema_version": 1,
+  "status": "blocked_by_host_counter_permissions",
+  "tool": "Nsight Compute"
+}

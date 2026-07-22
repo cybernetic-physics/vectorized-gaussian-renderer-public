@@ -1,0 +1,31 @@
+{
+  "artifact": {
+    "bytes": 1203883212,
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "url": "https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply"
+  },
+  "full_get": {
+    "bytes": 1203883212,
+    "sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "status": 200
+  },
+  "range_get": {
+    "accept_ranges": "bytes",
+    "access_control_allow_origin": "*",
+    "access_control_expose_headers": "Accept-Ranges,Content-Length,Content-Range,Content-Type,ETag",
+    "cache_control": "public, max-age=31536000, immutable",
+    "content_disposition": "attachment; filename=\"home-scan-lod0.ply\"",
+    "content_length": 32,
+    "content_range": "bytes 0-31/1203883212",
+    "content_type": "application/octet-stream",
+    "etag": "\"19485095a91dd7ef5672bdb1789e060a-18\"",
+    "requested_range": "bytes=0-31",
+    "status": 206
+  },
+  "schema_version": "external-dependency-public-verification-v1",
+  "verification": {
+    "anonymous_full_get_identity": "pass",
+    "anonymous_range_cors_metadata": "pass",
+    "pass": true
+  }
+}

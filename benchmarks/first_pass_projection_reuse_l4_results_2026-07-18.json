@@ -1,0 +1,333 @@
+{
+  "schema_version": "first-pass-projection-reuse-l4-results/v1",
+  "recorded_utc": "2026-07-19T00:30:39Z",
+  "issue": 43,
+  "customer_goal": "Make rich-output Gaussian rendering faster for independently moving robotics cameras without weakening fidelity, bounded-memory behavior, or CUDA safety.",
+  "verdict": {
+    "status": "qualified-optimization-not-vectorization-solution",
+    "summary": "Reusing first-pass projection candidates removes the second full camera/Gaussian projection. On the full 21.5M-Gaussian Home scene at logical B1024/P8 it improves 128x128 throughput by 40.41% and 256x256 throughput by 10.35%. On the separate 13.9M-Gaussian Garage 72-view B8/256x256 ABBA control it improves 4.58%. The benefit is therefore real but workload-dependent.",
+    "batch_scaling": "The full Home 128x128 candidate remains flat from physical P1 through P32: 198.30 images/s at P1 and 193.83 images/s at P32. This optimization reduces repeated work; it does not produce proportional vectorization scaling.",
+    "memory": "The project-once path stores every first-pass pixel-contributing candidate rather than only depth-retained records. Workspace rises by 55.01% on Home 128x128 P8, 40.64% on Home 256x256 P8, and 5.36% on Garage 256x256 B8. A tested memory-ceiling fallback preserves the direct-reprojection path.",
+    "claim_boundary": "These are direct standalone L4 results for RGB, expected depth, alpha, and semantic ID. They are not end-to-end Isaac Sim, Kit, Fabric, OVRTX, RTX, L40, RGB-only, or universal Gaussian-renderer results."
+  },
+  "source": {
+    "branch": "codex/issue-43-first-pass-reuse",
+    "base_commit": "51bc5a1de7a5cd9fbe7c786aad4aafe094e3e2fb",
+    "tested_cuda_diff_sha256": "d4275f06d9b4bffa5541f3c91bec9a198537373259886d99e370da87a5cb7cb4",
+    "baseline": "The frozen 51bc5a1 retained-record implementation projects every camera/Gaussian pair in both compact passes and stores 32-byte records only for candidates surviving at least one per-pixel depth cutoff.",
+    "candidate": "Pass 1 projects once, accumulates per-pixel depth-bucket optical thickness, and stores a 44-byte record for every projection that contributes alpha to at least one pixel. A separate kernel emits cutoff-retained intersections from those records, and compositing consumes the same records."
+  },
+  "machine": {
+    "provider": "GCP",
+    "project": "project-512201fe-6308-4879-83c",
+    "instance": "vgr-l4-issue43-20260718-01",
+    "zone": "us-east4-a",
+    "machine_type": "g2-standard-16",
+    "gpu_count": 1,
+    "gpu": "NVIDIA L4 23034 MiB",
+    "gpu_uuid": "GPU-f4f3d2ae-9c69-dde0-304c-b50b187ac823",
+    "driver": "580.173.02",
+    "cuda_toolkit": "12.8.93",
+    "torch": "2.7.1+cu128",
+    "python": "3.12.13",
+    "nsight_systems": "2024.6.2",
+    "nsight_compute": "2025.1.1",
+    "disk_auto_delete": true
+  },
+  "dependencies": {
+    "gsplat_commit": "77ab983ffe43420b2131669cb35776b883ca4c3c",
+    "home_scene_sha256": "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267",
+    "garage_scene_sha256": "cf8d65138dbc31e3619ce697a875b1a005fe88fa126d5737e66294b9064a171a"
+  },
+  "implementation": {
+    "record_bytes": 44,
+    "record_fields": {
+      "mean_2d_bytes": 8,
+      "conic_bytes": 12,
+      "depth_bytes": 4,
+      "opacity_bytes": 4,
+      "camera_id_bytes": 4,
+      "global_gaussian_id_bytes": 4,
+      "pixel_radii_bytes": 8
+    },
+    "pipeline": [
+      "Clear per-pixel depth-bucket optical-thickness workspace.",
+      "Project each active camera/Gaussian pair once, accumulate conservative optical thickness, and append a bounded projected candidate if it contributes to any pixel.",
+      "Derive each pixel's conservative retained-depth cutoff.",
+      "Visit stored projected candidates and emit only cutoff-retained pixel intersections.",
+      "Globally radix-sort the emitted prefix by pixel and depth.",
+      "Mark each pixel's sorted range.",
+      "Composite RGB, expected depth, alpha, and semantic ID from the stored projection records."
+    ],
+    "bounded_fallback": "If the complete 44-byte candidate workspace exceeds max_workspace_bytes, telemetry reports workspace-memory-ceiling and the renderer runs the prior direct-reprojection path.",
+    "not_one_kernel": true
+  },
+  "protocol": {
+    "logical_home": "Every observation covers 1,024 distinct cameras exactly once through bounded physical microbatches; all 1,024 cameras change between the two measured steps.",
+    "home_scene": "Full 21,497,908-Gaussian Home Scan, independently moving cameras, spatially coherent semantic classes, RGB+depth+alpha+semantic output.",
+    "home_timing": "CUDA events and synchronized wall time around a complete logical B1024 observation. Scene load, JIT, warmup, validation, output encoding, and capacity retries are outside measured ranges.",
+    "home_p8_samples": "One frozen baseline process and one candidate process, six measured logical-batch samples per process after warmup and full-output validation.",
+    "garage_scene": "Full 13,943,336-Gaussian Garage High Detail scene, immutable 72-view B8/256x256 contract, spatially coherent semantic classes.",
+    "garage_abba_order": [
+      "baseline-r1",
+      "candidate-r1",
+      "candidate-r2",
+      "baseline-r2"
+    ],
+    "garage_timing": "Each process warms five batches, runs complete trajectory repetitions for at least three measured seconds, and covers all 72 source views per repetition.",
+    "gsplat_control": "A same-node pinned-gsplat control was attempted from a clean extension cache under a hard 30-minute timeout. CUDA extension compilation consumed the window and exited 124 before rendering, so no gsplat throughput or comparison is reported from this run.",
+    "separate_verdicts": [
+      "unprofiled performance",
+      "same-equation fidelity",
+      "bounded fallback",
+      "CUDA memory safety",
+      "profile diagnosis",
+      "Isaac integration"
+    ]
+  },
+  "home_full_scene": {
+    "logical_batch": 1024,
+    "physical_p8_ab": [
+      {
+        "resolution": [
+          128,
+          128
+        ],
+        "baseline_images_per_second": 136.57790046875866,
+        "candidate_images_per_second": 191.76971014117262,
+        "speedup": 1.4041049795244052,
+        "baseline_logical_batch_gpu_ms": 7497.552652994792,
+        "candidate_logical_batch_gpu_ms": 5339.737955729167,
+        "baseline_workspace_bytes": 557042744,
+        "candidate_workspace_bytes": 863486380,
+        "workspace_ratio": 1.5501258912368132,
+        "baseline_record_count_last_submission": 2719781,
+        "candidate_record_count_last_submission": 6497012,
+        "tile_intersections_last_submission": 11285755,
+        "zero_overflow": true,
+        "all_1024_camera_output_audits_pass": true
+      },
+      {
+        "resolution": [
+          256,
+          256
+        ],
+        "baseline_images_per_second": 69.34298399556263,
+        "candidate_images_per_second": 76.52254226460241,
+        "speedup": 1.103536909653314,
+        "baseline_logical_batch_gpu_ms": 14767.17529296875,
+        "candidate_logical_batch_gpu_ms": 13381.677734375,
+        "baseline_workspace_bytes": 1959863928,
+        "candidate_workspace_bytes": 2756270568,
+        "workspace_ratio": 1.406358129573167,
+        "zero_overflow": true,
+        "all_1024_camera_output_audits_pass": true
+      }
+    ],
+    "candidate_physical_batch_sweep_128": [
+      {
+        "physical_batch": 1,
+        "images_per_second": 198.29562747046376,
+        "workspace_bytes": 150054340,
+        "driver_process_memory_bytes": 2403336192
+      },
+      {
+        "physical_batch": 4,
+        "images_per_second": 190.76972506498845,
+        "workspace_bytes": 497669184,
+        "driver_process_memory_bytes": 2667577344
+      },
+      {
+        "physical_batch": 8,
+        "images_per_second": 191.76971014117262,
+        "workspace_bytes": 863486380,
+        "driver_process_memory_bytes": 3034578944
+      },
+      {
+        "physical_batch": 16,
+        "images_per_second": 192.6232966685956,
+        "workspace_bytes": 1440099588,
+        "driver_process_memory_bytes": 3730833408
+      },
+      {
+        "physical_batch": 32,
+        "images_per_second": 193.83077299853906,
+        "workspace_bytes": 3077148316,
+        "driver_process_memory_bytes": 5559549952
+      }
+    ],
+    "p32_over_p1_throughput": 0.9774838480864146,
+    "scaling_interpretation": "No proportional physical-batch scaling was gained. P1 is the fastest tested point; larger microbatches primarily increase workspace."
+  },
+  "garage_abba": {
+    "resolution": [
+      256,
+      256
+    ],
+    "batch": 8,
+    "views": 72,
+    "baseline_process_images_per_second": [
+      72.36388313788156,
+      71.73640716100607
+    ],
+    "candidate_process_images_per_second": [
+      75.45375062601475,
+      75.25305369374928
+    ],
+    "baseline_mean_images_per_second": 72.05014514944381,
+    "candidate_mean_images_per_second": 75.35340215988202,
+    "speedup": 1.0458466392203196,
+    "baseline_workspace_bytes": 2952180856,
+    "candidate_workspace_bytes": 3110279500,
+    "workspace_ratio": 1.0535531702533336,
+    "baseline_record_count_last_submission": 10479984,
+    "candidate_record_count_last_submission": 10957520,
+    "tile_intersections_last_submission": 51965095,
+    "zero_overflow": true
+  },
+  "fidelity": {
+    "home_held_out": {
+      "views": 16,
+      "reference": "same-source compact direct-reprojection control",
+      "pass": true,
+      "failed_views": 0,
+      "worst_rgb_psnr_db": 95.07500434547303,
+      "worst_rgb_ssim": 0.9999999977602491,
+      "worst_lpips": 2.266144072393672e-8,
+      "worst_alpha_mae": 7.004928193055093e-8,
+      "worst_depth_relative_error_p95": 0.0,
+      "worst_semantic_agreement": 1.0
+    },
+    "garage_every_source_view": {
+      "views": 72,
+      "reference": "frozen retained-record compact screen-space EWA",
+      "pass": true,
+      "failed_views": 0,
+      "worst_rgb_psnr_db": 92.9907646272237,
+      "worst_rgb_ssim": 0.9999999955404265,
+      "worst_lpips": 2.411777977329166e-8,
+      "worst_alpha_mae": 2.6181623979937285e-8,
+      "worst_depth_relative_error_p95": 0.0,
+      "worst_semantic_agreement": 1.0,
+      "strict_semantic_agreement_all_pixels": 1.0
+    }
+  },
+  "profile": {
+    "case": "Full Home Scan, logical B1024, physical P8, 128x128, two measured steps and 256 native submissions.",
+    "tool": "Nsight Systems",
+    "baseline_total_kernel_time_ms": 15134.992021,
+    "candidate_total_kernel_time_ms": 10540.864269,
+    "candidate_over_baseline_total_kernel_time": 0.6964565461530744,
+    "baseline_expensive_projection": {
+      "calls": 512,
+      "time_ms": 10929.830535
+    },
+    "candidate_expensive_projection": {
+      "calls": 256,
+      "time_ms": 5546.533036,
+      "percent_of_candidate_kernel_time": 52.61933836214925
+    },
+    "candidate_projected_intersection_emission": {
+      "calls": 256,
+      "time_ms": 1011.629679,
+      "percent_of_candidate_kernel_time": 9.597217582766316
+    },
+    "candidate_sorting": {
+      "calls": 2560,
+      "time_ms": 2343.037435,
+      "percent_of_candidate_kernel_time": 22.228134005014386
+    },
+    "candidate_raster": {
+      "calls": 256,
+      "time_ms": 1456.255187,
+      "percent_of_candidate_kernel_time": 13.815330032118451
+    },
+    "kernel_launch_calls": {
+      "baseline": 3840,
+      "candidate": 3840
+    },
+    "interpretation": "The expensive projection kernel is called once rather than twice per native submission. It is replaced by one cheaper cached-emission launch, so total launch count does not fall. Combined projection plus cached emission takes 60.00% of the old two-pass projection time; total kernel time falls 30.35%. Sorting time is effectively unchanged and becomes the next largest stage.",
+    "ncu_limitation": "Hardware counters were not claimed; the previous node preflight reported RmProfilingAdminOnly=1."
+  },
+  "safety_and_contracts": {
+    "unit_tests": "172 passed, 1 skipped after the profiler-classification regression test was added.",
+    "native_cuda_smoke": true,
+    "projection_cache_coherence": true,
+    "memory_ceiling_fallback": {
+      "pass": true,
+      "requested_materialization": true,
+      "active": false,
+      "fallback_reason": "workspace-memory-ceiling",
+      "direct_workspace_bytes": 2940888,
+      "materialized_workspace_bytes": 2984844,
+      "max_workspace_bytes": 2950000
+    },
+    "compute_sanitizer": {
+      "candidate_memcheck_errors": 0,
+      "fallback_memcheck_errors": 0
+    },
+    "deterministic_unchanged_path": {
+      "pass": true,
+      "rgb_depth_alpha_semantic_bitwise_repeat": true
+    },
+    "multi_scene_and_active_subset": {
+      "pass": true,
+      "packed_scene_semantic_isolation": true,
+      "inactive_output_reset_policy": true,
+      "zero_overflow": true
+    },
+    "isaac_kit_fabric": {
+      "status": "not-run-on-this-node",
+      "reason": "The bounded GCP standalone L4 image does not contain Isaac Sim. Standalone CUDA evidence is not relabeled as integration evidence."
+    }
+  },
+  "upstream_research": {
+    "conclusion": "No exact drop-in kernel was found for project-once candidate compaction plus project-specific per-pixel optical-thickness cutoff, cutoff-filtered pixel intersection emission, global depth ordering, and fused RGB/depth/alpha/semantic output. This is a bounded search result, not proof that no implementation exists.",
+    "reused_architecture": "Project once and consume stored screen-space records downstream.",
+    "nearby_implementations": [
+      {
+        "project": "NVIDIA CCCL/CUB",
+        "url": "https://nvidia.github.io/cccl/unstable/cub/api/device.html",
+        "finding": "Provides generic scan, selection, run-length, and radix-sort primitives, not the renderer-specific projection/cutoff/emission operation."
+      },
+      {
+        "project": "gsplat packed projection",
+        "url": "https://github.com/nerfstudio-project/gsplat/blob/main/gsplat/cuda/csrc/ProjectionEWA3DGSPacked.cu",
+        "finding": "Uses count and write passes and recomputes projection; its downstream tile intersection consumes stored screen-space records but does not implement this renderer's per-pixel optical-thickness cutoff contract."
+      },
+      {
+        "project": "diff-gaussian-rasterization",
+        "url": "https://github.com/graphdeco-inria/diff-gaussian-rasterization/blob/main/cuda_rasterizer/rasterizer_impl.cu",
+        "finding": "Projects once into dense records and duplicates tile instances after a scan. That architecture is relevant, but its dense storage and tile-level contract are not a drop-in replacement for this pixel-cutoff rich-output path."
+      },
+      {
+        "project": "FlashGS",
+        "url": "https://github.com/InternLandMark/FlashGS/blob/main/csrc/cuda_rasterizer/preprocess.cu",
+        "finding": "Fuses projection with precise tile-intersection generation using a different tile-mask pipeline. Its published speedups are not transferable to this renderer without changing and revalidating the algorithmic contract."
+      }
+    ]
+  },
+  "limitations": [
+    "This is L4 evidence, not the requested final L40 hardware gate.",
+    "The benchmark bypasses Isaac Sim, Kit, Fabric, OVRTX, and RTX.",
+    "The strongest gain is the low-resolution projection-heavy Home case; separate 256x256 gains are 4.58% to 10.35%.",
+    "The candidate increases workspace because first-pass contributors can substantially outnumber depth-retained records.",
+    "The physical-batch sweep does not demonstrate vectorization scaling.",
+    "No new RGB-only comparison is included; all headline renderer timings require RGB, expected depth, alpha, and semantic ID.",
+    "The optional same-node pinned-gsplat control timed out during its clean CUDA extension build and produced no renderer measurement.",
+    "Nsight Compute occupancy, divergence, and memory-throughput counters were unavailable."
+  ],
+  "next_work": [
+    "Run the finite Isaac headless, Kit extension, and Fabric camera ladder on an Isaac-capable node.",
+    "Repeat the qualified cases on one L40 for the requested hardware gate.",
+    "Add a measured selection policy so project-once reuse is enabled only when its speed/memory tradeoff is favorable and the complete workspace fits.",
+    "Reduce candidate-record or overlaunch overhead without weakening exact cutoff and output semantics.",
+    "Profile sorting and compositing next; do not describe either as the sole batching bottleneck without a new A/B."
+  ],
+  "evidence": {
+    "local_root": "outputs/audits/issue-43-first-pass-reuse/evidence/l4-20260718",
+    "remote_transfer_file_set_sha256": "79d84c32427d2e43ebcc26078d0aee42787614c2525be7b4bf5c32a6d77884e9",
+    "reclassified_nsys_summary_sha256": "0200e362eea8cb4babd224a904c88fd0cad5d21e56b9d71f2f015ee6e3f283eb",
+    "gsplat_timed_out_build_log_sha256": "8f9d55995bb78f699e1ad9b71e79b21de5df5d44decb9f5047246cb9f096c880"
+  }
+}

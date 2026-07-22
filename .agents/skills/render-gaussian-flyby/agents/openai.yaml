@@ -1,0 +1,4 @@
+interface:
+  display_name: "Render Gaussian Flyby"
+  short_description: "Render and visually QA matched Gaussian flybys"
+  default_prompt: "Use $render-gaussian-flyby to render and validate a matched custom and OVRTX camera-path comparison."

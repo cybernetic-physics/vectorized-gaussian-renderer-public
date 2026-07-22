@@ -1,0 +1,28 @@
+{
+  "bounds_max": [9.001820774078379, 0.06708456113934522, 1.454748272895813],
+  "bounds_min": [-16.316597747802735, -2.620230040550232, -14.12363052368164],
+  "coordinate_system": "world-xz-y-up",
+  "eye_height": -1.545304199874401,
+  "eye_height_fraction": 0.4,
+  "motion_classification": "stress-near-field-sharp-visibility-transitions",
+  "name": "home-scan-stress-v1",
+  "planner": {"policy": "hand-selected-boundary-and-teleport-stress", "source_route": "home-scan-walkthrough-v1", "source_route_sha256": "c408c29bd0914a53386e0379ebe01ec3fcbfc270f1a332d2659c82595f6cc43f"},
+  "route_sha256": "fc053d46e0ccc56414b93c8b14eec1ebcb8913a3a9dfec2d38c95fbb9ed53cc9",
+  "schema_version": "home-scan-trajectory-route-v1",
+  "stressors": ["near-field-walls", "edge-on-splats", "high-overlap", "sharp-visibility-transitions", "difficult-boundaries"],
+  "validation": {
+    "angular_acceleration_rad_s2": {"max_absolute": 6239.97705078125, "mean_absolute": 238.85256958007812, "p95_absolute": 649.8882476806637},
+    "duplicate_poses": 0,
+    "foreground_coverage": {"mean": 0.843554941813151, "min": 0.678802490234375},
+    "manual_storyboard_review": "pass",
+    "minimum_clearance_m": 0.0007907646941021085,
+    "near_plane_pressure_fraction": 0.004860577034681713,
+    "path_length_m": 34.56879425048828,
+    "rotation_per_frame_rad": {"max": 1.8252379894256592, "mean": 0.1326473355293274, "p95": 0.41235531270503994},
+    "status": "measured-pass",
+    "storyboard_sha256": "7350f55b8da4344993803257489a208654125734d9ece7170cfc36f0db57b889",
+    "translation_per_frame_m": {"max": 0.29630279541015625, "mean": 0.29049405455589294, "p95": 0.29630210995674133},
+    "valid_depth_coverage": {"mean": 0.843554941813151, "min": 0.678802490234375}
+  },
+  "world_path_xz": [[-8.3056918874,-0.7565893953],[-6.7232907297,-1.6917399694],[-6.1298902956,-4.7524733985],[-7.0509101243,-6.1673660312],[-5.0191315954,-2.2849417728],[-0.1958859546,-4.0237144651],[-0.1958859546,-2.6067176510],[-3.1613627742,-2.2088111475],[-6.3020209808,-5.1535654116],[-6.1298902956,-3.8078088558],[-1.0459841705,-1.6147204307],[-0.9870865334,-5.1132546519]]
+}

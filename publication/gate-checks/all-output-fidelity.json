@@ -1,0 +1,11 @@
+{
+  "all_views_pass": true,
+  "finite_values": true,
+  "output_contracts": [
+    "rgb",
+    "alpha",
+    "depth",
+    "semantic_id"
+  ],
+  "zero_overflow": true
+}

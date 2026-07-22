@@ -1,0 +1,6 @@
+{
+  "application_exit_code": 0,
+  "bounded": true,
+  "error_summary": 0,
+  "tool": "compute-sanitizer"
+}
