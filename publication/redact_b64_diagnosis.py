@@ -250,6 +250,8 @@ def _transform_nodes(
             hash_count = 0
             for original_digest in sorted(node.dependencies):
                 public_digest = transformed_by_original[original_digest].public_sha256
+                if public_digest == original_digest:
+                    continue
                 source = original_digest.encode("ascii")
                 target = public_digest.encode("ascii")
                 occurrences = payload.count(source)
@@ -291,6 +293,8 @@ def _assert_reversible(
     reverse_hashes: dict[bytes, bytes] = {}
     for original_digest in sorted(node.dependencies):
         public_digest = transformed_by_original[original_digest].public_sha256
+        if public_digest == original_digest:
+            continue
         source = public_digest.encode("ascii")
         target = original_digest.encode("ascii")
         prior = reverse_hashes.get(source)

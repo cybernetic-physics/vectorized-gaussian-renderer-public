@@ -56,6 +56,14 @@ class B64DiagnosisRedactionTests(unittest.TestCase):
         )
         known = root / "source/B64_KNOWN_FAILURE_CASES.json"
         write_json(known, {"schema_version": "known", "case_count": 1})
+        unchanged_reference = historical / "evidence/unchanged-reference.json"
+        write_json(
+            unchanged_reference,
+            {
+                "schema_version": "unchanged-reference",
+                "known": private_identity(known, "known-failure-manifest.json"),
+            },
+        )
         attestation = historical / "evidence/attestation.json"
         write_json(
             attestation,
@@ -182,6 +190,20 @@ class B64DiagnosisRedactionTests(unittest.TestCase):
             self.assertGreater(manifest["path_prefix_replacements"], 0)
             self.assertGreater(manifest["artifact_hash_rebindings"], 0)
             self.assertTrue(all(record["reversible"] for record in manifest["files"]))
+            unchanged = outputs["root"] / "evidence/unchanged-reference.json"
+            source_unchanged = base / "source/historical/evidence/unchanged-reference.json"
+            self.assertEqual(unchanged.read_bytes(), source_unchanged.read_bytes())
+            unchanged_record = next(
+                record
+                for record in manifest["files"]
+                if record["logical_path"]
+                == "historical/evidence/unchanged-reference.json"
+            )
+            self.assertEqual(unchanged_record["artifact_hash_rebindings"], 0)
+            self.assertEqual(
+                unchanged_record["source_sha256"],
+                unchanged_record["public_sha256"],
+            )
 
     def test_output_is_deterministic(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
