@@ -38,7 +38,7 @@ from write_machine_provenance import build_machine_provenance
 
 
 COMMIT = "1" * 40
-GPU_UUID = "GPU-ebf6dc95-db46-4e1f-6e95-492c5c787805"
+GPU_UUID = "GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34"
 SCENE_SHA256 = "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267"
 STARTED = "2026-01-01T00:00:00+00:00"
 RESULT_TIME = "2026-01-01T00:00:01+00:00"

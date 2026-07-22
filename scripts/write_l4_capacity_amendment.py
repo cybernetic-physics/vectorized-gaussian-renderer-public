@@ -36,6 +36,9 @@ SOURCE_PATHS = {
     "matrix_driver_log": Path("matrix/matrix-driver.log"),
     "matrix_exit_code": Path("matrix/matrix-exit-code"),
 }
+# This is the immutable identity of the earlier east-region direct-B512 OOM,
+# not the west-region GPU frozen for the current headline matrix.
+HISTORICAL_FAILED_GPU_UUID = "GPU-ebf6dc95-db46-4e1f-6e95-492c5c787805"
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,7 +80,7 @@ def main() -> None:
         source_manifest.get("head") != "025bdaf2258894f477074dbd955653abcbfb3f62"
         or source_manifest.get("dirty") is not False
         or parsed.get("capacity_calibration_schedule") != expected_old_schedule
-        or parsed.get("expected_gpu_uuid") != "GPU-ebf6dc95-db46-4e1f-6e95-492c5c787805"
+        or parsed.get("expected_gpu_uuid") != HISTORICAL_FAILED_GPU_UUID
     ):
         raise ValueError("Failed matrix identity differs from the frozen direct-B512 attempt.")
     failure_log = (failed_root / SOURCE_PATHS["capacity_log"]).read_text(encoding="utf-8")

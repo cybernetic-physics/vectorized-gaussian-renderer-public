@@ -193,6 +193,13 @@ below that directory. The v7 launcher enters the frozen checkout explicitly,
 the matrix requires that exact working directory, and the publication scanner
 rejects both exact home roots and their descendants.
 
+The source-only v7 tag also produced no benchmark result. It passed launch and
+runtime preflights, then the first capacity child rejected the replacement L4
+because headline eligibility still named the unavailable east-region GPU's
+physical UUID. The v8 source freezes the current west-region L4 identity across
+the runner, claim ledger, machine provenance, and benchmark contract; it does
+not use the non-headline override.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

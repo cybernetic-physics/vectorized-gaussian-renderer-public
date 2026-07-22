@@ -203,7 +203,7 @@ def test_partial_winner_on_other_gpu_is_hardware_scoped_nonheadline() -> None:
     assert verdict == "custom-wins-rgb-full-sensor-fidelity-inconclusive"
     assert claim.startswith("Hardware-scoped non-headline partial result on NVIDIA L4 (GPU-test):")
     assert (
-        "This does not establish the frozen NVIDIA L4 (GPU-ebf6dc95-db46-4e1f-6e95-492c5c787805) headline result."
+        "This does not establish the frozen NVIDIA L4 (GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34) headline result."
     ) in claim
 
 

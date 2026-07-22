@@ -8,8 +8,8 @@ sensor without losing correctness or efficiency?
 
 ## Frozen primary workload
 
-- GPU: one Google Cloud NVIDIA L4 on instance `vgr-publish-l4-20260722` in
-  `us-east1-d`, UUID `GPU-ebf6dc95-db46-4e1f-6e95-492c5c787805`; every paired
+- GPU: one Google Cloud NVIDIA L4 on instance `vgr-publish-l4w1a-20260722` in
+  `us-west1-a`, UUID `GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34`; every paired
   artifact must record that UUID, driver 580.159.03, PyTorch 2.11.0+cu128,
   CUDA runtime 12.8, and the actual CUDA compiler/toolchain identity.
 - Scene: full Home Scan LOD0, exactly 21,497,908 Gaussians, PLY SHA-256
