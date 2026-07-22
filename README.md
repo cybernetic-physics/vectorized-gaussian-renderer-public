@@ -160,6 +160,14 @@ content-addressed publication bundle all pass. Earlier OVRTX and gsplat tables
 remain useful engineering diagnostics but are not the evidence for this release
 and are intentionally not repeated on the landing page.
 
+The source-only `benchmark-gcp-l4-matched-v2` tag produced no benchmark result
+and was superseded before measurement. Its launcher would have prepended a CUDA
+12.9 toolkit library directory to a CUDA 12.8 PyTorch wheel, reproducing an
+incompatible cuBLAS load during LPIPS. The v3 launcher leaves PyTorch's bundled
+runtime libraries authoritative and performs CUDA matrix, convolution, and
+LPIPS-Alex operations before any long render; it also records the loaded CUDA
+libraries and exact LPIPS weight hashes.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

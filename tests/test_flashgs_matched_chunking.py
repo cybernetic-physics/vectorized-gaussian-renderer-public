@@ -563,6 +563,7 @@ def test_publication_launcher_uses_empty_explicit_environment() -> None:
     assert '"XDG_RUNTIME_DIR=$safe_xdg"' in text
     assert '"MATCHED_PUBLICATION_RUNTIME=1"' in text
     assert 'safe_pythonpath="$PROJECT_ROOT/src:$gsplat_source"' in text
+    assert "LD_LIBRARY_PATH=" not in text
     assert "ISAACSIM_ML_PREBUNDLE" not in text
     assert "OVRTX_ROOT" not in text
     assert "PUBLICATION_MATRIX_ENVIRONMENT_SAFE" in text
