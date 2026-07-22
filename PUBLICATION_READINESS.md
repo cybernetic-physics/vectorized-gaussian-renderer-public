@@ -148,6 +148,16 @@ that same source and discard every earlier candidate timing from the final
 table. If it still fails, publish the failed row with no equivalence or winner
 claim. Do not lower the threshold.
 
+The historical RTX 3090 diagnosis retained private build/source roots in JSON,
+logs, and debug metadata. Those exact bytes must never enter the public bundle.
+Generate the deterministic same-length derivative with
+`publication/redact_b64_diagnosis.py`, publish its transformation manifest and
+tool, and bind all 30 transformed graph inputs through the generated public
+inventory. Rerun the unchanged five-case/92-pixel graph verifier on the
+derivative and privacy-scan every resulting file. The article must disclose
+this path-only transformation; it must not describe the derivative as
+byte-identical to the private capture.
+
 The frozen pre-fix debug traces came from an sm_86 RTX 3090, whereas the
 headline rerun uses an sm_89 L4. For the decisive rerun, intermediate
 projection alpha and power therefore retain a frozen float32-ULP bound, and the

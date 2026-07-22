@@ -95,6 +95,10 @@ B64_ORACLE_MANIFEST_SCHEMA = "flashgs-matched-gsplat-oracle-v4"
 B64_KNOWN_FAILURE_SCHEMA = "flashgs-b64-known-failure-cases-v1"
 B64_DIAGNOSIS_LOCK_SCHEMA = "flashgs-b64-diagnosis-lock-v1"
 B64_DIAGNOSIS_INDEX_SCHEMA = "flashgs-b64-diagnosis-index-v1"
+B64_PRIVACY_REDACTION_SCHEMA = "flashgs-b64-privacy-redaction-v1"
+B64_PRIVACY_REDACTION_INVENTORY_SCHEMA = (
+    "flashgs-b64-privacy-redaction-inventory-v1"
+)
 BOUNDED_WRAPPER_SCHEMA = "publication-bounded-gate-wrapper-v1"
 NODE_OCCUPANCY_SCHEMA = "flashgs-matched-node-occupancy-v2"
 B64_TRANSITIVE_EVIDENCE_KEYS = frozenset(
@@ -112,6 +116,9 @@ B64_TRANSITIVE_EVIDENCE_KEYS = frozenset(
         "oracle_node_occupancy",
         "diagnosis_index",
         "diagnosis_lock",
+        "diagnosis_privacy_redaction_inventory",
+        "diagnosis_privacy_redaction_manifest",
+        "diagnosis_privacy_redaction_tool",
         "known_failure_manifest",
         *(
             f"{prefix}_support_{suffix}"
@@ -1094,6 +1101,263 @@ def _validate_b64_repair_report(
     _parse_time(report.get("created_at"), label=f"{label} created_at")
 
 
+def _validate_b64_privacy_redaction(
+    evidence_root: EvidenceRoot,
+    evidence: dict[str, Any],
+) -> None:
+    """Bind every public B64 derivative byte to its disclosed transformation."""
+
+    redaction = _load_evidence_json(
+        evidence_root,
+        evidence,
+        "diagnosis_privacy_redaction_manifest",
+    )
+    inventory = _load_evidence_json(
+        evidence_root,
+        evidence,
+        "diagnosis_privacy_redaction_inventory",
+    )
+    tool_path = evidence_root.resolve_record(
+        evidence["diagnosis_privacy_redaction_tool"],
+        label="B64 diagnosis privacy-redaction tool",
+    )
+    tool_record = artifact_record(tool_path)
+    expected_contract = {
+        "artifact_hash_rebinding": "lowercase-sha256-same-length-substitution",
+        "path_redaction": "deterministic-same-length-private-root-substitution",
+        "payload_sizes_unchanged": True,
+        "reversibility": "every-public-file-roundtrips-byte-for-byte",
+    }
+    _require(
+        set(redaction)
+        == {
+            "artifact_hash_rebindings",
+            "file_count",
+            "files",
+            "generator",
+            "known_failure_manifest",
+            "pass",
+            "path_prefix_replacements",
+            "private_roots",
+            "schema_version",
+            "transformation_contract",
+        }
+        and redaction.get("schema_version") == B64_PRIVACY_REDACTION_SCHEMA
+        and redaction.get("pass") is True
+        and redaction.get("transformation_contract") == expected_contract,
+        "B64 diagnosis privacy-redaction contract differs.",
+    )
+    generator = redaction.get("generator")
+    _require(
+        isinstance(generator, dict)
+        and set(generator) == {"bytes", "logical_path", "sha256"}
+        and generator.get("logical_path")
+        == "publication/redact_b64_diagnosis.py"
+        and _same_artifact(generator, tool_record),
+        "B64 diagnosis privacy-redaction generator differs.",
+    )
+    known_binding = redaction.get("known_failure_manifest")
+    _require(
+        isinstance(known_binding, dict)
+        and set(known_binding) == {"bytes", "logical_path", "sha256"}
+        and known_binding.get("logical_path")
+        == "experiments/flashgs_matched/B64_KNOWN_FAILURE_CASES.json"
+        and _same_artifact(
+            known_binding,
+            evidence["known_failure_manifest"],
+        ),
+        "B64 privacy-redaction known-failure binding differs.",
+    )
+
+    raw_files = redaction.get("files")
+    _require(
+        isinstance(raw_files, list)
+        and len(raw_files) == 30
+        and redaction.get("file_count") == 30,
+        "B64 diagnosis privacy-redaction file set is incomplete.",
+    )
+    files_by_label: dict[str, dict[str, Any]] = {}
+    path_replacements = 0
+    hash_rebindings = 0
+    for raw_file in raw_files:
+        _require(
+            isinstance(raw_file, dict)
+            and set(raw_file)
+            == {
+                "artifact_hash_rebindings",
+                "bytes",
+                "logical_path",
+                "path_prefix_replacements",
+                "public_sha256",
+                "reversible",
+                "source_sha256",
+            },
+            "B64 diagnosis privacy-redaction file record is malformed.",
+        )
+        label = _safe_relative(
+            raw_file.get("logical_path"),
+            label="B64 privacy-redaction logical path",
+        )
+        _require(
+            label not in files_by_label,
+            "B64 privacy-redaction file labels repeat.",
+        )
+        path_count = raw_file.get("path_prefix_replacements")
+        hash_count = raw_file.get("artifact_hash_rebindings")
+        source_sha256 = raw_file.get("source_sha256")
+        public_sha256 = raw_file.get("public_sha256")
+        _require(
+            isinstance(raw_file.get("bytes"), int)
+            and not isinstance(raw_file.get("bytes"), bool)
+            and raw_file["bytes"] >= 0
+            and isinstance(path_count, int)
+            and not isinstance(path_count, bool)
+            and path_count >= 0
+            and isinstance(hash_count, int)
+            and not isinstance(hash_count, bool)
+            and hash_count >= 0
+            and raw_file.get("reversible") is True
+            and isinstance(source_sha256, str)
+            and SHA256_RE.fullmatch(source_sha256) is not None
+            and isinstance(public_sha256, str)
+            and SHA256_RE.fullmatch(public_sha256) is not None
+            and ((source_sha256 != public_sha256) == (path_count + hash_count > 0)),
+            f"B64 privacy-redaction file record differs: {label}.",
+        )
+        files_by_label[label] = raw_file
+        path_replacements += path_count
+        hash_rebindings += hash_count
+    required_labels = {
+        "diagnosis-index.json",
+        "diagnosis-lock.json",
+        "known-failure-manifest.json",
+    }
+    historical_labels = {
+        label for label in files_by_label if label.startswith("historical/")
+    }
+    _require(
+        set(files_by_label) == required_labels | historical_labels
+        and len(historical_labels) == 27,
+        "B64 privacy-redaction logical file set differs.",
+    )
+    _require(
+        redaction.get("path_prefix_replacements") == path_replacements
+        and path_replacements > 0
+        and redaction.get("artifact_hash_rebindings") == hash_rebindings
+        and hash_rebindings > 0,
+        "B64 privacy-redaction aggregate counts differ.",
+    )
+
+    roots = redaction.get("private_roots")
+    _require(
+        isinstance(roots, list)
+        and bool(roots)
+        and sum(
+            item.get("occurrences", 0)
+            for item in roots
+            if isinstance(item, dict)
+        )
+        == path_replacements,
+        "B64 privacy-redaction root commitments differ.",
+    )
+    root_hashes: set[str] = set()
+    replacements: set[str] = set()
+    for root in roots:
+        _require(
+            isinstance(root, dict)
+            and set(root)
+            == {"bytes", "occurrences", "replacement", "source_sha256"}
+            and isinstance(root.get("bytes"), int)
+            and not isinstance(root.get("bytes"), bool)
+            and root["bytes"] > 0
+            and isinstance(root.get("occurrences"), int)
+            and not isinstance(root.get("occurrences"), bool)
+            and root["occurrences"] > 0
+            and isinstance(root.get("replacement"), str)
+            and root["replacement"].isascii()
+            and re.fullmatch(r"/work/[0-9A-Za-z_]+", root["replacement"])
+            is not None
+            and len(root["replacement"].encode("ascii")) == root["bytes"]
+            and isinstance(root.get("source_sha256"), str)
+            and SHA256_RE.fullmatch(root["source_sha256"]) is not None,
+            "B64 privacy-redaction root commitment is malformed.",
+        )
+        root_hashes.add(root["source_sha256"])
+        replacements.add(root["replacement"])
+    _require(
+        len(root_hashes) == len(roots) and len(replacements) == len(roots),
+        "B64 privacy-redaction root commitments repeat.",
+    )
+
+    _require(
+        set(inventory)
+        == {"file_count", "files", "manifest", "pass", "schema_version"}
+        and inventory.get("schema_version")
+        == B64_PRIVACY_REDACTION_INVENTORY_SCHEMA
+        and inventory.get("pass") is True
+        and inventory.get("file_count") == 30
+        and _same_artifact(
+            inventory.get("manifest"),
+            evidence["diagnosis_privacy_redaction_manifest"],
+        ),
+        "B64 privacy-redaction inventory contract differs.",
+    )
+    inventory_files = inventory.get("files")
+    _require(
+        isinstance(inventory_files, list) and len(inventory_files) == 30,
+        "B64 privacy-redaction inventory file set is incomplete.",
+    )
+    inventory_by_label: dict[str, dict[str, Any]] = {}
+    for item in inventory_files:
+        _require(
+            isinstance(item, dict)
+            and set(item) == {"artifact", "logical_path"}
+            and isinstance(item.get("artifact"), dict)
+            and set(item["artifact"]) == {"bytes", "path", "sha256"},
+            "B64 privacy-redaction inventory file record is malformed.",
+        )
+        label = _safe_relative(
+            item.get("logical_path"),
+            label="B64 privacy-redaction inventory logical path",
+        )
+        _require(
+            label not in inventory_by_label,
+            "B64 privacy-redaction inventory labels repeat.",
+        )
+        resolved = evidence_root.resolve_record(
+            item["artifact"],
+            label=f"B64 privacy-redacted artifact {label}",
+        )
+        _require(
+            _identity(
+                artifact_record(resolved),
+                label=f"B64 privacy-redacted artifact {label}",
+            )
+            == (
+                files_by_label.get(label, {}).get("public_sha256"),
+                files_by_label.get(label, {}).get("bytes"),
+            ),
+            f"B64 privacy-redacted artifact differs: {label}.",
+        )
+        inventory_by_label[label] = item["artifact"]
+    _require(
+        set(inventory_by_label) == set(files_by_label),
+        "B64 privacy-redaction manifest and inventory file sets differ.",
+    )
+    for label, evidence_name in (
+        ("diagnosis-index.json", "diagnosis_index"),
+        ("diagnosis-lock.json", "diagnosis_lock"),
+        ("known-failure-manifest.json", "known_failure_manifest"),
+    ):
+        _require(
+            _same_artifact(
+                inventory_by_label[label],
+                evidence[evidence_name],
+            ),
+            f"B64 privacy-redaction inventory does not bind {label}.",
+        )
+
+
 def _validate_repair(
     evidence_root: EvidenceRoot,
     result: dict[str, Any],
@@ -1199,6 +1463,7 @@ def _validate_repair(
     known = _load_evidence_json(evidence_root, evidence, "known_failure_manifest")
     diagnosis_lock = _load_evidence_json(evidence_root, evidence, "diagnosis_lock")
     diagnosis = _load_evidence_json(evidence_root, evidence, "diagnosis_index")
+    _validate_b64_privacy_redaction(evidence_root, evidence)
     _require(
         known.get("schema_version") == B64_KNOWN_FAILURE_SCHEMA
         and known.get("diagnostic_only") is True

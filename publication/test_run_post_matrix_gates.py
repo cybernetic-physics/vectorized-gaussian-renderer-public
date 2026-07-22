@@ -19,6 +19,7 @@ from run_post_matrix_gates import (  # noqa: E402
     reject_symlink_components,
     require_real_directory,
     require_resume_ablation_alias,
+    write_b64_redaction_inventory,
     write_new_or_identical,
 )
 
@@ -59,6 +60,72 @@ class PostMatrixCoordinatorTests(unittest.TestCase):
             (destination / "nested/evidence.json").write_text("two\n", encoding="utf-8")
             with self.assertRaises(FileExistsError):
                 copy_tree_new_or_identical(source, destination)
+
+    def test_b64_redaction_inventory_binds_every_public_file(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            historical = root / "historical"
+            historical.mkdir()
+            historical_file = historical / "trace.bin"
+            historical_file.write_bytes(b"public-trace")
+            index = root / "diagnosis-index.json"
+            lock = root / "diagnosis-lock.json"
+            known = root / "known-failure-manifest.json"
+            manifest_path = root / "privacy-redaction-manifest.json"
+            for path, payload in (
+                (index, "index\n"),
+                (lock, "lock\n"),
+                (known, "known\n"),
+                (manifest_path, "manifest\n"),
+            ):
+                path.write_text(payload, encoding="utf-8")
+            files = []
+            for label, path in (
+                ("diagnosis-index.json", index),
+                ("diagnosis-lock.json", lock),
+                ("historical/trace.bin", historical_file),
+                ("known-failure-manifest.json", known),
+            ):
+                record = artifact_record(path)
+                files.append(
+                    {
+                        "bytes": record["bytes"],
+                        "logical_path": label,
+                        "public_sha256": record["sha256"],
+                    }
+                )
+            output = root / "privacy-redaction-inventory.json"
+            inventory = write_b64_redaction_inventory(
+                manifest={"files": files},
+                historical_root=historical,
+                diagnosis_index=index,
+                diagnosis_lock=lock,
+                known_failure_manifest=known,
+                manifest_path=manifest_path,
+                output=output,
+            )
+            self.assertTrue(inventory["pass"])
+            self.assertEqual(inventory["file_count"], 4)
+            write_b64_redaction_inventory(
+                manifest={"files": files},
+                historical_root=historical,
+                diagnosis_index=index,
+                diagnosis_lock=lock,
+                known_failure_manifest=known,
+                manifest_path=manifest_path,
+                output=output,
+            )
+            historical_file.write_bytes(b"changed")
+            with self.assertRaisesRegex(RuntimeError, "artifact differs"):
+                write_b64_redaction_inventory(
+                    manifest={"files": files},
+                    historical_root=historical,
+                    diagnosis_index=index,
+                    diagnosis_lock=lock,
+                    known_failure_manifest=known,
+                    manifest_path=manifest_path,
+                    output=root / "changed-inventory.json",
+                )
 
     def test_resume_directories_reject_symlinked_descendants(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

@@ -55,6 +55,12 @@ def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--scene-path", type=Path, required=True)
     parser.add_argument("--gsplat-source", type=Path, required=True)
     parser.add_argument("--diagnosis-index", type=Path, required=True)
+    parser.add_argument("--diagnosis-lock", type=Path, required=True)
+    parser.add_argument(
+        "--diagnosis-redaction-manifest",
+        type=Path,
+        required=True,
+    )
     parser.add_argument("--historical-b64-root", type=Path, required=True)
     parser.add_argument("--expected-gpu-uuid", required=True)
     parser.add_argument("--benchmark-tag", default="benchmark-gcp-l4-matched-v8")
@@ -98,6 +104,66 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def artifact_record(path: Path) -> dict[str, Any]:
+    candidate = require_regular(path, label="artifact")
+    return {
+        "bytes": candidate.stat().st_size,
+        "path": str(candidate.resolve(strict=True)),
+        "sha256": sha256_file(candidate),
+    }
+
+
+def write_b64_redaction_inventory(
+    *,
+    manifest: dict[str, Any],
+    historical_root: Path,
+    diagnosis_index: Path,
+    diagnosis_lock: Path,
+    known_failure_manifest: Path,
+    manifest_path: Path,
+    output: Path,
+) -> dict[str, Any]:
+    redaction_paths = {
+        "diagnosis-index.json": diagnosis_index,
+        "diagnosis-lock.json": diagnosis_lock,
+        "known-failure-manifest.json": known_failure_manifest,
+    }
+    raw_files = manifest.get("files")
+    if not isinstance(raw_files, list) or not raw_files:
+        raise RuntimeError("B64 privacy-redaction manifest has no files.")
+    for raw_file in raw_files:
+        label = raw_file.get("logical_path") if isinstance(raw_file, dict) else None
+        if isinstance(label, str) and label.startswith("historical/"):
+            relative = Path(label).relative_to("historical")
+            redaction_paths[label] = historical_root / relative
+    expected_labels = {
+        raw_file.get("logical_path")
+        for raw_file in raw_files
+        if isinstance(raw_file, dict)
+    }
+    if set(redaction_paths) != expected_labels:
+        raise RuntimeError("B64 privacy-redaction inventory file set differs.")
+    inventory_files = []
+    for raw_file in raw_files:
+        label = raw_file["logical_path"]
+        record = artifact_record(redaction_paths[label])
+        if (
+            record["bytes"] != raw_file.get("bytes")
+            or record["sha256"] != raw_file.get("public_sha256")
+        ):
+            raise RuntimeError(f"B64 privacy-redacted artifact differs: {label}.")
+        inventory_files.append({"artifact": record, "logical_path": label})
+    inventory = {
+        "file_count": len(inventory_files),
+        "files": inventory_files,
+        "manifest": artifact_record(manifest_path),
+        "pass": True,
+        "schema_version": "flashgs-b64-privacy-redaction-inventory-v1",
+    }
+    write_new_or_identical(output, canonical_json_bytes(inventory))
+    return inventory
 
 
 def require_regular(
@@ -310,6 +376,14 @@ def main(arguments: Iterable[str] | None = None) -> None:
     gsplat_source = args.gsplat_source.resolve(strict=True)
     historical = args.historical_b64_root.resolve(strict=True)
     diagnosis_source = require_regular(args.diagnosis_index, label="B64 diagnosis index")
+    diagnosis_lock_source = require_regular(
+        args.diagnosis_lock,
+        label="B64 diagnosis lock",
+    )
+    redaction_manifest_source = require_regular(
+        args.diagnosis_redaction_manifest,
+        label="B64 diagnosis privacy-redaction manifest",
+    )
     if not output.is_relative_to(matrix) or output == matrix:
         raise ValueError(
             "Post-matrix output root must be a fresh child of the canonical matrix root."
@@ -462,11 +536,36 @@ def main(arguments: Iterable[str] | None = None) -> None:
         tools / "run_deterministic_replay.py",
         tools / "deterministic_digest_smoke.py",
         tools / "run_pytest_gate.py",
+        tools / "redact_b64_diagnosis.py",
         tools / "write_machine_provenance.py",
         tools / "write_verification.py",
         tools / "aggregate_verification.py",
     ):
         require_regular(required, label=f"publication tool {required.name}")
+    redaction_module_path = tools / "redact_b64_diagnosis.py"
+    redaction_spec = importlib.util.spec_from_file_location(
+        "publication_b64_privacy_redaction",
+        redaction_module_path,
+    )
+    if redaction_spec is None or redaction_spec.loader is None:
+        raise RuntimeError("Cannot load the B64 privacy-redaction verifier.")
+    redaction_module = importlib.util.module_from_spec(redaction_spec)
+    sys.modules[redaction_spec.name] = redaction_module
+    try:
+        redaction_spec.loader.exec_module(redaction_module)
+        redaction_manifest_payload = redaction_module.verify_public_derivative(
+            historical_root=historical,
+            diagnosis_index=diagnosis_source,
+            diagnosis_lock=diagnosis_lock_source,
+            known_failure_manifest=(
+                source_root
+                / "experiments/flashgs_matched/B64_KNOWN_FAILURE_CASES.json"
+            ),
+            manifest_path=redaction_manifest_source,
+            generator_path=redaction_module_path,
+        )
+    finally:
+        sys.modules.pop(redaction_spec.name, None)
     publication_test_paths = sorted(tools.glob("test_*.py"))
     publication_test_paths.extend(
         [
@@ -823,11 +922,34 @@ def main(arguments: Iterable[str] | None = None) -> None:
         known,
     )
     copy_file_new_or_identical(
-        source_root / "experiments/flashgs_matched/B64_DIAGNOSIS_LOCK.json",
+        diagnosis_lock_source,
         lock,
     )
     diagnosis = b64_artifacts / "evidence/diagnostics/diagnosis-index.json"
     copy_file_new_or_identical(diagnosis_source, diagnosis)
+    redaction_manifest = (
+        b64_artifacts
+        / "evidence/diagnostics/privacy-redaction-manifest.json"
+    )
+    redaction_tool = (
+        b64_artifacts
+        / "evidence/diagnostics/redact_b64_diagnosis.py"
+    )
+    copy_file_new_or_identical(redaction_manifest_source, redaction_manifest)
+    copy_file_new_or_identical(redaction_module_path, redaction_tool)
+    redaction_inventory = (
+        b64_artifacts
+        / "evidence/diagnostics/privacy-redaction-inventory.json"
+    )
+    write_b64_redaction_inventory(
+        manifest=redaction_manifest_payload,
+        historical_root=historical_target,
+        diagnosis_index=diagnosis,
+        diagnosis_lock=lock,
+        known_failure_manifest=known,
+        manifest_path=redaction_manifest,
+        output=redaction_inventory,
+    )
     repair_root = b64_artifacts / "evidence/repair"
     repair_root.mkdir(parents=True, exist_ok=True)
     survey = load_json(
@@ -926,6 +1048,9 @@ def main(arguments: Iterable[str] | None = None) -> None:
     b64_evidence = {
         "diagnosis_index": diagnosis,
         "diagnosis_lock": lock,
+        "diagnosis_privacy_redaction_inventory": redaction_inventory,
+        "diagnosis_privacy_redaction_manifest": redaction_manifest,
+        "diagnosis_privacy_redaction_tool": redaction_tool,
         "known_failure_manifest": known,
         "oracle": oracle,
         "oracle_camera_bundle": oracle.with_suffix(".camera-bundle.json"),

@@ -9,9 +9,33 @@ The publication path is fail-closed and has three layers:
    the final public Git merge, tags, and release.
 
 Run `run_post_matrix_gates.py` only after the frozen matrix has produced a
-passing `summary.json`. Its `--output-root` must be a fresh child of the matrix
-root. It serializes all GPU work under the cooperative executor lock, writes
-the canonical P1-versus-P128 ablation alias, and creates and immediately
+passing `summary.json`. Before that coordinator starts, convert the private
+historical B64 diagnosis into its public derivative with
+`redact_b64_diagnosis.py`. The transformer replaces only same-length private
+root strings and the SHA-256 strings transitively affected by those replacements;
+it proves every output byte round-trips, emits no private root, and writes a
+deterministic transformation manifest. The unchanged repair verifier must then
+rebuild the five-case, five-culprit, 92-pixel diagnosis graph from the derivative.
+
+```bash
+python3 publication/redact_b64_diagnosis.py \
+  --historical-root /private/b64-short-tail-pre-fix-5eca4e6 \
+  --diagnosis-index /private/diagnosis-index.json \
+  --diagnosis-lock experiments/flashgs_matched/B64_DIAGNOSIS_LOCK.json \
+  --known-failure-manifest experiments/flashgs_matched/B64_KNOWN_FAILURE_CASES.json \
+  --output-root /staging/public-b64/outputs/publication-readiness/b64-short-tail-pre-fix-5eca4e6 \
+  --output-index /staging/public-b64/evidence/diagnostics/diagnosis-index.json \
+  --output-lock /staging/public-b64/experiments/flashgs_matched/B64_DIAGNOSIS_LOCK.json \
+  --output-manifest /staging/public-b64/evidence/diagnostics/privacy-redaction-manifest.json
+```
+
+Pass those three public derivative paths to `run_post_matrix_gates.py` through
+`--historical-b64-root`, `--diagnosis-index`, `--diagnosis-lock`, and
+`--diagnosis-redaction-manifest`. Its `--output-root` must be a fresh child of
+the matrix root. Before GPU work, the coordinator independently verifies the
+derivative and writes an inventory whose artifact records bind all 30 public
+graph inputs. It serializes all GPU work under the cooperative executor lock,
+writes the canonical P1-versus-P128 ablation alias, and creates and immediately
 revalidates `publication/verification.json`. Any gate failure stops the ladder;
 do not reuse a partially failed root as release evidence.
 

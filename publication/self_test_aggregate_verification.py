@@ -361,6 +361,97 @@ def repair_evidence(
         },
     )
     diagnosis_index_record = artifact_record(diagnosis_index_path)
+    redaction_tool_path = artifact_root / "redact_b64_diagnosis.py"
+    redaction_tool_path.write_text("# fixture redaction tool\n", encoding="utf-8")
+    redaction_tool_record = artifact_record(redaction_tool_path)
+    public_files = {
+        "diagnosis-index.json": diagnosis_index_record,
+        "diagnosis-lock.json": diagnosis_lock_record,
+        "known-failure-manifest.json": known_record,
+    }
+    for index in range(27):
+        label = f"historical/fixture-{index:02d}.bin"
+        path = artifact_root / label
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(f"public-redacted-fixture-{index}".encode("utf-8"))
+        public_files[label] = artifact_record(path)
+    redaction_file_records = []
+    for label, record in sorted(public_files.items()):
+        transformed = label == "historical/fixture-00.bin"
+        redaction_file_records.append(
+            {
+                "artifact_hash_rebindings": 1 if transformed else 0,
+                "bytes": record["bytes"],
+                "logical_path": label,
+                "path_prefix_replacements": 1 if transformed else 0,
+                "public_sha256": record["sha256"],
+                "reversible": True,
+                "source_sha256": (
+                    hashlib.sha256(b"private-fixture-00").hexdigest()
+                    if transformed
+                    else record["sha256"]
+                ),
+            }
+        )
+    redaction_manifest_path = artifact_root / "privacy-redaction-manifest.json"
+    replacement = "/work/redacted"
+    write_json(
+        redaction_manifest_path,
+        {
+            "artifact_hash_rebindings": 1,
+            "file_count": len(redaction_file_records),
+            "files": redaction_file_records,
+            "generator": {
+                "bytes": redaction_tool_record["bytes"],
+                "logical_path": "publication/redact_b64_diagnosis.py",
+                "sha256": redaction_tool_record["sha256"],
+            },
+            "known_failure_manifest": {
+                "bytes": known_record["bytes"],
+                "logical_path": (
+                    "experiments/flashgs_matched/B64_KNOWN_FAILURE_CASES.json"
+                ),
+                "sha256": known_record["sha256"],
+            },
+            "pass": True,
+            "path_prefix_replacements": 1,
+            "private_roots": [
+                {
+                    "bytes": len(replacement.encode("ascii")),
+                    "occurrences": 1,
+                    "replacement": replacement,
+                    "source_sha256": hashlib.sha256(b"private-root").hexdigest(),
+                }
+            ],
+            "schema_version": "flashgs-b64-privacy-redaction-v1",
+            "transformation_contract": {
+                "artifact_hash_rebinding": (
+                    "lowercase-sha256-same-length-substitution"
+                ),
+                "path_redaction": (
+                    "deterministic-same-length-private-root-substitution"
+                ),
+                "payload_sizes_unchanged": True,
+                "reversibility": "every-public-file-roundtrips-byte-for-byte",
+            },
+        },
+    )
+    redaction_manifest_record = artifact_record(redaction_manifest_path)
+    redaction_inventory_path = artifact_root / "privacy-redaction-inventory.json"
+    write_json(
+        redaction_inventory_path,
+        {
+            "file_count": len(public_files),
+            "files": [
+                {"artifact": record, "logical_path": label}
+                for label, record in sorted(public_files.items())
+            ],
+            "manifest": redaction_manifest_record,
+            "pass": True,
+            "schema_version": "flashgs-b64-privacy-redaction-inventory-v1",
+        },
+    )
+    redaction_inventory_record = artifact_record(redaction_inventory_path)
 
     repair_records: dict[str, dict[str, Any]] = {}
     raw_records: dict[str, dict[str, Any]] = {}
@@ -544,6 +635,9 @@ def repair_evidence(
         "oracle_node_occupancy": oracle_occupancy_record,
         "diagnosis_index": diagnosis_index_record,
         "diagnosis_lock": diagnosis_lock_record,
+        "diagnosis_privacy_redaction_inventory": redaction_inventory_record,
+        "diagnosis_privacy_redaction_manifest": redaction_manifest_record,
+        "diagnosis_privacy_redaction_tool": redaction_tool_record,
         "known_failure_manifest": known_record,
     }
 
@@ -1735,6 +1829,46 @@ class AggregateVerificationTests(unittest.TestCase):
     def test_b64_missing_transitive_evidence_key_fails_with_refreshed_graph(self) -> None:
         record, gate, result_path, result = self.b64_graph()
         result["evidence"].pop("repeat_support_log")
+        self.save_b64_graph(record, gate, result_path, result)
+        self.assert_rejected()
+
+    def test_b64_privacy_redaction_manifest_tamper_fails(self) -> None:
+        record, gate, result_path, result = self.b64_graph()
+        evidence = result["evidence"]
+        manifest_path = Path(
+            evidence["diagnosis_privacy_redaction_manifest"]["path"]
+        )
+        manifest = load(manifest_path)
+        manifest["path_prefix_replacements"] += 1
+        write_json(manifest_path, manifest)
+        refresh(evidence["diagnosis_privacy_redaction_manifest"], manifest_path)
+        inventory_path = Path(
+            evidence["diagnosis_privacy_redaction_inventory"]["path"]
+        )
+        inventory = load(inventory_path)
+        inventory["manifest"] = evidence["diagnosis_privacy_redaction_manifest"]
+        write_json(inventory_path, inventory)
+        refresh(evidence["diagnosis_privacy_redaction_inventory"], inventory_path)
+        self.save_b64_graph(record, gate, result_path, result)
+        self.assert_rejected()
+
+    def test_b64_privacy_redacted_artifact_tamper_fails(self) -> None:
+        record, gate, result_path, result = self.b64_graph()
+        evidence = result["evidence"]
+        inventory_path = Path(
+            evidence["diagnosis_privacy_redaction_inventory"]["path"]
+        )
+        inventory = load(inventory_path)
+        item = next(
+            raw
+            for raw in inventory["files"]
+            if raw["logical_path"] == "historical/fixture-00.bin"
+        )
+        artifact_path = Path(item["artifact"]["path"])
+        artifact_path.write_bytes(artifact_path.read_bytes() + b"tamper")
+        refresh(item["artifact"], artifact_path)
+        write_json(inventory_path, inventory)
+        refresh(evidence["diagnosis_privacy_redaction_inventory"], inventory_path)
         self.save_b64_graph(record, gate, result_path, result)
         self.assert_rejected()
 

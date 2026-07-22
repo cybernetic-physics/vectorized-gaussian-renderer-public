@@ -287,6 +287,16 @@ Compute Sanitizer also passed. Exact-current reruns must bind the same repaired
 native source and binary used by the fresh matrix before these become release
 claims. Every interrupted timing remains diagnostic only.
 
+The historical capture retained private build paths in JSON, logs, and binary
+debug metadata. The public evidence therefore uses a disclosed, deterministic
+derivative: private root strings are replaced with same-length tokens and only
+their transitive artifact hashes are rebound. The release includes the
+transformer, a per-file reversible-transformation manifest, and an independently
+checked inventory binding all 30 transformed graph inputs. The unchanged
+scientific verifier must still reconstruct all five culprit cases and all 92
+historical mismatch pixels. This is a privacy transformation, not a claim that
+the published files are byte-identical to the private capture.
+
 ## The OptiX tracer is a separate experiment
 
 The repository also contains an experimental Gaussian ray-volume tracer. It can
