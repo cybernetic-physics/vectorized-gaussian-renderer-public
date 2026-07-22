@@ -25,6 +25,7 @@ from typing import Any, Iterable
 
 
 SCENE_SHA256 = "29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267"
+FLASHGS_COMMIT = "cdfc4e4002318423eda356eed02df8e01fa32cb6"
 BATCHES = "1,8,32,64,128,256,512,1024"
 REQUIRED_GATES = (
     "flashgs-b64-repair",
@@ -56,6 +57,7 @@ REQUIRED_PYTEST_FRAGMENTS = (
     "test_redacts_paths_and_rebinds_transitive_hashes",
     "test_content_addressed_manifest_matches_canonical_bytes",
     "test_build_stage_authors_projection_sorting_and_fractional_opacity",
+    "test_checked_out_upstream_transform_preserves_equation_functions",
     "test_s3_put_is_signed_and_conditionally_create_only",
     "test_rejects_non_public_repository_before_network_record",
     "test_inconsistent_primary_run_environment_fails",
@@ -73,6 +75,7 @@ def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--canonical-runtime", type=Path, required=True)
     parser.add_argument("--scene-path", type=Path, required=True)
     parser.add_argument("--gsplat-source", type=Path, required=True)
+    parser.add_argument("--flashgs-source", type=Path, required=True)
     parser.add_argument("--diagnosis-index", type=Path, required=True)
     parser.add_argument("--diagnosis-lock", type=Path, required=True)
     parser.add_argument(
@@ -224,6 +227,36 @@ def require_real_directory(path: Path, *, boundary: Path, label: str) -> Path:
     resolved = path.resolve(strict=True)
     if not resolved.is_dir() or not resolved.is_relative_to(boundary.resolve(strict=True)):
         raise ValueError(f"{label} is not a contained regular directory: {path}")
+    return resolved
+
+
+def require_clean_git_checkout(
+    path: Path,
+    *,
+    expected_commit: str,
+    label: str,
+) -> Path:
+    raw = path.absolute()
+    if raw.is_symlink():
+        raise ValueError(f"{label} may not be a symlink: {raw}")
+    resolved = raw.resolve(strict=True)
+    if not resolved.is_dir():
+        raise ValueError(f"{label} is not a directory: {resolved}")
+    head = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"],
+        cwd=resolved,
+        text=True,
+    ).strip()
+    status = subprocess.check_output(
+        ["git", "status", "--short", "--untracked-files=all"],
+        cwd=resolved,
+        text=True,
+    ).splitlines()
+    if head != expected_commit or status:
+        raise ValueError(
+            f"{label} must be clean at {expected_commit}; "
+            f"observed head={head}, status={status}."
+        )
     return resolved
 
 
@@ -393,6 +426,11 @@ def main(arguments: Iterable[str] | None = None) -> None:
     uv = require_regular(args.uv, label="uv", executable=True, allow_symlink=True)
     scene = require_regular(args.scene_path, label="Home Scan scene")
     gsplat_source = args.gsplat_source.resolve(strict=True)
+    flashgs_source = require_clean_git_checkout(
+        args.flashgs_source,
+        expected_commit=FLASHGS_COMMIT,
+        label="Pinned FlashGS source",
+    )
     historical = args.historical_b64_root.resolve(strict=True)
     diagnosis_source = require_regular(args.diagnosis_index, label="B64 diagnosis index")
     diagnosis_lock_source = require_regular(
@@ -420,6 +458,12 @@ def main(arguments: Iterable[str] | None = None) -> None:
         raise ValueError("Home Scan scene SHA-256 differs from the publication contract.")
     if not gsplat_source.is_dir() or gsplat_source.is_symlink():
         raise ValueError("Pinned gsplat source is missing or symlinked.")
+    expected_flashgs_sibling = source_root.parent / "FlashGS"
+    if flashgs_source != expected_flashgs_sibling.resolve(strict=True):
+        raise ValueError(
+            "Pinned FlashGS must be the real sibling checkout at "
+            f"{expected_flashgs_sibling}."
+        )
     if not args.canonical_runtime.resolve(strict=True).is_dir():
         raise ValueError("Canonical Isaac runtime is missing.")
 

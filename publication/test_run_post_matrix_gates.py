@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -18,6 +19,7 @@ from run_post_matrix_gates import (  # noqa: E402
     copy_tree_new_or_identical,
     reject_tree_symlinks,
     reject_symlink_components,
+    require_clean_git_checkout,
     require_real_directory,
     require_resume_ablation_alias,
     write_b64_redaction_inventory,
@@ -41,6 +43,10 @@ class PostMatrixCoordinatorTests(unittest.TestCase):
         required = set(REQUIRED_PYTEST_FRAGMENTS)
         self.assertIn(
             "test_build_stage_authors_projection_sorting_and_fractional_opacity",
+            required,
+        )
+        self.assertIn(
+            "test_checked_out_upstream_transform_preserves_equation_functions",
             required,
         )
         self.assertIn(
@@ -141,6 +147,49 @@ class PostMatrixCoordinatorTests(unittest.TestCase):
                     known_failure_manifest=known,
                     manifest_path=manifest_path,
                     output=root / "changed-inventory.json",
+                )
+
+    def test_clean_dependency_checkout_rejects_source_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkout = Path(temporary) / "dependency"
+            subprocess.run(["git", "init", str(checkout)], check=True, capture_output=True)
+            source = checkout / "source.txt"
+            source.write_text("pinned\n", encoding="utf-8")
+            subprocess.run(["git", "add", "source.txt"], cwd=checkout, check=True)
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=Publication Test",
+                    "-c",
+                    "user.email=publication-test@example.invalid",
+                    "commit",
+                    "-m",
+                    "fixture",
+                ],
+                cwd=checkout,
+                check=True,
+                capture_output=True,
+            )
+            commit = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
+                cwd=checkout,
+                text=True,
+            ).strip()
+            self.assertEqual(
+                require_clean_git_checkout(
+                    checkout,
+                    expected_commit=commit,
+                    label="fixture dependency",
+                ),
+                checkout.resolve(),
+            )
+            source.write_text("drift\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "must be clean"):
+                require_clean_git_checkout(
+                    checkout,
+                    expected_commit=commit,
+                    label="fixture dependency",
                 )
 
     def test_resume_directories_reject_symlinked_descendants(self) -> None:

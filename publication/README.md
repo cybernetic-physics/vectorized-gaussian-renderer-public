@@ -31,13 +31,17 @@ python3 publication/redact_b64_diagnosis.py \
 
 Pass those three public derivative paths to `run_post_matrix_gates.py` through
 `--historical-b64-root`, `--diagnosis-index`, `--diagnosis-lock`, and
-`--diagnosis-redaction-manifest`. Its `--output-root` must be a fresh child of
-the matrix root. Before GPU work, the coordinator independently verifies the
-derivative and writes an inventory whose artifact records bind all 30 public
-graph inputs. It serializes all GPU work under the cooperative executor lock,
-writes the canonical P1-versus-P128 ablation alias, and creates and immediately
-revalidates `publication/verification.json`. Any gate failure stops the ladder;
-do not reuse a partially failed root as release evidence.
+`--diagnosis-redaction-manifest`. Pass the clean public FlashGS checkout at
+commit `cdfc4e4002318423eda356eed02df8e01fa32cb6` through
+`--flashgs-source`; it must be the real `FlashGS` sibling of the frozen
+benchmark checkout so the upstream-source audit cannot skip. The coordinator's
+`--output-root` must be a fresh child of the matrix root. Before GPU work, it
+independently verifies the derivative and writes an inventory whose artifact
+records bind all 30 public graph inputs. It serializes all GPU work under the
+cooperative executor lock, writes the canonical P1-versus-P128 ablation alias,
+and creates and immediately revalidates `publication/verification.json`. Any
+gate failure stops the ladder; do not reuse a partially failed root as release
+evidence.
 
 Then run `finalize_article.py --evidence-root <matrix-root> --template post.md`.
 It emits `publication/article.md` and `publication/claim-ledger.json`, refuses
