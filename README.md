@@ -232,7 +232,7 @@ the scene in two resident ParticleField prims containing 16,777,215 and
 | Custom EWA video | [MP4](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/custom.mp4) |
 | OVRTX perspective video | [MP4](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/ovrtx-perspective.mp4) |
 | Poster and 12-frame visual audit | [poster](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/poster.png), [storyboard](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/flybys/home-scan/v1-a59ed5ade5b2/storyboard.png) |
-| Canonical Home Scan LOD0 | [1.20 GB PLY](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply), [dataset manifest](https://raw.githubusercontent.com/cybernetic-physics/vectorized-gaussian-renderer-public/b4a4fd0ec6962d905e9bc33672607e5161d6ee05/publication/manifests/b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json) |
+| Canonical Home Scan LOD0 | [1.20 GB PLY](https://pub-243008be935848b6accaf262f04a7b82.r2.dev/datasets/home-scan-lod0/29cee1594654/home-scan-lod0.ply), [dataset manifest](https://cdn.jsdelivr.net/gh/cybernetic-physics/vectorized-gaussian-renderer-public@b4a4fd0ec6962d905e9bc33672607e5161d6ee05/publication/manifests/b231602598b1eb039175dcb7edbd475167c2fc92011c5e975a4727c62b9f74b9.json) |
 
 The packaged video was decoded again after H.264 encoding and visually checked
 at the beginning, midpoint, end, and twelve evenly spaced frames. The path is
