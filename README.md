@@ -180,6 +180,12 @@ preflight exposed that this host's normal empty-tmux state is reported as
 occupancy probe did not yet recognize. The v5 source recognizes that specific
 empty-server result while continuing to reject unknown telemetry failures.
 
+The source-only v5 tag also produced no benchmark result. Its CUDA runtime
+preflight passed, but the wrapper rejected its own CUDA child because it saved
+process samples and deferred ancestry checks until after that child had exited.
+The v6 source verifies ancestry while each process is live and retains only the
+direct child and descendants it actually verified on the expected GPU.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

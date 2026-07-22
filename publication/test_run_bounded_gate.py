@@ -112,6 +112,52 @@ class BoundedGateTests(unittest.TestCase):
         descendant.assert_called_once_with(42, 7)
 
     @mock.patch("publication.run_bounded_gate.descendant_of", return_value=False)
+    def test_sampler_accepts_the_known_direct_child_after_exit(
+        self,
+        descendant: mock.Mock,
+    ) -> None:
+        sample = {
+            "probe_status": {"success": True},
+            "compute_apps": [
+                {"gpu_uuid": "GPU-good", "pid": "42", "process_name": "[No data]"}
+            ],
+        }
+        self.assertEqual(
+            sample_failures(
+                sample,
+                expected_gpu_uuid="GPU-good",
+                executor_pid=7,
+                allowed_pids={42},
+            ),
+            [],
+        )
+        descendant.assert_not_called()
+
+    @mock.patch("publication.run_bounded_gate.descendant_of", return_value=True)
+    def test_sampler_retains_a_live_verified_descendant(
+        self,
+        descendant: mock.Mock,
+    ) -> None:
+        allowed_pids = {41}
+        sample = {
+            "probe_status": {"success": True},
+            "compute_apps": [
+                {"gpu_uuid": "GPU-good", "pid": "42", "process_name": "python"}
+            ],
+        }
+        self.assertEqual(
+            sample_failures(
+                sample,
+                expected_gpu_uuid="GPU-good",
+                executor_pid=7,
+                allowed_pids=allowed_pids,
+            ),
+            [],
+        )
+        self.assertEqual(allowed_pids, {41, 42})
+        descendant.assert_called_once_with(42, 7)
+
+    @mock.patch("publication.run_bounded_gate.descendant_of", return_value=False)
     def test_sampler_rejects_unrelated_or_wrong_gpu(self, _descendant: mock.Mock) -> None:
         sample = {
             "probe_status": {"success": True},

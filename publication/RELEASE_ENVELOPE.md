@@ -49,13 +49,13 @@ The spec schema is `publication-external-release-envelope-spec-v1`:
   },
   "repository": {
     "benchmark_commit": "<40 lowercase hex>",
-    "benchmark_tag": "benchmark-gcp-l4-matched-v5",
+    "benchmark_tag": "benchmark-gcp-l4-matched-v6",
     "final_merge_commit": "<40 lowercase hex>",
     "name": "vectorized-gaussian-renderer-public",
     "owner": "cybernetic-physics",
     "publication_content_commit": "<40 lowercase hex>",
-    "release_tag": "vgr-gcp-l4-matched-v5",
-    "release_url": "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public/releases/tag/vgr-gcp-l4-matched-v5",
+    "release_tag": "vgr-gcp-l4-matched-v6",
+    "release_url": "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public/releases/tag/vgr-gcp-l4-matched-v6",
     "url": "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public",
     "visibility": "public"
   },
@@ -103,7 +103,7 @@ publication ref:
 
 ```bash
 python3 scripts/verify_publication_code_freeze.py \
-  --benchmark-ref benchmark-gcp-l4-matched-v5 \
+  --benchmark-ref benchmark-gcp-l4-matched-v6 \
   --publication-ref <publication-content-commit> \
   --output <code-freeze-record>
 ```
@@ -120,9 +120,9 @@ python3 publication/verify_public_release.py r2 \
 
 python3 publication/verify_public_release.py github \
   --repository-url https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public \
-  --benchmark-tag benchmark-gcp-l4-matched-v5 \
+  --benchmark-tag benchmark-gcp-l4-matched-v6 \
   --benchmark-commit <benchmark-commit> \
-  --release-tag vgr-gcp-l4-matched-v5 \
+  --release-tag vgr-gcp-l4-matched-v6 \
   --final-merge-commit <final-merge-commit> \
   --article post.md \
   --readme README.md \
@@ -150,10 +150,10 @@ python3 publication/write_release_spec.py \
   --owner cybernetic-physics \
   --name vectorized-gaussian-renderer-public \
   --benchmark-commit <benchmark-commit> \
-  --benchmark-tag benchmark-gcp-l4-matched-v5 \
+  --benchmark-tag benchmark-gcp-l4-matched-v6 \
   --publication-content-commit <publication-content-commit> \
   --final-merge-commit <final-merge-commit> \
-  --release-tag vgr-gcp-l4-matched-v5 \
+  --release-tag vgr-gcp-l4-matched-v6 \
   --output <release-spec.json>
 ```
 

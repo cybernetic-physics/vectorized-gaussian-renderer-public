@@ -178,8 +178,12 @@ def sample_failures(
     *,
     expected_gpu_uuid: str,
     executor_pid: int,
+    allowed_pids: set[int] | None = None,
 ) -> list[str]:
+    """Classify one live sample and retain descendants verified in that sample."""
+
     failures: list[str] = []
+    known_pids = allowed_pids if allowed_pids is not None else set()
     if (sample.get("probe_status") or {}).get("success") is not True:
         failures.append("sampled compute-process telemetry probe failed")
     for app in sample.get("compute_apps", []):
@@ -187,7 +191,12 @@ def sample_failures(
             pid = int(app.get("pid", -1))
         except (TypeError, ValueError):
             pid = -1
-        if app.get("gpu_uuid") != expected_gpu_uuid or not descendant_of(pid, executor_pid):
+        correct_gpu = app.get("gpu_uuid") == expected_gpu_uuid
+        verified = pid in known_pids
+        if correct_gpu and not verified and descendant_of(pid, executor_pid):
+            known_pids.add(pid)
+            verified = True
+        if not correct_gpu or not verified:
             failures.append(
                 "sampled unfamiliar CUDA compute process: "
                 f"{app.get('gpu_uuid')} pid={app.get('pid')} {app.get('process_name')}"
@@ -202,18 +211,30 @@ class DescendantComputeSampler:
         capture: Any,
         expected_gpu_uuid: str,
         executor_pid: int,
+        direct_child_pid: int,
         interval_seconds: float = 0.25,
     ) -> None:
         self.capture = capture
         self.expected_gpu_uuid = expected_gpu_uuid
         self.executor_pid = executor_pid
+        self.allowed_pids = {direct_child_pid}
         self.interval_seconds = interval_seconds
         self.samples: list[dict[str, Any]] = []
+        self.failures: list[str] = []
         self._stop = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
 
     def _capture(self) -> None:
-        self.samples.append(self.capture())
+        sample = self.capture()
+        self.failures.extend(
+            sample_failures(
+                sample,
+                expected_gpu_uuid=self.expected_gpu_uuid,
+                executor_pid=self.executor_pid,
+                allowed_pids=self.allowed_pids,
+            )
+        )
+        self.samples.append(sample)
 
     def _run(self) -> None:
         self._capture()
@@ -228,27 +249,21 @@ class DescendantComputeSampler:
         self._stop.set()
         self._thread.join()
         self._capture()
-        failures = [
-            failure
-            for sample in self.samples
-            for failure in sample_failures(
-                sample,
-                expected_gpu_uuid=self.expected_gpu_uuid,
-                executor_pid=self.executor_pid,
-            )
-        ]
         return {
             "schema_version": "publication-descendant-compute-process-sampling-v1",
             "scope": "node-wide-all-visible-nvidia-gpus",
             "coverage": "periodic-samples-not-continuous-observation",
-            "allowed_process_rule": "executor-descendants-on-exact-expected-gpu",
+            "allowed_process_rule": (
+                "direct-child-or-live-verified-executor-descendants-on-exact-expected-gpu"
+            ),
             "executor_pid": self.executor_pid,
+            "allowed_pids": sorted(self.allowed_pids),
             "expected_gpu_uuid": self.expected_gpu_uuid,
             "interval_seconds": self.interval_seconds,
             "sample_count": len(self.samples),
             "samples": self.samples,
-            "failures": failures,
-            "pass": not failures,
+            "failures": self.failures,
+            "pass": not self.failures,
         }
 
 
@@ -327,11 +342,7 @@ def main(arguments: Iterable[str] | None = None) -> None:
     log_path = output_dir / "full.log"
     timed_out = False
     child: subprocess.Popen[str] | None = None
-    sampler = DescendantComputeSampler(
-        capture=capture_compute_apps_snapshot,
-        expected_gpu_uuid=args.expected_gpu_uuid,
-        executor_pid=os.getpid(),
-    ).start()
+    sampler: DescendantComputeSampler | None = None
     try:
         with log_path.open("x", encoding="utf-8") as stream:
             child = subprocess.Popen(
@@ -343,6 +354,12 @@ def main(arguments: Iterable[str] | None = None) -> None:
                 text=True,
                 start_new_session=True,
             )
+            sampler = DescendantComputeSampler(
+                capture=capture_compute_apps_snapshot,
+                expected_gpu_uuid=args.expected_gpu_uuid,
+                executor_pid=os.getpid(),
+                direct_child_pid=child.pid,
+            ).start()
             try:
                 returncode = child.wait(timeout=args.timeout_seconds)
             except subprocess.TimeoutExpired:
@@ -354,7 +371,8 @@ def main(arguments: Iterable[str] | None = None) -> None:
                     os.killpg(child.pid, signal.SIGKILL)
                     returncode = child.wait(timeout=10)
     finally:
-        sampled = sampler.stop()
+        if sampler is not None:
+            sampled = sampler.stop()
     postflight = capture_node_snapshot()
     postflight_failures = occupancy_failures(
         postflight,

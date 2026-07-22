@@ -320,7 +320,7 @@ harness; it is not an OVRTX API limitation.
 
 At release, the content-addressed evidence archive, checksum manifest, retrieval
 receipt, and external release envelope will be attached to the
-`vgr-gcp-l4-matched-v5` GitHub release. This draft does not assert that the
+`vgr-gcp-l4-matched-v6` GitHub release. This draft does not assert that the
 release or anonymous retrieval checks are already complete. The scientific
 archive is immutable; the separate envelope binds its hash to the final Git
 merge, release tag, and anonymously verified download objects.
