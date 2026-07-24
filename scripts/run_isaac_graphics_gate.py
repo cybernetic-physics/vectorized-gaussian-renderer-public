@@ -34,6 +34,10 @@ OVERLAY_REQUIREMENTS = (
     "lpips==0.1.4",
     "tqdm==4.67.1",
 )
+DEFAULT_VULKAN_ICD_CANDIDATES = (
+    Path("/etc/vulkan/icd.d/nvidia_icd.json"),
+    Path("/usr/share/vulkan/icd.d/nvidia_icd.json"),
+)
 IDENTITY_MARKER = "ISAAC_GPU_IDENTITY "
 GPU_BLOCK = re.compile(r"(?m)^GPU(?P<index>\d+):\s*$")
 GPU_TABLE_ROW = re.compile(
@@ -98,7 +102,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--vulkan-icd",
         type=Path,
-        default=Path("/usr/share/vulkan/icd.d/nvidia_icd.json"),
+        default=None,
+        help=(
+            "Explicit NVIDIA Vulkan ICD manifest. By default, the gate accepts "
+            "exactly one standard NVIDIA runfile or distribution-package location."
+        ),
     )
     args = parser.parse_args()
     if args.timeout_seconds <= 0:
@@ -127,6 +135,33 @@ def parse_args() -> argparse.Namespace:
     if output_root == canonical_runtime or canonical_runtime in output_root.parents:
         parser.error("--output-root must be outside --canonical-runtime.")
     return args
+
+
+def resolve_vulkan_icd(
+    explicit: Path | None,
+    *,
+    candidates: tuple[Path, ...] = DEFAULT_VULKAN_ICD_CANDIDATES,
+) -> Path:
+    """Resolve one unambiguous NVIDIA ICD from the runfile or distro layout."""
+
+    if explicit is not None:
+        if not explicit.is_file():
+            raise GateFailure(f"NVIDIA Vulkan ICD does not exist: {explicit}")
+        return explicit.resolve(strict=True)
+
+    existing = [candidate for candidate in candidates if candidate.is_file()]
+    if not existing:
+        locations = ", ".join(str(candidate) for candidate in candidates)
+        raise GateFailure(f"NVIDIA Vulkan ICD was not found in: {locations}")
+
+    resolved = {candidate.resolve(strict=True) for candidate in existing}
+    if len(resolved) != 1:
+        locations = ", ".join(str(candidate) for candidate in existing)
+        raise GateFailure(
+            "Multiple distinct NVIDIA Vulkan ICD manifests were found; pass "
+            f"--vulkan-icd explicitly: {locations}"
+        )
+    return resolved.pop()
 
 
 def _terminate_process_group(process: subprocess.Popen[Any]) -> None:
@@ -827,6 +862,7 @@ def lane_plan(args: argparse.Namespace, scratch: Path) -> list[Lane]:
 
 def main() -> None:
     args = parse_args()
+    args.vulkan_icd = resolve_vulkan_icd(args.vulkan_icd)
     args.output_root.mkdir(parents=True, exist_ok=True)
     scratch = args.output_root / "scratch"
     logs = args.output_root / "logs"
@@ -837,9 +873,6 @@ def main() -> None:
         args.source_root / ".agents" / "skills" / "test-isaac-graphics" / "scripts" / "check-isaac-log.sh"
     ).resolve()
     base_env = dict(os.environ)
-    if not args.vulkan_icd.is_file():
-        raise GateFailure(f"NVIDIA Vulkan ICD does not exist: {args.vulkan_icd}")
-
     summary: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "pass": False,
@@ -850,6 +883,7 @@ def main() -> None:
         "canonical_runtime": str(args.canonical_runtime.resolve()),
         "python": str(args.python.absolute()),
         "uv": str(args.uv.absolute()),
+        "vulkan_icd": str(args.vulkan_icd),
         "invocation": {
             "command": [sys.executable, *sys.argv],
             "command_shell": shlex.join([sys.executable, *sys.argv]),

@@ -113,16 +113,23 @@ the cross-renderer result, or establish a batch-scaling law. Report all trials
 whether they favor P1, favor P128, or disagree.
 
 Current execution: the corrected matrix is being refrozen as
-`benchmark-gcp-l4-matched-v10`; no v10 timing result exists yet. The complete
+`benchmark-gcp-l4-matched-v11`; no v11 timing result exists yet. The complete
 v8 timed rows remain diagnostic because their first profiler control stopped
 on a false host-path match, and the fail-closed shutdown caused GCP to assign a
 new physical L4 before profiling. The v9 preflight then exposed, before any
 long timing run, that the post-matrix coordinator used the unrecognized generic
 `ACCEPT_EULA` variable rather than Isaac Sim 6's `OMNI_KIT_ACCEPT_EULA`. The v10
-contract corrects that gate environment, still binds every artifact to one
-exact launch-time UUID, and treats the NVIDIA L4 model—not an ephemeral source
-constant—as the headline hardware class. It will use a fresh output root and
-automatic shutdown. Frozen pre-repair traces establish the original sparse
+preflight corrected that environment, then proved the plain GCP L4 allocation
+was CUDA-only for this purpose and that the qualified GRID runfile placed its
+ICD under `/etc/vulkan` rather than the gate's sole `/usr/share/vulkan`
+assumption. On one licensed L4 vWS, the minimal lane passed, the first default
+RTX lane passed after 577 seconds of cold warmup, and a fresh warmed default
+lane passed in 14.44 seconds. The v11 contract accepts one unambiguous standard
+ICD layout, requires the vWS/Vulkan provisioning preconditions, still binds
+every artifact to one exact launch-time UUID, and treats the NVIDIA L4 model—not
+an ephemeral source constant—as the headline hardware class. It will use a
+fresh output root and automatic shutdown. Frozen pre-repair traces establish
+the original sparse
 edge-tile omission's exact cause:
 the final cooperative load in short tile tails used an unassigned feature
 offset and therefore read the first Gaussian's features. An older complete

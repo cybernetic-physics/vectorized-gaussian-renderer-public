@@ -222,6 +222,17 @@ long matrix was launched. The v10 source exports the recognized Kit variable,
 removes the stale generic variable, and regression-tests the complete shared
 gate environment.
 
+The v10 source also produced no benchmark result. Its preflight established
+that a plain GCP `nvidia-l4` allocation can run CUDA but is not the licensed
+graphics configuration required by the exact Isaac/Vulkan gates. After moving
+the preserved workspace to one `nvidia-l4-vws` allocation with the qualified
+GRID driver, Vulkan and both finite Isaac lanes passed under Xvfb. That driver
+installs its valid ICD manifest under `/etc/vulkan`, while the gate assumed only
+the distribution-package path under `/usr/share/vulkan`; the mismatch would
+have stopped the post-matrix gate. The v11 gate accepts exactly one resolved
+manifest from either standard layout, and the GCP provisioner now requires the
+vWS license, disabled GSP firmware, and a passing NVIDIA Vulkan probe.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

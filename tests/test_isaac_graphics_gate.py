@@ -21,12 +21,45 @@ from scripts.run_isaac_graphics_gate import (
     parse_nvidia_gpu_inventory,
     parse_vulkan_summary,
     prepare_experience_overlay,
+    resolve_vulkan_icd,
     runtime_fingerprint,
     source_fingerprint,
 )
 
 
 UUID = "1da70b0f240df25d77a08a437043f744"
+
+
+def test_vulkan_icd_auto_resolves_grid_runfile_layout(tmp_path: Path) -> None:
+    runfile = tmp_path / "etc/vulkan/icd.d/nvidia_icd.json"
+    distro = tmp_path / "usr/share/vulkan/icd.d/nvidia_icd.json"
+    runfile.parent.mkdir(parents=True)
+    runfile.write_text("{}\n", encoding="utf-8")
+
+    assert resolve_vulkan_icd(None, candidates=(runfile, distro)) == runfile.resolve()
+
+
+def test_vulkan_icd_auto_resolution_rejects_distinct_ambiguous_manifests(
+    tmp_path: Path,
+) -> None:
+    runfile = tmp_path / "etc/nvidia_icd.json"
+    distro = tmp_path / "usr/nvidia_icd.json"
+    runfile.parent.mkdir()
+    distro.parent.mkdir()
+    runfile.write_text("{\"driver\": \"runfile\"}\n", encoding="utf-8")
+    distro.write_text("{\"driver\": \"distro\"}\n", encoding="utf-8")
+
+    with pytest.raises(GateFailure, match="Multiple distinct"):
+        resolve_vulkan_icd(None, candidates=(runfile, distro))
+
+
+def test_vulkan_icd_explicit_path_records_resolved_manifest(tmp_path: Path) -> None:
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text("{}\n", encoding="utf-8")
+    alias = tmp_path / "alias.json"
+    alias.symlink_to(manifest)
+
+    assert resolve_vulkan_icd(alias) == manifest.resolve()
 
 
 def test_dependency_overlay_pins_direct_and_transitive_missing_modules() -> None:

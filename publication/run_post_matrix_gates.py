@@ -85,7 +85,7 @@ def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--historical-b64-root", type=Path, required=True)
     parser.add_argument("--expected-gpu-uuid", required=True)
-    parser.add_argument("--benchmark-tag", default="benchmark-gcp-l4-matched-v10")
+    parser.add_argument("--benchmark-tag", default="benchmark-gcp-l4-matched-v11")
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args(arguments)
 

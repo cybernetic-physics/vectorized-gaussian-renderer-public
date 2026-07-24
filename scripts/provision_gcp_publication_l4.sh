@@ -33,6 +33,23 @@ if ! command -v nvidia-smi >/dev/null 2>&1; then
   exit 2
 fi
 
+NVIDIA_QUERY="$(nvidia-smi -q)"
+if ! grep -Eq \
+  'Product Name[[:space:]]+:[[:space:]]+NVIDIA RTX Virtual Workstation' \
+  <<< "$NVIDIA_QUERY" || \
+   ! grep -Eq 'License Status[[:space:]]+:[[:space:]]+Licensed' \
+  <<< "$NVIDIA_QUERY"; then
+  echo \
+    "Publication graphics gates require an nvidia-l4-vws VM and a licensed NVIDIA GRID driver." \
+    >&2
+  exit 2
+fi
+if [[ ! -r /proc/driver/nvidia/params ]] || \
+   [[ "$(awk '/^EnableGpuFirmware:/{print $2}' /proc/driver/nvidia/params)" != 0 ]]; then
+  echo "Linux L4 vWS publication requires NVIDIA GSP firmware to be disabled." >&2
+  exit 2
+fi
+
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update
 sudo apt-get install -y \
@@ -51,6 +68,33 @@ mkdir -p \
   "$DATASET_ROOT" \
   "$TOOLS_ROOT/ovrtx-0.3.0/python" \
   "$PROVENANCE_ROOT"
+
+VULKAN_ICD=""
+for candidate in \
+  /etc/vulkan/icd.d/nvidia_icd.json \
+  /usr/share/vulkan/icd.d/nvidia_icd.json; do
+  if [[ -f "$candidate" ]]; then
+    resolved="$(readlink -f "$candidate")"
+    if [[ -n "$VULKAN_ICD" && "$VULKAN_ICD" != "$resolved" ]]; then
+      echo "Multiple distinct NVIDIA Vulkan ICD manifests are installed." >&2
+      exit 2
+    fi
+    VULKAN_ICD="$resolved"
+  fi
+done
+if [[ -z "$VULKAN_ICD" ]]; then
+  echo "No NVIDIA Vulkan ICD manifest is installed." >&2
+  exit 2
+fi
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/xdg-runtime-vgr-publication}"
+install -d -m 700 "$XDG_RUNTIME_DIR"
+VK_ICD_FILENAMES="$VULKAN_ICD" timeout 60s xvfb-run -a vulkaninfo --summary \
+  > "$PROVENANCE_ROOT/vulkaninfo-summary.txt" 2>&1
+if ! grep -Eq 'deviceName[[:space:]]*=[[:space:]]*NVIDIA L4' \
+  "$PROVENANCE_ROOT/vulkaninfo-summary.txt"; then
+  echo "Vulkan did not expose the NVIDIA L4." >&2
+  exit 2
+fi
 
 if [[ ! -x "$UV_BIN" ]]; then
   curl -LsSf https://astral.sh/uv/install.sh | \
@@ -182,6 +226,9 @@ sudo ln -sfn "$ISAAC_SHIM" /isaac-sim
   date -u +%FT%TZ
   printf 'project_root=%s\n' "$PROJECT_ROOT"
   printf 'runtime_root=%s\n' "$RUNTIME_ROOT"
+  printf 'vulkan_icd=%s\n' "$VULKAN_ICD"
+  printf 'vulkan_summary_sha256=%s\n' \
+    "$(sha256sum "$PROVENANCE_ROOT/vulkaninfo-summary.txt" | cut -d' ' -f1)"
   nvidia-smi \
     --query-gpu=name,uuid,driver_version,memory.total \
     --format=csv,noheader
