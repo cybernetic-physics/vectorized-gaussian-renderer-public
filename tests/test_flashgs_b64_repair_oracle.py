@@ -14,13 +14,12 @@ from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (
     GSPLAT_ORACLE_SCHEMA,
     HEADLINE_COMPUTE_CAPABILITY,
     HEADLINE_GPU_NAME,
-    HEADLINE_GPU_UUID,
     HEADLINE_TORCH_CUDA_ARCH_LIST,
     MATCHED_GAUSSIAN_SUPPORT_SIGMA,
     MATCHED_PROJECTION_RULES,
     PINNED_GSPLAT_COMMIT,
-    PINNED_GSPLAT_PATCHED_UTILS_SHA256,
     PINNED_GSPLAT_PATCH_SHA256,
+    PINNED_GSPLAT_PATCHED_UTILS_SHA256,
     artifact_record,
 )
 from isaacsim_gaussian_renderer.evaluation.matched_semantics import (
@@ -34,9 +33,8 @@ from isaacsim_gaussian_renderer.flashgs_repair import (
     FLASHGS_B64_REPAIR_VERIFICATION_SCHEMA,
 )
 
-
 TRAJECTORY_ID = "9" * 64
-GPU_UUID = HEADLINE_GPU_UUID
+GPU_UUID = "GPU-11111111-2222-3333-4444-555555555555"
 GPU_NAME = HEADLINE_GPU_NAME
 
 

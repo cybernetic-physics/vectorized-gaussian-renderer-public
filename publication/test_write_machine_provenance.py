@@ -7,6 +7,8 @@ from pathlib import Path
 
 from publication import write_machine_provenance as provenance
 
+TEST_GPU_UUID = "GPU-11111111-2222-3333-4444-555555555555"
+
 
 def write_json(path: Path, value: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -30,7 +32,7 @@ class MachineProvenanceTests(unittest.TestCase):
             "cuda_runtime": "12.8",
             "driver": "580.159.03",
             "gpu_name": provenance.ACCEPTED_HARDWARE_NAME,
-            "gpu_uuid": provenance.ACCEPTED_HARDWARE_UUID,
+            "gpu_uuid": TEST_GPU_UUID,
             "torch": "2.11.0+cu128",
             "torch_cuda_arch_list": "8.9",
             "source_git_commit": "a" * 40,
@@ -64,12 +66,12 @@ class MachineProvenanceTests(unittest.TestCase):
             self.fixture(root)
             result = provenance.build_machine_provenance(
                 root,
-                expected_gpu_uuid=provenance.ACCEPTED_HARDWARE_UUID,
+                expected_gpu_uuid=TEST_GPU_UUID,
             )
             self.assertTrue(result["pass"])
             self.assertEqual(result["primary_run_count"], 32)
             self.assertEqual(result["gpu_name"], "NVIDIA L4")
-            self.assertEqual(result["gpu_uuid"], provenance.ACCEPTED_HARDWARE_UUID)
+            self.assertEqual(result["gpu_uuid"], TEST_GPU_UUID)
             encoded = provenance.canonical_json_bytes(result).decode("utf-8")
             self.assertNotIn(str(root), encoded)
             self.assertTrue(
@@ -87,7 +89,7 @@ class MachineProvenanceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "environments disagree"):
                 provenance.build_machine_provenance(
                     root,
-                    expected_gpu_uuid=provenance.ACCEPTED_HARDWARE_UUID,
+                    expected_gpu_uuid=TEST_GPU_UUID,
                 )
 
     def test_missing_primary_run_fails(self) -> None:
@@ -98,7 +100,27 @@ class MachineProvenanceTests(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 provenance.build_machine_provenance(
                     root,
-                    expected_gpu_uuid=provenance.ACCEPTED_HARDWARE_UUID,
+                    expected_gpu_uuid=TEST_GPU_UUID,
+                )
+
+    def test_launch_uuid_must_match_every_primary_run(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            self.fixture(root)
+            with self.assertRaisesRegex(ValueError, "machine environment differs"):
+                provenance.build_machine_provenance(
+                    root,
+                    expected_gpu_uuid="GPU-aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                )
+
+    def test_launch_uuid_must_be_canonical(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            self.fixture(root)
+            with self.assertRaisesRegex(ValueError, "canonical NVIDIA device UUID"):
+                provenance.build_machine_provenance(
+                    root,
+                    expected_gpu_uuid="GPU-test",
                 )
 
     def test_symlinked_primary_run_fails(self) -> None:
@@ -112,7 +134,7 @@ class MachineProvenanceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "symlink"):
                 provenance.build_machine_provenance(
                     root,
-                    expected_gpu_uuid=provenance.ACCEPTED_HARDWARE_UUID,
+                    expected_gpu_uuid=TEST_GPU_UUID,
                 )
 
     def test_run_source_manifest_binding_is_required(self) -> None:
@@ -126,7 +148,7 @@ class MachineProvenanceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "source binding differs"):
                 provenance.build_machine_provenance(
                     root,
-                    expected_gpu_uuid=provenance.ACCEPTED_HARDWARE_UUID,
+                    expected_gpu_uuid=TEST_GPU_UUID,
                 )
 
     def test_writer_is_idempotent_but_refuses_different_bytes(self) -> None:
@@ -140,7 +162,7 @@ class MachineProvenanceTests(unittest.TestCase):
                 "--output",
                 str(output),
                 "--expected-gpu-uuid",
-                provenance.ACCEPTED_HARDWARE_UUID,
+                TEST_GPU_UUID,
             ]
             provenance.main(arguments)
             first = output.read_bytes()

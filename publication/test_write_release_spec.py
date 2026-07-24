@@ -11,7 +11,6 @@ from unittest import mock
 from publication import write_release_spec as writer
 from publication.release_envelope import _resolve_artifact, _validate_repository_spec
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -32,10 +31,10 @@ class WriteReleaseSpecTests(unittest.TestCase):
             "owner": "cybernetic-physics",
             "name": "vectorized-gaussian-renderer-public",
             "benchmark_commit": "1" * 40,
-            "benchmark_tag": "benchmark-gcp-l4-matched-v8",
+            "benchmark_tag": "benchmark-gcp-l4-matched-v9",
             "publication_content_commit": "2" * 40,
             "final_merge_commit": "3" * 40,
-            "release_tag": "vgr-gcp-l4-matched-v8",
+            "release_tag": "vgr-gcp-l4-matched-v9",
         }
 
     def tearDown(self) -> None:
@@ -61,7 +60,7 @@ class WriteReleaseSpecTests(unittest.TestCase):
         self.assertEqual(
             spec["repository"]["release_url"],
             "https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public/"
-            "releases/tag/vgr-gcp-l4-matched-v8",
+            "releases/tag/vgr-gcp-l4-matched-v9",
         )
         self.assertEqual(spec["repository"]["visibility"], "public")
         for role, path in self.artifacts.items():
@@ -226,13 +225,13 @@ class WriteReleaseSpecTests(unittest.TestCase):
                 "--benchmark-commit",
                 "1" * 40,
                 "--benchmark-tag",
-                "benchmark-gcp-l4-matched-v8",
+                "benchmark-gcp-l4-matched-v9",
                 "--publication-content-commit",
                 "2" * 40,
                 "--final-merge-commit",
                 "3" * 40,
                 "--release-tag",
-                "vgr-gcp-l4-matched-v8",
+                "vgr-gcp-l4-matched-v9",
                 "--output",
                 str(self.output),
             )

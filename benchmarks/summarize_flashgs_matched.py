@@ -26,12 +26,11 @@ from benchmarks.flashgs_matched_memory import (  # noqa: E402
 from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (  # noqa: E402
     CAPACITY_CALIBRATION_SCHEMA,
     CAPACITY_CONSUMPTION_SCHEMA,
+    FIDELITY_SCHEMA,
     FLASHGS_DEMAND_SURVEY_CONSUMPTION_SCHEMA,
     FLASHGS_DEMAND_SURVEY_SCHEMA,
-    HEADLINE_GPU_NAME,
-    HEADLINE_GPU_UUID,
-    FIDELITY_SCHEMA,
     GSPLAT_ORACLE_SCHEMA,
+    HEADLINE_GPU_NAME,
     MATCHED_GAUSSIAN_SUPPORT_SIGMA,
     MATCHED_PROJECTION_RULES,
     PRIMARY_BATCHES,
@@ -43,8 +42,9 @@ from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (  # noqa: E
     TIMED_CAPACITY_VERIFICATION_SCHEMA,
     artifact_record,
     derive_flashgs_prefix_capacities,
-    primary_fidelity_selection,
+    is_nvidia_gpu_uuid,
     primary_execution_schedule_failures,
+    primary_fidelity_selection,
     primary_max_physical_views,
     same_artifact,
     source_identity,
@@ -1642,7 +1642,7 @@ def apply_matrix_claim_gates(
             f"{hardware_scope['gpu_name']} "
             f"({hardware_scope['gpu_uuid']}): {supported_claim} "
             f"This does not establish the frozen {HEADLINE_GPU_NAME} "
-            f"({HEADLINE_GPU_UUID}) headline result."
+            "hardware-class headline result."
         )
     return verdict, supported_claim
 
@@ -1671,6 +1671,7 @@ def build_summary(
     rgb_speedups = interpretation.pop("rgb_speedups")
     matrix_failures: list[str] = []
     matrix_invocation_artifact = None
+    invocation_gpu_uuid: str | None = None
     summary_command_artifact = None
     matrix_invocation_path = root / "provenance/matrix-invocation.json"
     summary_command_path = root / "logs/summarize.command.json"
@@ -1696,8 +1697,9 @@ def build_summary(
         parsed_matrix_args = matrix_invocation.get("parsed_arguments") or {}
         if Path(str(parsed_matrix_args.get("output_root", ""))).resolve() != root.resolve():
             raise ValueError("matrix invocation output root differs")
-        if parsed_matrix_args.get("expected_gpu_uuid") != (HEADLINE_GPU_UUID):
-            raise ValueError("matrix invocation GPU UUID differs")
+        invocation_gpu_uuid = parsed_matrix_args.get("expected_gpu_uuid")
+        if not is_nvidia_gpu_uuid(invocation_gpu_uuid):
+            raise ValueError("matrix invocation GPU UUID is not canonical")
         if parsed_matrix_args.get("batches") != batches_csv:
             raise ValueError("matrix invocation batches differ")
         if parsed_matrix_args.get("custom_chunked_physical_views") != (PRIMARY_CHUNKED_PHYSICAL_VIEWS):
@@ -1803,11 +1805,15 @@ def build_summary(
     )
     reference_environment = {field: runs[0]["environment"].get(field) for field in environment_fields}
     reference_source = source_identity(runs[0]["environment"]["source_provenance"])
+    reference_gpu_uuid = reference_environment.get("gpu_uuid")
     if (
         reference_environment.get("gpu_name") != HEADLINE_GPU_NAME
-        or reference_environment.get("gpu_uuid") != HEADLINE_GPU_UUID
+        or not is_nvidia_gpu_uuid(reference_gpu_uuid)
+        or reference_gpu_uuid != invocation_gpu_uuid
     ):
-        matrix_failures.append("matrix hardware is not the frozen headline GPU UUID")
+        matrix_failures.append(
+            "matrix hardware is not one consistently UUID-bound headline L4"
+        )
     capacity_artifacts: dict[str, dict[str, Any]] = {
         "custom": {},
         "flashgs": {},
@@ -1822,7 +1828,7 @@ def build_summary(
     else:
         if (
             matrix_launch_payload.get("schema_version") != "flashgs-matched-matrix-launch-occupancy-v2"
-            or matrix_launch_payload.get("expected_gpu_uuid") != HEADLINE_GPU_UUID
+            or matrix_launch_payload.get("expected_gpu_uuid") != reference_gpu_uuid
             or ((matrix_launch_payload.get("executor_control") or {}).get("scope") != "all-visible-gpus")
             or (
                 ((matrix_launch_payload.get("executor_control") or {}).get("cooperative_node_wide_lock") or {}).get(

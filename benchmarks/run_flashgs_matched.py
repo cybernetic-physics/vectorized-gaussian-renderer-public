@@ -52,7 +52,6 @@ from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (  # noqa: E
     FLASHGS_DEMAND_SURVEY_CONSUMPTION_SCHEMA,
     FLASHGS_DEMAND_SURVEY_SCHEMA,
     HEADLINE_GPU_NAME,
-    HEADLINE_GPU_UUID,
     MATCHED_GAUSSIAN_SUPPORT_SIGMA,
     MATCHED_PROJECTION_RULES,
     PRIMARY_BATCHES,
@@ -60,9 +59,10 @@ from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (  # noqa: E
     RENDERER_RUN_SCHEMA,
     TIMED_CAPACITY_VERIFICATION_SCHEMA,
     active_cuda_device_uuid,
-    audit_flashgs_demand_counter_source,
     artifact_record,
+    audit_flashgs_demand_counter_source,
     derive_flashgs_prefix_capacities,
+    is_nvidia_gpu_uuid,
     load_verified_source_manifest,
     primary_fidelity_selection,
     primary_max_physical_views,
@@ -1260,17 +1260,19 @@ def main() -> None:
     torch.cuda.init()
     gpu_name = torch.cuda.get_device_name(torch.cuda.current_device())
     gpu_uuid = current_process_gpu_uuid()
+    if not is_nvidia_gpu_uuid(args.expected_gpu_uuid):
+        raise ValueError("--expected-gpu-uuid is not a canonical NVIDIA GPU UUID.")
     if gpu_uuid != args.expected_gpu_uuid:
         raise RuntimeError(
             "Active CUDA process GPU UUID differs from the explicit contract: "
             f"{gpu_uuid!r} != {args.expected_gpu_uuid!r}."
         )
-    headline_gpu_pass = gpu_name == HEADLINE_GPU_NAME and gpu_uuid == HEADLINE_GPU_UUID
+    headline_gpu_pass = gpu_name == HEADLINE_GPU_NAME
     if not headline_gpu_pass and not args.allow_nonheadline_gpu:
         raise RuntimeError(
-            "Headline benchmark requires "
-            f"{HEADLINE_GPU_NAME} ({HEADLINE_GPU_UUID}); current device is "
-            f"{gpu_name} ({gpu_uuid})."
+            f"Headline benchmark requires {HEADLINE_GPU_NAME}; current device "
+            f"is {gpu_name} ({gpu_uuid}). The exact UUID remains bound by "
+            "--expected-gpu-uuid."
         )
     trajectory = load_trajectory(args.trajectory)
     if trajectory.scene_sha256 != args.scene_sha256:

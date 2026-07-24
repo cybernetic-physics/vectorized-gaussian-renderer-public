@@ -13,10 +13,9 @@ from typing import Any, Iterable
 
 from verify_claim_ledger import (
     ACCEPTED_HARDWARE_NAME,
-    ACCEPTED_HARDWARE_UUID,
     PRIMARY_BATCHES,
+    is_nvidia_gpu_uuid,
 )
-
 
 SCHEMA_VERSION = "publication-machine-provenance-v1"
 RUN_SCHEMA = "flashgs-matched-renderer-run-v4"
@@ -106,13 +105,18 @@ def same_identity(record: Any, expected: dict[str, Any]) -> bool:
     )
 
 
-def normalized_environment(value: Any, *, label: str) -> dict[str, Any]:
+def normalized_environment(
+    value: Any,
+    *,
+    label: str,
+    expected_gpu_uuid: str,
+) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} has no environment object")
     environment = {field: value.get(field) for field in ENVIRONMENT_FIELDS}
     if (
         environment["gpu_name"] != ACCEPTED_HARDWARE_NAME
-        or environment["gpu_uuid"] != ACCEPTED_HARDWARE_UUID
+        or environment["gpu_uuid"] != expected_gpu_uuid
         or not isinstance(environment["driver"], str)
         or not environment["driver"]
         or not isinstance(environment["cuda_runtime"], str)
@@ -143,8 +147,8 @@ def build_machine_provenance(
     root = matrix_root.resolve(strict=True)
     if not root.is_dir():
         raise ValueError("Matrix root is not a directory")
-    if expected_gpu_uuid != ACCEPTED_HARDWARE_UUID:
-        raise ValueError("Expected GPU UUID differs from the frozen publication L4")
+    if not is_nvidia_gpu_uuid(expected_gpu_uuid):
+        raise ValueError("Expected GPU UUID is not a canonical NVIDIA device UUID")
 
     source_path, source = load_json(
         root / "provenance/source-manifest.json",
@@ -186,6 +190,7 @@ def build_machine_provenance(
                 normalized = normalized_environment(
                     environment,
                     label=relative.as_posix(),
+                    expected_gpu_uuid=expected_gpu_uuid,
                 )
                 if common_environment is None:
                     common_environment = normalized

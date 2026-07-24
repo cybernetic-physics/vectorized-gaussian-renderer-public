@@ -9,9 +9,13 @@ sensor without losing correctness or efficiency?
 ## Frozen primary workload
 
 - GPU: one Google Cloud NVIDIA L4 on instance `vgr-publish-l4w1a-20260722` in
-  `us-west1-a`, UUID `GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34`; every paired
-  artifact must record that UUID, driver 580.159.03, PyTorch 2.11.0+cu128,
-  CUDA runtime 12.8, and the actual CUDA compiler/toolchain identity.
+  `us-west1-a`. The launcher records the canonical UUID reported for that
+  allocation, and every paired artifact, occupancy sample, oracle, profiler,
+  summary, and exact-current gate must record the same UUID. The contract also
+  records driver 580.159.03, PyTorch 2.11.0+cu128, CUDA runtime 12.8, and the
+  actual CUDA compiler/toolchain identity. The physical UUID is evidence rather
+  than a source constant because a GCP stop/start can legitimately assign a
+  different L4.
 - Scene: full Home Scan LOD0, exactly 21,497,908 Gaussians, PLY SHA-256
   `29cee159465406d94f2b24954eefb9da76ba80cab827b558a6e75676b8809267`.
 - Resolution: 128x128.

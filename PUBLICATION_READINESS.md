@@ -112,13 +112,15 @@ submission schedule at B128; it does not isolate a kernel mechanism, explain
 the cross-renderer result, or establish a batch-scaling law. Report all trials
 whether they favor P1, favor P128, or disagree.
 
-Current execution: the corrected matrix is running from the frozen
-`benchmark-gcp-l4-matched-v8` source on one identified L4. An earlier launch
-completed capacity calibration but was rejected before any timed row because
-its postflight occupancy check observed an overlapping verification shell from
-the same investigation. That failed root remains diagnostic only; the clean
-replacement uses a fresh output root and automatic shutdown. Frozen pre-repair
-traces establish the original sparse edge-tile omission's exact cause:
+Current execution: the corrected matrix is being refrozen as
+`benchmark-gcp-l4-matched-v9`; no v9 timing result exists yet. The complete v8
+timed rows remain diagnostic because their first profiler control stopped on a
+false host-path match, and the fail-closed shutdown caused GCP to assign a new
+physical L4 before profiling. The v9 contract still binds every artifact to one
+exact launch-time UUID, but treats the NVIDIA L4 model—not an ephemeral source
+constant—as the headline hardware class. It will use a fresh output root and
+automatic shutdown. Frozen pre-repair traces establish the original sparse
+edge-tile omission's exact cause:
 the final cooperative load in short tile tails used an unassigned feature
 offset and therefore read the first Gaussian's features. An older complete
 Freiza run is also invalid because its candidates used 3.0-sigma support while

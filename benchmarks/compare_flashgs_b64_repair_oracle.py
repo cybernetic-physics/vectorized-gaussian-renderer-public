@@ -17,7 +17,6 @@ from typing import Any, Mapping
 
 import numpy as np
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_ROOT = PROJECT_ROOT / "src"
 for import_root in (str(PROJECT_ROOT), str(SRC_ROOT)):
@@ -30,14 +29,14 @@ from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (  # noqa: E
     GSPLAT_ORACLE_SCHEMA,
     HEADLINE_COMPUTE_CAPABILITY,
     HEADLINE_GPU_NAME,
-    HEADLINE_GPU_UUID,
     HEADLINE_TORCH_CUDA_ARCH_LIST,
     MATCHED_GAUSSIAN_SUPPORT_SIGMA,
     MATCHED_PROJECTION_RULES,
     PINNED_GSPLAT_COMMIT,
-    PINNED_GSPLAT_PATCHED_UTILS_SHA256,
     PINNED_GSPLAT_PATCH_SHA256,
+    PINNED_GSPLAT_PATCHED_UTILS_SHA256,
     artifact_record,
+    is_nvidia_gpu_uuid,
     same_artifact,
     source_identity,
     verify_gsplat_oracle_support_evidence,
@@ -56,7 +55,6 @@ from isaacsim_gaussian_renderer.flashgs_repair import (  # noqa: E402
     FLASHGS_B64_REPAIR_VERIFICATION_SCHEMA,
     load_verified_b64_repair_raw_outputs,
 )
-
 
 SCHEMA_VERSION = "flashgs-b64-repair-gsplat-all-pixel-v2"
 HOME_SCAN_COUNT = 21_497_908
@@ -221,8 +219,8 @@ def _validate_report(report: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("Repair scene is not the canonical full Home Scan.")
     gpu_uuid = environment.get("gpu_uuid")
     gpu_name = environment.get("gpu_name")
-    if gpu_uuid != HEADLINE_GPU_UUID or gpu_name != HEADLINE_GPU_NAME:
-        raise ValueError("Repair report is not from the identified headline GPU.")
+    if not is_nvidia_gpu_uuid(gpu_uuid) or gpu_name != HEADLINE_GPU_NAME:
+        raise ValueError("Repair report is not from one identified headline L4.")
     return {
         "trajectory_id": trajectory_id,
         "semantic_topology": equation["semantic_topology"],

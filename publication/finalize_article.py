@@ -36,7 +36,6 @@ from verify_claim_ledger import (
     ACCEPTED_EQUATION_CONTRACT,
     ACCEPTED_HARDWARE,
     ACCEPTED_HARDWARE_NAME,
-    ACCEPTED_HARDWARE_UUID,
     ACCEPTED_SCENE,
     ALLOWED_RELEASE_CLAIMS,
     ARTICLE_LOGICAL_PATH,
@@ -53,6 +52,7 @@ from verify_claim_ledger import (
     canonical_json_bytes,
     file_sha256,
     format_result,
+    is_nvidia_gpu_uuid,
     load_decimal_json,
     normalized_format,
     numeric,
@@ -63,7 +63,6 @@ from verify_claim_ledger import (
     resolve_validated_ablation,
     verify_claim_ledger,
 )
-
 
 FINALIZATION_SCHEMA = "publication-article-finalization-v2"
 STATUS_PLACEHOLDER = "<!-- publication:status -->"
@@ -292,7 +291,7 @@ def _classify_summary(summary: Any) -> tuple[str, tuple[str, ...]]:
     hardware = summary.get("hardware_scope")
     hardware_invalid = not isinstance(hardware, dict) or (
         hardware.get("gpu_name") != ACCEPTED_HARDWARE_NAME
-        or hardware.get("gpu_uuid") != ACCEPTED_HARDWARE_UUID
+        or not is_nvidia_gpu_uuid(hardware.get("gpu_uuid"))
     )
     complete = bool(
         summary.get("pass") is True
@@ -444,9 +443,11 @@ def _validate_summary(
     hardware = summary.get("hardware_scope")
     if not isinstance(hardware, dict) or (
         hardware.get("gpu_name") != ACCEPTED_HARDWARE_NAME
-        or hardware.get("gpu_uuid") != ACCEPTED_HARDWARE_UUID
+        or not is_nvidia_gpu_uuid(hardware.get("gpu_uuid"))
     ):
-        raise FinalizationError("Canonical matrix is not bound to the fixed publication L4.")
+        raise FinalizationError(
+            "Canonical matrix is not bound to one identified publication L4."
+        )
 
     rows_by_contract: dict[str, list[dict[str, Any]]] = {}
     speedups_by_contract: dict[str, list[Decimal]] = {}

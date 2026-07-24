@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import math
+import re
 import subprocess
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -18,7 +19,6 @@ from isaacsim_gaussian_renderer.benchmark_manifest import (
 from isaacsim_gaussian_renderer.evaluation.evidence_bundle import (
     resolve_artifact_record,
 )
-
 
 RENDERER_RUN_SCHEMA = "flashgs-matched-renderer-run-v4"
 CAPACITY_CALIBRATION_SCHEMA = "flashgs-matched-capacity-calibration-v1"
@@ -44,9 +44,12 @@ PRIMARY_BATCHES = (1, 8, 32, 64, 128, 256, 512, 1024)
 PRIMARY_CHUNKED_BATCHES = (512, 1024)
 PRIMARY_CHUNKED_PHYSICAL_VIEWS = 128
 HEADLINE_GPU_NAME = "NVIDIA L4"
-HEADLINE_GPU_UUID = "GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34"
 HEADLINE_COMPUTE_CAPABILITY = (8, 9)
 HEADLINE_TORCH_CUDA_ARCH_LIST = "8.9"
+NVIDIA_GPU_UUID_RE = re.compile(
+    r"GPU-[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-"
+    r"[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"
+)
 # Pinned gsplat commit 77ab983 defines GAUSSIAN_EXTEND as 3.33f in
 # gsplat/cuda/include/Common.h.  The matched candidates must use that exact
 # support cutoff; 3.0 is the separate OVRTX contract, not the gsplat oracle
@@ -71,6 +74,17 @@ PRIMARY_TRAJECTORY_IDS = {
     512: "f750294341d523b1b46f626b609fbd5e2a0a43d28f0aa35a4614d6f0f6ed8c7d",
     1024: "375a6711e86333621448c94ca1ad7985bd2687c4b585f68c823624725c223910",
 }
+
+
+def is_nvidia_gpu_uuid(value: Any) -> bool:
+    """Return whether *value* is a canonical NVIDIA device UUID.
+
+    The benchmark binds every artifact to the UUID supplied at launch.  The
+    physical UUID is evidence, not source configuration: cloud stop/start can
+    legitimately assign another card of the same contracted hardware class.
+    """
+
+    return isinstance(value, str) and NVIDIA_GPU_UUID_RE.fullmatch(value) is not None
 
 
 def primary_fidelity_selection(

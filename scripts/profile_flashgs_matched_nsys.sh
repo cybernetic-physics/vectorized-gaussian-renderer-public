@@ -20,10 +20,15 @@ fi
 
 # Nsight reports retain printable target-process environment strings. Reject
 # credentials and user-specific home paths before a capture can be created.
+# A path is user-specific only when /home/<user> or /Users/<user> begins at a
+# value/token boundary.  A portable workspace directory whose later component
+# happens to be named "home" (for example /workspace/runtime/home/cache) is not
+# a host-user path.
+host_user_path_re='(^|[^[:alnum:]])/(Users|home)/[^/[:space:]:]+($|/|["[:space:],}\]])'
 while IFS= read -r -d '' environment_entry; do
   environment_name="${environment_entry%%=*}"
   environment_value="${environment_entry#*=}"
-  environment_name_upper="${environment_name^^}"
+  environment_name_upper="$(printf '%s' "$environment_name" | tr '[:lower:]' '[:upper:]')"
   case "_${environment_name_upper}_" in
     *_API_KEY_*|*_ACCESS_KEY_*|*_AUTH_*|*_AUTHORIZATION_*|*_CREDENTIAL_*|*_CREDENTIALS_*|*_PASSWORD_*|*_PASSWD_*|*_PRIVATE_KEY_*|*_SECRET_*|*_TOKEN_*)
       if [[ -n "$environment_value" ]]; then
@@ -32,12 +37,10 @@ while IFS= read -r -d '' environment_entry; do
       fi
       ;;
   esac
-  case "$environment_value" in
-    *"/Users/"*|*"/home/"*)
-      echo "Host-user path is forbidden during publication profiling: $environment_name" >&2
-      exit 2
-      ;;
-  esac
+  if [[ "$environment_value" =~ $host_user_path_re ]]; then
+    echo "Host-user path is forbidden during publication profiling: $environment_name" >&2
+    exit 2
+  fi
 done < <(env -0)
 echo "PUBLICATION_PROFILE_ENVIRONMENT_SAFE"
 

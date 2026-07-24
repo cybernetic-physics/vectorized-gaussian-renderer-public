@@ -23,7 +23,6 @@ from verify_claim_ledger import (
     ABLATION_SCHEMA,
     ACCEPTED_BASELINE_LABEL,
     ACCEPTED_HARDWARE_NAME,
-    ACCEPTED_HARDWARE_UUID,
     ARTICLE_LOGICAL_PATH,
     LEDGER_LOGICAL_PATH,
     PRIMARY_BATCHES,
@@ -35,6 +34,8 @@ from verify_claim_ledger import (
     parse_claim_markers,
     verify_claim_ledger,
 )
+
+TEST_GPU_UUID = "GPU-11111111-2222-3333-4444-555555555555"
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -168,7 +169,7 @@ def create_fixture(root: Path, *, states: dict[str, str] | None = None) -> Path:
             "matrix_fairness_failures": [],
             "hardware_scope": {
                 "gpu_name": ACCEPTED_HARDWARE_NAME,
-                "gpu_uuid": ACCEPTED_HARDWARE_UUID,
+                "gpu_uuid": TEST_GPU_UUID,
             },
             "preflight_evidence": {
                 "b128_independent_repeats": repeat_evidence,

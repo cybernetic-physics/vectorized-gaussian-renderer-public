@@ -17,20 +17,19 @@ from verify_claim_ledger import (
     ACCEPTED_EQUATION_CONTRACT,
     ACCEPTED_HARDWARE,
     ACCEPTED_HARDWARE_NAME,
-    ACCEPTED_HARDWARE_UUID,
     ACCEPTED_SCENE,
     ALLOWED_RELEASE_CLAIMS,
     ARTICLE_LOGICAL_PATH,
     BUNDLE_SCHEMA,
-    ClaimLedgerError,
     LEDGER_LOGICAL_PATH,
     LEDGER_SCHEMA,
     PRIMARY_BATCHES,
     REQUIRED_RELEASE_CLAIM_IDS,
-    SUMMARY_SCHEMA,
     STRICT_LEDGER_SCHEMA,
+    SUMMARY_SCHEMA,
     VERIFICATION_LOGICAL_PATH,
     VERIFICATION_SCHEMA,
+    ClaimLedgerError,
     canonical_json_bytes,
     file_sha256,
     format_result,
@@ -41,6 +40,8 @@ from verify_claim_ledger import (
     resolve_json_pointer,
     verify_claim_ledger,
 )
+
+TEST_GPU_UUID = "GPU-11111111-2222-3333-4444-555555555555"
 
 
 def write_json(path: Path, value: Any) -> None:
@@ -118,7 +119,7 @@ def create_staging(root: Path) -> None:
             "headline_eligible": True,
             "hardware_scope": {
                 "gpu_name": ACCEPTED_HARDWARE_NAME,
-                "gpu_uuid": ACCEPTED_HARDWARE_UUID,
+                "gpu_uuid": TEST_GPU_UUID,
             },
             "primary_full_sensor_dynamic_table": full_rows,
             "rgb_only_dynamic_table": rgb_rows,

@@ -8,10 +8,10 @@ import pytest
 from isaacsim_gaussian_renderer.evaluation.matched_artifacts import (
     SOURCE_MANIFEST_SCHEMA,
     artifact_record,
+    is_nvidia_gpu_uuid,
     load_verified_source_manifest,
     verify_node_occupancy_evidence,
 )
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -122,3 +122,18 @@ def test_node_occupancy_evidence_fails_closed(tmp_path):
     record = artifact_record(path)
     with pytest.raises(ValueError, match="did not pass"):
         verify_node_occupancy_evidence(record, expected_gpu_uuid="GPU-test")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("GPU-e743499c-909b-d8d9-4236-cf4ad000bc97", True),
+        ("GPU-11111111-2222-3333-4444-555555555555", True),
+        ("GPU-test", False),
+        ("e743499c-909b-d8d9-4236-cf4ad000bc97", False),
+        ("GPU-e743499c-909b-d8d9-4236-cf4ad000bc9", False),
+        (None, False),
+    ],
+)
+def test_nvidia_gpu_uuid_validation(value, expected):
+    assert is_nvidia_gpu_uuid(value) is expected

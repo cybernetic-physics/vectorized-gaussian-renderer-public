@@ -200,6 +200,20 @@ physical UUID. The v8 source freezes the current west-region L4 identity across
 the runner, claim ledger, machine provenance, and benchmark contract; it does
 not use the non-headline override.
 
+The v8 source produced no complete publication result. Its clean long attempt
+finished every timed row, oracle comparison, fidelity comparison, and B128
+repeat, then the first Nsight wrapper falsely classified the portable cache
+path `/workspace/runtime/public-v3/home/torch-cache` as a host-user path. After
+the fail-closed shutdown, GCP assigned another physical L4; v8's source-level
+UUID constant correctly prevented a mixed-device resume but also made a fresh
+same-class run impossible without another source revision. A bounded v8 retry
+with the newly assigned UUID therefore stopped before capacity calibration or
+timing. The v9 source defines headline hardware by the NVIDIA L4 model, while
+the launch-time UUID remains mandatory and must agree across every run,
+occupancy sample, oracle, profile, summary, and post-matrix gate. It also makes
+the profiler's host-path predicate distinguish a real `/home/<user>` root from
+a later workspace component merely named `home`.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts

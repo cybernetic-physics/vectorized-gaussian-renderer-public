@@ -105,10 +105,10 @@ SHA-256, for example:
 python3 publication/publish_immutable_r2.py \
   --bucket vectorized-gaussian-renderer-assets \
   --public-base-url https://pub-243008be935848b6accaf262f04a7b82.r2.dev \
-  --file /path/to/gcp-l4-matched-v8.tar \
-  --key evidence/gcp-l4-matched-v8/<full-archive-sha256>.tar \
-  --download-name gcp-l4-matched-v8.tar \
-  --receipt /path/to/gcp-l4-matched-v8.r2-receipt.json
+  --file /path/to/gcp-l4-matched-v9.tar \
+  --key evidence/gcp-l4-matched-v9/<full-archive-sha256>.tar \
+  --download-name gcp-l4-matched-v9.tar \
+  --receipt /path/to/gcp-l4-matched-v9.r2-receipt.json
 ```
 
 Before the first upload, the helper snapshots the local bytes and downloads
@@ -160,9 +160,9 @@ archive after the publisher succeeds:
 
 ```bash
 python3 publication/verify_public_release.py r2 \
-  --receipt /path/to/gcp-l4-matched-v8.r2-receipt.json \
-  --archive /path/to/gcp-l4-matched-v8.tar \
-  --output /path/to/gcp-l4-matched-v8.r2-public.json
+  --receipt /path/to/gcp-l4-matched-v9.r2-receipt.json \
+  --archive /path/to/gcp-l4-matched-v9.tar \
+  --output /path/to/gcp-l4-matched-v9.r2-public.json
 ```
 
 This second pass uses no R2 credential. It re-downloads every public object,
@@ -177,13 +177,13 @@ visibility exist, generate the GitHub record:
 ```bash
 python3 publication/verify_public_release.py github \
   --repository-url https://github.com/cybernetic-physics/vectorized-gaussian-renderer-public \
-  --benchmark-tag benchmark-gcp-l4-matched-v8 \
+  --benchmark-tag benchmark-gcp-l4-matched-v9 \
   --benchmark-commit <benchmark-commit> \
-  --release-tag vgr-gcp-l4-matched-v8 \
+  --release-tag vgr-gcp-l4-matched-v9 \
   --final-merge-commit <full-merge-commit> \
   --article post.md \
   --readme README.md \
-  --output /path/to/gcp-l4-matched-v8.github-public.json
+  --output /path/to/gcp-l4-matched-v9.github-public.json
 ```
 
 The GitHub pass also uses no credential or `gh` session. It verifies the

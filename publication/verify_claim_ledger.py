@@ -85,7 +85,6 @@ from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation, localcontext
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
-
 LEDGER_SCHEMA = "flashgs-matched-claim-ledger-v1"
 STRICT_LEDGER_SCHEMA = "publication-claim-ledger-strict-v1"
 RECEIPT_SCHEMA = "publication-claim-ledger-verification-v1"
@@ -95,9 +94,12 @@ ARTICLE_LOGICAL_PATH = "publication/article.md"
 ACCEPTED_BASELINE_LABEL = "FlashGS-derived matched-contract port"
 ACCEPTED_HARDWARE = "one identified Google Cloud NVIDIA L4"
 ACCEPTED_HARDWARE_NAME = "NVIDIA L4"
-ACCEPTED_HARDWARE_UUID = "GPU-b3c9268d-2b06-d924-90cc-d2171c86ef34"
 ACCEPTED_SCENE = "Home Scan LOD0"
 ACCEPTED_EQUATION_CONTRACT = "pinned-gsplat matched EWA"
+NVIDIA_GPU_UUID_RE = re.compile(
+    r"GPU-[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-"
+    r"[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"
+)
 SUMMARY_LOGICAL_PATH = "summary.json"
 SUMMARY_SCHEMA = "flashgs-matched-summary-v4"
 VERIFICATION_LOGICAL_PATH = "publication/verification.json"
@@ -115,6 +117,14 @@ FORBIDDEN_BASELINE_LABELS = frozenset(
         "integration-only FlashGS",
     }
 )
+
+
+def is_nvidia_gpu_uuid(value: Any) -> bool:
+    """Validate the exact device identity carried by release evidence."""
+
+    return isinstance(value, str) and NVIDIA_GPU_UUID_RE.fullmatch(value) is not None
+
+
 ALLOWED_OPERATIONS = frozenset(
     {"direct", "ratio", "difference", "percent", "min", "median", "max", "range"}
 )
@@ -876,9 +886,11 @@ def verify_claim_ledger(
     hardware_scope = summary.get("hardware_scope")
     if not isinstance(hardware_scope, dict) or (
         hardware_scope.get("gpu_name") != ACCEPTED_HARDWARE_NAME
-        or hardware_scope.get("gpu_uuid") != ACCEPTED_HARDWARE_UUID
+        or not is_nvidia_gpu_uuid(hardware_scope.get("gpu_uuid"))
     ):
-        raise ClaimLedgerError("Validated matrix summary hardware is not the fixed publication L4.")
+        raise ClaimLedgerError(
+            "Validated matrix summary hardware is not one identified publication L4."
+        )
     for table_name in ("primary_full_sensor_dynamic_table", "rgb_only_dynamic_table"):
         table = summary.get(table_name)
         if (
