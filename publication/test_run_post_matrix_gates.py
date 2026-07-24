@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,7 @@ from aggregate_verification import REQUIRED_GATE_IDS  # noqa: E402
 from run_post_matrix_gates import (  # noqa: E402
     REQUIRED_GATES,
     REQUIRED_PYTEST_FRAGMENTS,
+    build_gate_environment,
     copy_tree_new_or_identical,
     reject_tree_symlinks,
     reject_symlink_components,
@@ -39,6 +41,35 @@ def artifact_record(path: Path) -> dict[str, object]:
 
 
 class PostMatrixCoordinatorTests(unittest.TestCase):
+    def test_gate_environment_accepts_isaac_eula_with_the_kit_variable(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            matrix = root / "matrix"
+            tools = source / "publication"
+            environment = build_gate_environment(
+                source_root=source,
+                matrix=matrix,
+                tools=tools,
+                base_environment={
+                    "ACCEPT_EULA": "Y",
+                    "PYTHONPATH": "/existing/pythonpath",
+                    "VGR_GPU_EXECUTOR_LOCK_OWNER_PID": "123",
+                },
+            )
+            self.assertEqual(environment["OMNI_KIT_ACCEPT_EULA"], "YES")
+            self.assertNotIn("ACCEPT_EULA", environment)
+            self.assertNotIn("VGR_GPU_EXECUTOR_LOCK_OWNER_PID", environment)
+            self.assertEqual(
+                environment["PYTHONPATH"].split(os.pathsep),
+                [
+                    str(source),
+                    str(source / "src"),
+                    str(source),
+                    "/existing/pythonpath",
+                ],
+            )
+
     def test_release_unit_gate_requires_nonoptional_publication_modules(self) -> None:
         required = set(REQUIRED_PYTEST_FRAGMENTS)
         self.assertIn(

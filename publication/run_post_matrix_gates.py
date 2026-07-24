@@ -85,7 +85,7 @@ def parse_args(arguments: Iterable[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--historical-b64-root", type=Path, required=True)
     parser.add_argument("--expected-gpu-uuid", required=True)
-    parser.add_argument("--benchmark-tag", default="benchmark-gcp-l4-matched-v9")
+    parser.add_argument("--benchmark-tag", default="benchmark-gcp-l4-matched-v10")
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args(arguments)
 
@@ -410,6 +410,44 @@ def command_adapter(
     return command
 
 
+def build_gate_environment(
+    *,
+    source_root: Path,
+    matrix: Path,
+    tools: Path,
+    base_environment: dict[str, str] | None = None,
+) -> dict[str, str]:
+    """Build the shared bounded-gate environment, including Isaac's EULA contract."""
+    environment = dict(os.environ if base_environment is None else base_environment)
+    environment["VGR_PROJECT_ROOT"] = str(source_root)
+    environment["PROJECT_ROOT"] = str(source_root)
+    environment["VGR_NATIVE_BUILD_ROOT"] = str(matrix / "provenance/native-extensions")
+    environment["TORCH_EXTENSIONS_DIR"] = str(matrix / "provenance/torch-extensions")
+    environment["TORCH_CUDA_ARCH_LIST"] = "8.9"
+    existing_pythonpath = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = os.pathsep.join(
+        value
+        for value in (
+            str(tools.parent),
+            str(source_root / "src"),
+            str(source_root),
+            existing_pythonpath,
+        )
+        if value
+    )
+    environment["VGR_GPU_EXECUTOR_LOCK_PATH"] = (
+        "/tmp/vgr-publication-7fb2981-gpu-executor.lock"
+    )
+    environment.pop("VGR_GPU_EXECUTOR_LOCK_OWNER_PID", None)
+
+    # Isaac Sim 6 checks OMNI_KIT_ACCEPT_EULA.  The generic ACCEPT_EULA name is
+    # not recognized by Kit and previously made the post-matrix graphics gates
+    # fail before SimulationApp startup.
+    environment.pop("ACCEPT_EULA", None)
+    environment["OMNI_KIT_ACCEPT_EULA"] = "YES"
+    return environment
+
+
 def main(arguments: Iterable[str] | None = None) -> None:
     args = parse_args(arguments)
     source_root = args.source_root.resolve(strict=True)
@@ -641,26 +679,11 @@ def main(arguments: Iterable[str] | None = None) -> None:
     for test_path in publication_test_paths:
         require_regular(test_path, label=f"publication test {test_path.name}")
 
-    environment = os.environ.copy()
-    environment["VGR_PROJECT_ROOT"] = str(source_root)
-    environment["PROJECT_ROOT"] = str(source_root)
-    environment["VGR_NATIVE_BUILD_ROOT"] = str(matrix / "provenance/native-extensions")
-    environment["TORCH_EXTENSIONS_DIR"] = str(matrix / "provenance/torch-extensions")
-    environment["TORCH_CUDA_ARCH_LIST"] = "8.9"
-    existing_pythonpath = environment.get("PYTHONPATH", "")
-    environment["PYTHONPATH"] = os.pathsep.join(
-        value
-        for value in (
-            str(tools.parent),
-            str(source_root / "src"),
-            str(source_root),
-            existing_pythonpath,
-        )
-        if value
+    environment = build_gate_environment(
+        source_root=source_root,
+        matrix=matrix,
+        tools=tools,
     )
-    environment["VGR_GPU_EXECUTOR_LOCK_PATH"] = "/tmp/vgr-publication-7fb2981-gpu-executor.lock"
-    environment.pop("VGR_GPU_EXECUTOR_LOCK_OWNER_PID", None)
-    environment["ACCEPT_EULA"] = "Y"
 
     wrappers: dict[str, dict[str, Any]] = {}
 

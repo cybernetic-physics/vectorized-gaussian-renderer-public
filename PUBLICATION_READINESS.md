@@ -113,11 +113,14 @@ the cross-renderer result, or establish a batch-scaling law. Report all trials
 whether they favor P1, favor P128, or disagree.
 
 Current execution: the corrected matrix is being refrozen as
-`benchmark-gcp-l4-matched-v9`; no v9 timing result exists yet. The complete v8
-timed rows remain diagnostic because their first profiler control stopped on a
-false host-path match, and the fail-closed shutdown caused GCP to assign a new
-physical L4 before profiling. The v9 contract still binds every artifact to one
-exact launch-time UUID, but treats the NVIDIA L4 model—not an ephemeral source
+`benchmark-gcp-l4-matched-v10`; no v10 timing result exists yet. The complete
+v8 timed rows remain diagnostic because their first profiler control stopped
+on a false host-path match, and the fail-closed shutdown caused GCP to assign a
+new physical L4 before profiling. The v9 preflight then exposed, before any
+long timing run, that the post-matrix coordinator used the unrecognized generic
+`ACCEPT_EULA` variable rather than Isaac Sim 6's `OMNI_KIT_ACCEPT_EULA`. The v10
+contract corrects that gate environment, still binds every artifact to one
+exact launch-time UUID, and treats the NVIDIA L4 model—not an ephemeral source
 constant—as the headline hardware class. It will use a fresh output root and
 automatic shutdown. Frozen pre-repair traces establish the original sparse
 edge-tile omission's exact cause:

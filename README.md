@@ -214,6 +214,14 @@ occupancy sample, oracle, profile, summary, and post-matrix gate. It also makes
 the profiler's host-path predicate distinguish a real `/home/<user>` root from
 a later workspace component merely named `home`.
 
+The v9 source also produced no benchmark result. A finite smoke of the newly
+relocated Isaac Sim runtime exposed that the exact-current post-matrix
+coordinator exported the generic `ACCEPT_EULA=Y` variable, while Isaac Sim 6's
+Kit launcher requires `OMNI_KIT_ACCEPT_EULA`. The failure occurred before the
+long matrix was launched. The v10 source exports the recognized Kit variable,
+removes the stale generic variable, and regression-tests the complete shared
+gate environment.
+
 This evaluation is a steady-state, robotics-shaped renderer microbenchmark over
 one synthetic camera population, one 21,497,908-Gaussian Home Scan, one 128×128
 resolution, and a predeclared direct/P128 physical schedule. Smaller contracts
